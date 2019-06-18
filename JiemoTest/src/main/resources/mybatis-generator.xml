@@ -34,7 +34,7 @@
 		
 		
 		自动生成dao接口     ，改targetPackage="放置自动生成的DAO文件的目录" 
-		<javaClientGenerator type="XMLMAPPER" targetPackage="com.enuedu.JiemoTest.dao.Jiemo.dao" targetProject="D:\GetHubPro\jiemoTestTry\JiemoTest\src\main\java">
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.neuedu.JiemoTest.dao.Jiemo.dao" targetProject="D:\GetHubPro\jiemoTestTry\JiemoTest\src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		

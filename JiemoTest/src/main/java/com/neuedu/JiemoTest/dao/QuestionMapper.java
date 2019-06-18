@@ -1,4 +1,4 @@
-package com.enuedu.JiemoTest.dao;
+package com.neuedu.JiemoTest.dao;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Param;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.enuedu.JiemoTest.dao.QuestionMapper" >
+<mapper namespace="com.neuedu.JiemoTest.dao.QuestionMapper" >
   <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Question" >
     <id column="questionId" property="questionid" jdbcType="INTEGER" />
     <result column="title" property="title" jdbcType="VARCHAR" />

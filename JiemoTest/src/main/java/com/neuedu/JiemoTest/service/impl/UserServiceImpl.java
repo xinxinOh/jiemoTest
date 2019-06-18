@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.neuedu.JiemoTest.jms.queue.Produce;
 import com.neuedu.JiemoTest.service.UserService;
-import com.enuedu.JiemoTest.dao.UserInfoMapper;
+import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.UserInfo;
 /**
  * @Service 把该类注册到spring框架,生成一个bean对象,这是实例化该类对象的一个过程,整个框架当中只有一个该实例 

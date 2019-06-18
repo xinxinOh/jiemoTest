@@ -1,4 +1,4 @@
-package com.neu.edu.JiemoTest.congfig;
+package com.neuedu.JiemoTest.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

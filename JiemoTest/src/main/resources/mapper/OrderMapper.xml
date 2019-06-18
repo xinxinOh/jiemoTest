@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.enuedu.JiemoTest.dao.OrderMapper" >
+<mapper namespace="com.neuedu.JiemoTest.dao.OrderMapper" >
   <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Order" >
     <id column="orderId" property="orderid" jdbcType="INTEGER" />
     <result column="userId" property="userid" jdbcType="INTEGER" />

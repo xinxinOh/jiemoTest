@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.enuedu.JiemoTest.dao.UserInfoMapper;
+import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.UserInfo;
 
 /**

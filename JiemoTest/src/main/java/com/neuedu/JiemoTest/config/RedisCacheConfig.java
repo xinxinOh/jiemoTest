@@ -1,4 +1,4 @@
-package com.neu.edu.JiemoTest.congfig;
+package com.neuedu.JiemoTest.config;
 
 
 import java.util.concurrent.CountDownLatch;
