@@ -3,30 +3,30 @@ package com.neuedu.JiemoTest.dao;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import com.neuedu.JiemoTest.entity.questionInPart;
-import com.neuedu.JiemoTest.entity.questionInPartExample;
-import com.neuedu.JiemoTest.entity.questionInPartKey;
+import com.neuedu.JiemoTest.entity.QuestionInPart;
+import com.neuedu.JiemoTest.entity.QuestionInPartExample;
+import com.neuedu.JiemoTest.entity.QuestionInPartKey;
 
-public interface questionInPartMapper {
-    int countByExample(questionInPartExample example);
+public interface QuestionInPartMapper {
+    int countByExample(QuestionInPartExample example);
 
-    int deleteByExample(questionInPartExample example);
+    int deleteByExample(QuestionInPartExample example);
 
-    int deleteByPrimaryKey(questionInPartKey key);
+    int deleteByPrimaryKey(QuestionInPartKey key);
 
-    int insert(questionInPart record);
+    int insert(QuestionInPart record);
 
-    int insertSelective(questionInPart record);
+    int insertSelective(QuestionInPart record);
 
-    List<questionInPart> selectByExample(questionInPartExample example);
+    List<QuestionInPart> selectByExample(QuestionInPartExample example);
 
-    questionInPart selectByPrimaryKey(questionInPartKey key);
+    QuestionInPart selectByPrimaryKey(QuestionInPartKey key);
 
-    int updateByExampleSelective(@Param("record") questionInPart record, @Param("example") questionInPartExample example);
+    int updateByExampleSelective(@Param("record") QuestionInPart record, @Param("example") QuestionInPartExample example);
 
-    int updateByExample(@Param("record") questionInPart record, @Param("example") questionInPartExample example);
+    int updateByExample(@Param("record") QuestionInPart record, @Param("example") QuestionInPartExample example);
 
-    int updateByPrimaryKeySelective(questionInPart record);
+    int updateByPrimaryKeySelective(QuestionInPart record);
 
-    int updateByPrimaryKey(questionInPart record);
+    int updateByPrimaryKey(QuestionInPart record);
 }

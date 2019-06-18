@@ -3,14 +3,14 @@ package com.neuedu.JiemoTest.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class questionInPartExample {
+public class QuestionInPartExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public questionInPartExample() {
+    public QuestionInPartExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 

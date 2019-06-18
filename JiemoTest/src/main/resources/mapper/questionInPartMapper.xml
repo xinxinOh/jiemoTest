@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.neuedu.JiemoTest.dao.questionInPartMapper" >
-  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.questionInPart" >
+<mapper namespace="com.neuedu.JiemoTest.dao.QuestionInPartMapper" >
+  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.QuestionInPart" >
     <id column="partId" property="partid" jdbcType="INTEGER" />
     <id column="questionId" property="questionid" jdbcType="INTEGER" />
     <result column="grade" property="grade" jdbcType="INTEGER" />
@@ -68,7 +68,7 @@
   <sql id="Base_Column_List" >
     partId, questionId, grade, serialNum
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.questionInPartExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.QuestionInPartExample" >
     select
     <if test="distinct" >
       distinct
@@ -82,31 +82,31 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.questionInPartKey" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.QuestionInPartKey" >
     select 
     <include refid="Base_Column_List" />
     from question_in_part
     where partId = #{partid,jdbcType=INTEGER}
       and questionId = #{questionid,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.questionInPartKey" >
+  <delete id="deleteByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.QuestionInPartKey" >
     delete from question_in_part
     where partId = #{partid,jdbcType=INTEGER}
       and questionId = #{questionid,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.questionInPartExample" >
+  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.QuestionInPartExample" >
     delete from question_in_part
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.questionInPart" >
+  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.QuestionInPart" >
     insert into question_in_part (partId, questionId, grade, 
       serialNum)
     values (#{partid,jdbcType=INTEGER}, #{questionid,jdbcType=INTEGER}, #{grade,jdbcType=INTEGER}, 
       #{serialnum,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.questionInPart" >
+  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.QuestionInPart" >
     insert into question_in_part
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="partid != null" >
@@ -137,7 +137,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.questionInPartExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.QuestionInPartExample" resultType="java.lang.Integer" >
     select count(*) from question_in_part
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
@@ -173,7 +173,7 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.questionInPart" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.QuestionInPart" >
     update question_in_part
     <set >
       <if test="grade != null" >
@@ -186,7 +186,7 @@
     where partId = #{partid,jdbcType=INTEGER}
       and questionId = #{questionid,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.questionInPart" >
+  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.QuestionInPart" >
     update question_in_part
     set grade = #{grade,jdbcType=INTEGER},
       serialNum = #{serialnum,jdbcType=INTEGER}

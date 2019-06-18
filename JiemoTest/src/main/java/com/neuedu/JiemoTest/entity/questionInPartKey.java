@@ -1,6 +1,6 @@
 package com.neuedu.JiemoTest.entity;
 
-public class questionInPartKey {
+public class QuestionInPartKey {
     private Integer partid;
 
     private Integer questionid;

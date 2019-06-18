@@ -1,6 +1,6 @@
 package com.neuedu.JiemoTest.entity;
 
-public class questionInPart extends questionInPartKey {
+public class QuestionInPart extends QuestionInPartKey {
     private Integer grade;
 
     private Integer serialnum;
