@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.enuedu.JiemoTest.dao.BankMapper" >
+  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Bank" >
+    <id column="bankId" property="bankid" jdbcType="INTEGER" />
+    <result column="userId" property="userid" jdbcType="INTEGER" />
+    <result column="sourceBankId" property="sourcebankid" jdbcType="INTEGER" />
+    <result column="bankName" property="bankname" jdbcType="VARCHAR" />
+    <result column="bankIntroduction" property="bankintroduction" jdbcType="VARCHAR" />
+    <result column="createDate" property="createdate" jdbcType="INTEGER" />
+    <result column="spare_1" property="spare1" jdbcType="INTEGER" />
+    <result column="spare_2" property="spare2" jdbcType="INTEGER" />
+    <result column="spare_3" property="spare3" jdbcType="VARCHAR" />
+    <result column="spare_4" property="spare4" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    bankId, userId, sourceBankId, bankName, bankIntroduction, createDate, spare_1, spare_2, 
+    spare_3, spare_4
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.BankExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from bank
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bank
+    where bankId = #{bankid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bank
+    where bankId = #{bankid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.BankExample" >
+    delete from bank
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Bank" >
+    insert into bank (bankId, userId, sourceBankId, 
+      bankName, bankIntroduction, createDate, 
+      spare_1, spare_2, spare_3, 
+      spare_4)
+    values (#{bankid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{sourcebankid,jdbcType=INTEGER}, 
+      #{bankname,jdbcType=VARCHAR}, #{bankintroduction,jdbcType=VARCHAR}, #{createdate,jdbcType=INTEGER}, 
+      #{spare1,jdbcType=INTEGER}, #{spare2,jdbcType=INTEGER}, #{spare3,jdbcType=VARCHAR}, 
+      #{spare4,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.Bank" >
+    insert into bank
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bankid != null" >
+        bankId,
+      </if>
+      <if test="userid != null" >
+        userId,
+      </if>
+      <if test="sourcebankid != null" >
+        sourceBankId,
+      </if>
+      <if test="bankname != null" >
+        bankName,
+      </if>
+      <if test="bankintroduction != null" >
+        bankIntroduction,
+      </if>
+      <if test="createdate != null" >
+        createDate,
+      </if>
+      <if test="spare1 != null" >
+        spare_1,
+      </if>
+      <if test="spare2 != null" >
+        spare_2,
+      </if>
+      <if test="spare3 != null" >
+        spare_3,
+      </if>
+      <if test="spare4 != null" >
+        spare_4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bankid != null" >
+        #{bankid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="sourcebankid != null" >
+        #{sourcebankid,jdbcType=INTEGER},
+      </if>
+      <if test="bankname != null" >
+        #{bankname,jdbcType=VARCHAR},
+      </if>
+      <if test="bankintroduction != null" >
+        #{bankintroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null" >
+        #{createdate,jdbcType=INTEGER},
+      </if>
+      <if test="spare1 != null" >
+        #{spare1,jdbcType=INTEGER},
+      </if>
+      <if test="spare2 != null" >
+        #{spare2,jdbcType=INTEGER},
+      </if>
+      <if test="spare3 != null" >
+        #{spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="spare4 != null" >
+        #{spare4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.BankExample" resultType="java.lang.Integer" >
+    select count(*) from bank
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update bank
+    <set >
+      <if test="record.bankid != null" >
+        bankId = #{record.bankid,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null" >
+        userId = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.sourcebankid != null" >
+        sourceBankId = #{record.sourcebankid,jdbcType=INTEGER},
+      </if>
+      <if test="record.bankname != null" >
+        bankName = #{record.bankname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bankintroduction != null" >
+        bankIntroduction = #{record.bankintroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createdate != null" >
+        createDate = #{record.createdate,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare1 != null" >
+        spare_1 = #{record.spare1,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare2 != null" >
+        spare_2 = #{record.spare2,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare3 != null" >
+        spare_3 = #{record.spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.spare4 != null" >
+        spare_4 = #{record.spare4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update bank
+    set bankId = #{record.bankid,jdbcType=INTEGER},
+      userId = #{record.userid,jdbcType=INTEGER},
+      sourceBankId = #{record.sourcebankid,jdbcType=INTEGER},
+      bankName = #{record.bankname,jdbcType=VARCHAR},
+      bankIntroduction = #{record.bankintroduction,jdbcType=VARCHAR},
+      createDate = #{record.createdate,jdbcType=INTEGER},
+      spare_1 = #{record.spare1,jdbcType=INTEGER},
+      spare_2 = #{record.spare2,jdbcType=INTEGER},
+      spare_3 = #{record.spare3,jdbcType=VARCHAR},
+      spare_4 = #{record.spare4,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.Bank" >
+    update bank
+    <set >
+      <if test="userid != null" >
+        userId = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="sourcebankid != null" >
+        sourceBankId = #{sourcebankid,jdbcType=INTEGER},
+      </if>
+      <if test="bankname != null" >
+        bankName = #{bankname,jdbcType=VARCHAR},
+      </if>
+      <if test="bankintroduction != null" >
+        bankIntroduction = #{bankintroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null" >
+        createDate = #{createdate,jdbcType=INTEGER},
+      </if>
+      <if test="spare1 != null" >
+        spare_1 = #{spare1,jdbcType=INTEGER},
+      </if>
+      <if test="spare2 != null" >
+        spare_2 = #{spare2,jdbcType=INTEGER},
+      </if>
+      <if test="spare3 != null" >
+        spare_3 = #{spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="spare4 != null" >
+        spare_4 = #{spare4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where bankId = #{bankid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Bank" >
+    update bank
+    set userId = #{userid,jdbcType=INTEGER},
+      sourceBankId = #{sourcebankid,jdbcType=INTEGER},
+      bankName = #{bankname,jdbcType=VARCHAR},
+      bankIntroduction = #{bankintroduction,jdbcType=VARCHAR},
+      createDate = #{createdate,jdbcType=INTEGER},
+      spare_1 = #{spare1,jdbcType=INTEGER},
+      spare_2 = #{spare2,jdbcType=INTEGER},
+      spare_3 = #{spare3,jdbcType=VARCHAR},
+      spare_4 = #{spare4,jdbcType=VARCHAR}
+    where bankId = #{bankid,jdbcType=INTEGER}
+  </update>
+</mapper>
