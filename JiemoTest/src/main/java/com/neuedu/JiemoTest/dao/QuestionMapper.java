@@ -1,14 +1,10 @@
 package com.neuedu.JiemoTest.dao;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
 import com.neuedu.JiemoTest.entity.Question;
 import com.neuedu.JiemoTest.entity.QuestionExample;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
-@Mapper
 public interface QuestionMapper {
     int countByExample(QuestionExample example);
 
@@ -31,6 +27,4 @@ public interface QuestionMapper {
     int updateByPrimaryKeySelective(Question record);
 
     int updateByPrimaryKey(Question record);
-    
-    List<Question> getQuestionByPaperId(int paperID);
 }

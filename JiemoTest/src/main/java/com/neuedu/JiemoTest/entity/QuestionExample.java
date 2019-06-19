@@ -564,63 +564,63 @@ public class QuestionExample {
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeIsNull() {
-            addCriterion("edit_time is null");
+        public Criteria andEdittimeIsNull() {
+            addCriterion("editTime is null");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeIsNotNull() {
-            addCriterion("edit_time is not null");
+        public Criteria andEdittimeIsNotNull() {
+            addCriterion("editTime is not null");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeEqualTo(Integer value) {
-            addCriterion("edit_time =", value, "editTime");
+        public Criteria andEdittimeEqualTo(Integer value) {
+            addCriterion("editTime =", value, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeNotEqualTo(Integer value) {
-            addCriterion("edit_time <>", value, "editTime");
+        public Criteria andEdittimeNotEqualTo(Integer value) {
+            addCriterion("editTime <>", value, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeGreaterThan(Integer value) {
-            addCriterion("edit_time >", value, "editTime");
+        public Criteria andEdittimeGreaterThan(Integer value) {
+            addCriterion("editTime >", value, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeGreaterThanOrEqualTo(Integer value) {
-            addCriterion("edit_time >=", value, "editTime");
+        public Criteria andEdittimeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("editTime >=", value, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeLessThan(Integer value) {
-            addCriterion("edit_time <", value, "editTime");
+        public Criteria andEdittimeLessThan(Integer value) {
+            addCriterion("editTime <", value, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeLessThanOrEqualTo(Integer value) {
-            addCriterion("edit_time <=", value, "editTime");
+        public Criteria andEdittimeLessThanOrEqualTo(Integer value) {
+            addCriterion("editTime <=", value, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeIn(List<Integer> values) {
-            addCriterion("edit_time in", values, "editTime");
+        public Criteria andEdittimeIn(List<Integer> values) {
+            addCriterion("editTime in", values, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeNotIn(List<Integer> values) {
-            addCriterion("edit_time not in", values, "editTime");
+        public Criteria andEdittimeNotIn(List<Integer> values) {
+            addCriterion("editTime not in", values, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeBetween(Integer value1, Integer value2) {
-            addCriterion("edit_time between", value1, value2, "editTime");
+        public Criteria andEdittimeBetween(Integer value1, Integer value2) {
+            addCriterion("editTime between", value1, value2, "edittime");
             return (Criteria) this;
         }
 
-        public Criteria andEditTimeNotBetween(Integer value1, Integer value2) {
-            addCriterion("edit_time not between", value1, value2, "editTime");
+        public Criteria andEdittimeNotBetween(Integer value1, Integer value2) {
+            addCriterion("editTime not between", value1, value2, "edittime");
             return (Criteria) this;
         }
     }

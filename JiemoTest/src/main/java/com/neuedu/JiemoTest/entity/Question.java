@@ -15,7 +15,7 @@ public class Question {
 
     private Integer difficultdegree;
 
-    private Integer editTime;
+    private Integer edittime;
 
     public Integer getQuestionid() {
         return questionid;
@@ -73,11 +73,11 @@ public class Question {
         this.difficultdegree = difficultdegree;
     }
 
-    public Integer getEditTime() {
-        return editTime;
+    public Integer getEdittime() {
+        return edittime;
     }
 
-    public void setEditTime(Integer editTime) {
-        this.editTime = editTime;
+    public void setEdittime(Integer edittime) {
+        this.edittime = edittime;
     }
 }

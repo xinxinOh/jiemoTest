@@ -142,4 +142,32 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
+
+  <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- 通过题库查找题目 -->
+  <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  
+  <!-- 设置结果集返回类型 -->
+  <resultMap type="com.neuedu.JiemoTest.entity.Question" id="QuestionResultMap">
+  	<id column="questionId" property="questionid" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="options" property="options" jdbcType="VARCHAR" />
+    <result column="answer" property="answer" jdbcType="VARCHAR" />
+    <result column="questionType" property="questiontype" jdbcType="INTEGER" />
+    <result column="analysis" property="analysis" jdbcType="VARCHAR" />
+    <result column="difficultDegree" property="difficultdegree" jdbcType="INTEGER" />
+    <result column="edit_time" property="editTime" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <!-- 查询语句 -->
+  <!-- select * from question where questionId in (select questionId from question_in_bank where bankId = 1) -->
+  <sql id="Question_List" >
+    questionId, title, options, answer, questionType, analysis, difficultDegree, edit_time
+  </sql>
+  <select id="selectQuestionByQuestionBank" resultMap="QuestionResultMap" parameterType="java.lang.Integer">
+    select 
+    <include refid="Question_List" />
+    from question
+    where questionId in(select questionId from question_in_bank where bankId = #{bankid,jdbcType=INTEGER})
+  </select>
 </mapper>
