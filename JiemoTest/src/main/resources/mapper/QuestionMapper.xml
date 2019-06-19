@@ -255,4 +255,12 @@
       edit_time = #{editTime,jdbcType=INTEGER}
     where questionId = #{questionid,jdbcType=INTEGER}
   </update>
+  
+  <select id=" getQuestionByPaperId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from question,answer_info
+    where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
+  </select>
+  
 </mapper>

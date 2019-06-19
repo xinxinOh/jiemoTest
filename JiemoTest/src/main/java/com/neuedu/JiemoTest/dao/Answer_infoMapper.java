@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.neuedu.JiemoTest.entity.Answer_info;
 import com.neuedu.JiemoTest.entity.Answer_infoExample;
 import com.neuedu.JiemoTest.entity.Answer_infoKey;
+import com.neuedu.JiemoTest.entity.Question;
 @Mapper
 public interface Answer_infoMapper {
     int countByExample(Answer_infoExample example);
@@ -31,4 +32,5 @@ public interface Answer_infoMapper {
     int updateByPrimaryKeySelective(Answer_info record);
 
     int updateByPrimaryKey(Answer_info record);
+    
 }
