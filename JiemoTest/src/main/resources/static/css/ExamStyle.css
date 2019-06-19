@@ -1,0 +1,16 @@
+.header-font-color{color:#000!important;}
+.header-border{border-bottom:3px solid darkseagreen}
+.title-size{
+ width:70%;
+ height:70%;
+}
+.NavBar-background{
+	background-color: #F1FCFA!important;
+}
+.NavBar-item{
+	text-align:center;line-height:40px;
+}
+.NavBar-a{
+	overflow:hidden;vertical-align:middle;display:block;width: 200px;height: 40px;font-size: 16px;
+}
+
