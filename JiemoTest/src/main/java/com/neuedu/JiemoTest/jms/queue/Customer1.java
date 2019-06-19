@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.neuedu.JiemoTest.dao.Answer_infoMapper;
 import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.UserInfo;
 
@@ -17,8 +18,11 @@ import com.neuedu.JiemoTest.entity.UserInfo;
 @Component
 public class Customer1 {
 	
+	/*
+	 * @Autowired UserInfoMapper userInfoMapper;
+	 */
 	@Autowired
-	UserInfoMapper userInfoMapper;
+	Answer_infoMapper answer_infoMapper;
 
 	/**
 	 * 在项目中随时监听demo.queue1队列 ,如果队列有变化 ,消费者就会监听到 ,会触发下面的方法,进行处理

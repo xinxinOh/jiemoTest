@@ -1,11 +1,13 @@
 package com.neuedu.JiemoTest.dao;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.neuedu.JiemoTest.entity.Exam;
 import com.neuedu.JiemoTest.entity.ExamExample;
-
+@Mapper
 public interface ExamMapper {
     int countByExample(ExamExample example);
 

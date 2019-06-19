@@ -1,11 +1,13 @@
 package com.neuedu.JiemoTest.dao;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.neuedu.JiemoTest.entity.Group;
 import com.neuedu.JiemoTest.entity.GroupExample;
-
+@Mapper
 public interface GroupMapper {
     int countByExample(GroupExample example);
 

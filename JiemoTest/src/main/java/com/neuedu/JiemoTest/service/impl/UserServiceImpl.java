@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.neuedu.JiemoTest.jms.queue.Produce;
 import com.neuedu.JiemoTest.service.UserService;
+import com.neuedu.JiemoTest.dao.Answer_infoMapper;
 import com.neuedu.JiemoTest.dao.UserInfoMapper;
+import com.neuedu.JiemoTest.entity.Answer_info;
 import com.neuedu.JiemoTest.entity.UserInfo;
 /**
  * @Service 把该类注册到spring框架,生成一个bean对象,这是实例化该类对象的一个过程,整个框架当中只有一个该实例 
@@ -22,8 +24,11 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * @autowired  依赖注入   实现声明接口类型 ,可以调用子类对象 
 	 */
+	/*
+	 * @Autowired UserInfoMapper userInfoMapper;
+	 */
 	@Autowired
-	UserInfoMapper userInfoMapper;
+	Answer_infoMapper answer_infoMapper;
 	
 	
 	@Autowired
@@ -31,8 +36,8 @@ public class UserServiceImpl implements UserService {
 	
 	
 	@Override
-	public List<UserInfo> queryAll() {
-		List<UserInfo> list = userInfoMapper.selectByExample(null);
+	public List<Answer_info> queryAll() {
+		List<Answer_info> list = answer_infoMapper.selectByExample(null);
 		return list;
 	}
 

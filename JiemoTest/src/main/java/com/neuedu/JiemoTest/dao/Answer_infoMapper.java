@@ -1,12 +1,14 @@
 package com.neuedu.JiemoTest.dao;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.neuedu.JiemoTest.entity.Answer_info;
 import com.neuedu.JiemoTest.entity.Answer_infoExample;
 import com.neuedu.JiemoTest.entity.Answer_infoKey;
-
+@Mapper
 public interface Answer_infoMapper {
     int countByExample(Answer_infoExample example);
 

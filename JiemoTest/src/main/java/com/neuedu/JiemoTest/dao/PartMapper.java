@@ -1,11 +1,13 @@
 package com.neuedu.JiemoTest.dao;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.neuedu.JiemoTest.entity.Part;
 import com.neuedu.JiemoTest.entity.PartExample;
-
+@Mapper
 public interface PartMapper {
     int countByExample(PartExample example);
 

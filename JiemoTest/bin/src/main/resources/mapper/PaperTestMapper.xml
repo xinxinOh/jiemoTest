@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.neuedu.JiemoTest.dao.PaperTestMapper" >
+  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.PaperTest" >
+    <id column="paperId" property="paperid" jdbcType="INTEGER" />
+    <result column="examId" property="examid" jdbcType="INTEGER" />
+    <result column="userId" property="userid" jdbcType="INTEGER" />
+    <result column="examTitle" property="examtitle" jdbcType="VARCHAR" />
+    <result column="paperState" property="paperstate" jdbcType="INTEGER" />
+    <result column="participateTime" property="participatetime" jdbcType="INTEGER" />
+    <result column="submitTime" property="submittime" jdbcType="INTEGER" />
+    <result column="changeWindowsNum" property="changewindowsnum" jdbcType="INTEGER" />
+    <result column="ifTeacherDelete" property="ifteacherdelete" jdbcType="INTEGER" />
+    <result column="studentGrade" property="studentgrade" jdbcType="REAL" />
+    <result column="spare_1" property="spare1" jdbcType="INTEGER" />
+    <result column="spare_2" property="spare2" jdbcType="INTEGER" />
+    <result column="spare_3" property="spare3" jdbcType="VARCHAR" />
+    <result column="spare_4" property="spare4" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    paperId, examId, userId, examTitle, paperState, participateTime, submitTime, changeWindowsNum, 
+    ifTeacherDelete, studentGrade, spare_1, spare_2, spare_3, spare_4
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.PaperTestExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from paper_test
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from paper_test
+    where paperId = #{paperid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from paper_test
+    where paperId = #{paperid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.PaperTestExample" >
+    delete from paper_test
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.PaperTest" >
+    insert into paper_test (paperId, examId, userId, 
+      examTitle, paperState, participateTime, 
+      submitTime, changeWindowsNum, ifTeacherDelete, 
+      studentGrade, spare_1, spare_2, 
+      spare_3, spare_4)
+    values (#{paperid,jdbcType=INTEGER}, #{examid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, 
+      #{examtitle,jdbcType=VARCHAR}, #{paperstate,jdbcType=INTEGER}, #{participatetime,jdbcType=INTEGER}, 
+      #{submittime,jdbcType=INTEGER}, #{changewindowsnum,jdbcType=INTEGER}, #{ifteacherdelete,jdbcType=INTEGER}, 
+      #{studentgrade,jdbcType=REAL}, #{spare1,jdbcType=INTEGER}, #{spare2,jdbcType=INTEGER}, 
+      #{spare3,jdbcType=VARCHAR}, #{spare4,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.PaperTest" >
+    insert into paper_test
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="paperid != null" >
+        paperId,
+      </if>
+      <if test="examid != null" >
+        examId,
+      </if>
+      <if test="userid != null" >
+        userId,
+      </if>
+      <if test="examtitle != null" >
+        examTitle,
+      </if>
+      <if test="paperstate != null" >
+        paperState,
+      </if>
+      <if test="participatetime != null" >
+        participateTime,
+      </if>
+      <if test="submittime != null" >
+        submitTime,
+      </if>
+      <if test="changewindowsnum != null" >
+        changeWindowsNum,
+      </if>
+      <if test="ifteacherdelete != null" >
+        ifTeacherDelete,
+      </if>
+      <if test="studentgrade != null" >
+        studentGrade,
+      </if>
+      <if test="spare1 != null" >
+        spare_1,
+      </if>
+      <if test="spare2 != null" >
+        spare_2,
+      </if>
+      <if test="spare3 != null" >
+        spare_3,
+      </if>
+      <if test="spare4 != null" >
+        spare_4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="paperid != null" >
+        #{paperid,jdbcType=INTEGER},
+      </if>
+      <if test="examid != null" >
+        #{examid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="examtitle != null" >
+        #{examtitle,jdbcType=VARCHAR},
+      </if>
+      <if test="paperstate != null" >
+        #{paperstate,jdbcType=INTEGER},
+      </if>
+      <if test="participatetime != null" >
+        #{participatetime,jdbcType=INTEGER},
+      </if>
+      <if test="submittime != null" >
+        #{submittime,jdbcType=INTEGER},
+      </if>
+      <if test="changewindowsnum != null" >
+        #{changewindowsnum,jdbcType=INTEGER},
+      </if>
+      <if test="ifteacherdelete != null" >
+        #{ifteacherdelete,jdbcType=INTEGER},
+      </if>
+      <if test="studentgrade != null" >
+        #{studentgrade,jdbcType=REAL},
+      </if>
+      <if test="spare1 != null" >
+        #{spare1,jdbcType=INTEGER},
+      </if>
+      <if test="spare2 != null" >
+        #{spare2,jdbcType=INTEGER},
+      </if>
+      <if test="spare3 != null" >
+        #{spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="spare4 != null" >
+        #{spare4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.PaperTestExample" resultType="java.lang.Integer" >
+    select count(*) from paper_test
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update paper_test
+    <set >
+      <if test="record.paperid != null" >
+        paperId = #{record.paperid,jdbcType=INTEGER},
+      </if>
+      <if test="record.examid != null" >
+        examId = #{record.examid,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null" >
+        userId = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.examtitle != null" >
+        examTitle = #{record.examtitle,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paperstate != null" >
+        paperState = #{record.paperstate,jdbcType=INTEGER},
+      </if>
+      <if test="record.participatetime != null" >
+        participateTime = #{record.participatetime,jdbcType=INTEGER},
+      </if>
+      <if test="record.submittime != null" >
+        submitTime = #{record.submittime,jdbcType=INTEGER},
+      </if>
+      <if test="record.changewindowsnum != null" >
+        changeWindowsNum = #{record.changewindowsnum,jdbcType=INTEGER},
+      </if>
+      <if test="record.ifteacherdelete != null" >
+        ifTeacherDelete = #{record.ifteacherdelete,jdbcType=INTEGER},
+      </if>
+      <if test="record.studentgrade != null" >
+        studentGrade = #{record.studentgrade,jdbcType=REAL},
+      </if>
+      <if test="record.spare1 != null" >
+        spare_1 = #{record.spare1,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare2 != null" >
+        spare_2 = #{record.spare2,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare3 != null" >
+        spare_3 = #{record.spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.spare4 != null" >
+        spare_4 = #{record.spare4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update paper_test
+    set paperId = #{record.paperid,jdbcType=INTEGER},
+      examId = #{record.examid,jdbcType=INTEGER},
+      userId = #{record.userid,jdbcType=INTEGER},
+      examTitle = #{record.examtitle,jdbcType=VARCHAR},
+      paperState = #{record.paperstate,jdbcType=INTEGER},
+      participateTime = #{record.participatetime,jdbcType=INTEGER},
+      submitTime = #{record.submittime,jdbcType=INTEGER},
+      changeWindowsNum = #{record.changewindowsnum,jdbcType=INTEGER},
+      ifTeacherDelete = #{record.ifteacherdelete,jdbcType=INTEGER},
+      studentGrade = #{record.studentgrade,jdbcType=REAL},
+      spare_1 = #{record.spare1,jdbcType=INTEGER},
+      spare_2 = #{record.spare2,jdbcType=INTEGER},
+      spare_3 = #{record.spare3,jdbcType=VARCHAR},
+      spare_4 = #{record.spare4,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.PaperTest" >
+    update paper_test
+    <set >
+      <if test="examid != null" >
+        examId = #{examid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        userId = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="examtitle != null" >
+        examTitle = #{examtitle,jdbcType=VARCHAR},
+      </if>
+      <if test="paperstate != null" >
+        paperState = #{paperstate,jdbcType=INTEGER},
+      </if>
+      <if test="participatetime != null" >
+        participateTime = #{participatetime,jdbcType=INTEGER},
+      </if>
+      <if test="submittime != null" >
+        submitTime = #{submittime,jdbcType=INTEGER},
+      </if>
+      <if test="changewindowsnum != null" >
+        changeWindowsNum = #{changewindowsnum,jdbcType=INTEGER},
+      </if>
+      <if test="ifteacherdelete != null" >
+        ifTeacherDelete = #{ifteacherdelete,jdbcType=INTEGER},
+      </if>
+      <if test="studentgrade != null" >
+        studentGrade = #{studentgrade,jdbcType=REAL},
+      </if>
+      <if test="spare1 != null" >
+        spare_1 = #{spare1,jdbcType=INTEGER},
+      </if>
+      <if test="spare2 != null" >
+        spare_2 = #{spare2,jdbcType=INTEGER},
+      </if>
+      <if test="spare3 != null" >
+        spare_3 = #{spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="spare4 != null" >
+        spare_4 = #{spare4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where paperId = #{paperid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.PaperTest" >
+    update paper_test
+    set examId = #{examid,jdbcType=INTEGER},
+      userId = #{userid,jdbcType=INTEGER},
+      examTitle = #{examtitle,jdbcType=VARCHAR},
+      paperState = #{paperstate,jdbcType=INTEGER},
+      participateTime = #{participatetime,jdbcType=INTEGER},
+      submitTime = #{submittime,jdbcType=INTEGER},
+      changeWindowsNum = #{changewindowsnum,jdbcType=INTEGER},
+      ifTeacherDelete = #{ifteacherdelete,jdbcType=INTEGER},
+      studentGrade = #{studentgrade,jdbcType=REAL},
+      spare_1 = #{spare1,jdbcType=INTEGER},
+      spare_2 = #{spare2,jdbcType=INTEGER},
+      spare_3 = #{spare3,jdbcType=VARCHAR},
+      spare_4 = #{spare4,jdbcType=VARCHAR}
+    where paperId = #{paperid,jdbcType=INTEGER}
+  </update>
+</mapper>

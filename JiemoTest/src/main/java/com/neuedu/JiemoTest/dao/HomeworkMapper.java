@@ -1,12 +1,14 @@
 package com.neuedu.JiemoTest.dao;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.neuedu.JiemoTest.entity.Homework;
 import com.neuedu.JiemoTest.entity.HomeworkExample;
 import com.neuedu.JiemoTest.entity.HomeworkKey;
-
+@Mapper
 public interface HomeworkMapper {
     int countByExample(HomeworkExample example);
 
