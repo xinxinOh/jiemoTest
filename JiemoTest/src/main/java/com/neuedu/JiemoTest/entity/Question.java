@@ -3,6 +3,8 @@ package com.neuedu.JiemoTest.entity;
 public class Question {
     private Integer questionid;
 
+    private String questionskill;
+
     private String title;
 
     private String options;
@@ -17,12 +19,28 @@ public class Question {
 
     private Integer edittime;
 
+    private Integer spare1;
+
+    private Integer spare2;
+
+    private String spare3;
+
+    private String spare4;
+
     public Integer getQuestionid() {
         return questionid;
     }
 
     public void setQuestionid(Integer questionid) {
         this.questionid = questionid;
+    }
+
+    public String getQuestionskill() {
+        return questionskill;
+    }
+
+    public void setQuestionskill(String questionskill) {
+        this.questionskill = questionskill == null ? null : questionskill.trim();
     }
 
     public String getTitle() {
@@ -79,5 +97,37 @@ public class Question {
 
     public void setEdittime(Integer edittime) {
         this.edittime = edittime;
+    }
+
+    public Integer getSpare1() {
+        return spare1;
+    }
+
+    public void setSpare1(Integer spare1) {
+        this.spare1 = spare1;
+    }
+
+    public Integer getSpare2() {
+        return spare2;
+    }
+
+    public void setSpare2(Integer spare2) {
+        this.spare2 = spare2;
+    }
+
+    public String getSpare3() {
+        return spare3;
+    }
+
+    public void setSpare3(String spare3) {
+        this.spare3 = spare3 == null ? null : spare3.trim();
+    }
+
+    public String getSpare4() {
+        return spare4;
+    }
+
+    public void setSpare4(String spare4) {
+        this.spare4 = spare4 == null ? null : spare4.trim();
     }
 }

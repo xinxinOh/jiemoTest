@@ -3,6 +3,7 @@
 <mapper namespace="com.neuedu.JiemoTest.dao.QuestionMapper" >
   <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Question" >
     <id column="questionId" property="questionid" jdbcType="INTEGER" />
+    <result column="questionSkill" property="questionskill" jdbcType="VARCHAR" />
     <result column="title" property="title" jdbcType="VARCHAR" />
     <result column="options" property="options" jdbcType="VARCHAR" />
     <result column="answer" property="answer" jdbcType="VARCHAR" />
@@ -10,6 +11,10 @@
     <result column="analysis" property="analysis" jdbcType="VARCHAR" />
     <result column="difficultDegree" property="difficultdegree" jdbcType="INTEGER" />
     <result column="editTime" property="edittime" jdbcType="INTEGER" />
+    <result column="spare_1" property="spare1" jdbcType="INTEGER" />
+    <result column="spare_2" property="spare2" jdbcType="INTEGER" />
+    <result column="spare_3" property="spare3" jdbcType="VARCHAR" />
+    <result column="spare_4" property="spare4" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -70,7 +75,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    question.questionId, title, options, answer, questionType, analysis, difficultDegree, editTime
+    questionId, questionSkill, title, options, answer, questionType, analysis, difficultDegree, 
+    editTime, spare_1, spare_2, spare_3, spare_4
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.QuestionExample" >
     select
@@ -103,18 +109,25 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Question" >
-    insert into question (questionId, title, options, 
-      answer, questionType, analysis, 
-      difficultDegree, editTime)
-    values (#{questionid,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{options,jdbcType=VARCHAR}, 
-      #{answer,jdbcType=VARCHAR}, #{questiontype,jdbcType=INTEGER}, #{analysis,jdbcType=VARCHAR}, 
-      #{difficultdegree,jdbcType=INTEGER}, #{edittime,jdbcType=INTEGER})
+    insert into question (questionId, questionSkill, title, 
+      options, answer, questionType, 
+      analysis, difficultDegree, editTime, 
+      spare_1, spare_2, spare_3, 
+      spare_4)
+    values (#{questionid,jdbcType=INTEGER}, #{questionskill,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{options,jdbcType=VARCHAR}, #{answer,jdbcType=VARCHAR}, #{questiontype,jdbcType=INTEGER}, 
+      #{analysis,jdbcType=VARCHAR}, #{difficultdegree,jdbcType=INTEGER}, #{edittime,jdbcType=INTEGER}, 
+      #{spare1,jdbcType=INTEGER}, #{spare2,jdbcType=INTEGER}, #{spare3,jdbcType=VARCHAR}, 
+      #{spare4,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.Question" >
     insert into question
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="question.questionid != null" >
-        question.questionId,
+      <if test="questionid != null" >
+        questionId,
+      </if>
+      <if test="questionskill != null" >
+        questionSkill,
       </if>
       <if test="title != null" >
         title,
@@ -137,10 +150,25 @@
       <if test="edittime != null" >
         editTime,
       </if>
+      <if test="spare1 != null" >
+        spare_1,
+      </if>
+      <if test="spare2 != null" >
+        spare_2,
+      </if>
+      <if test="spare3 != null" >
+        spare_3,
+      </if>
+      <if test="spare4 != null" >
+        spare_4,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="questionid != null" >
         #{questionid,jdbcType=INTEGER},
+      </if>
+      <if test="questionskill != null" >
+        #{questionskill,jdbcType=VARCHAR},
       </if>
       <if test="title != null" >
         #{title,jdbcType=VARCHAR},
@@ -163,6 +191,18 @@
       <if test="edittime != null" >
         #{edittime,jdbcType=INTEGER},
       </if>
+      <if test="spare1 != null" >
+        #{spare1,jdbcType=INTEGER},
+      </if>
+      <if test="spare2 != null" >
+        #{spare2,jdbcType=INTEGER},
+      </if>
+      <if test="spare3 != null" >
+        #{spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="spare4 != null" >
+        #{spare4,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.QuestionExample" resultType="java.lang.Integer" >
@@ -176,6 +216,9 @@
     <set >
       <if test="record.questionid != null" >
         questionId = #{record.questionid,jdbcType=INTEGER},
+      </if>
+      <if test="record.questionskill != null" >
+        questionSkill = #{record.questionskill,jdbcType=VARCHAR},
       </if>
       <if test="record.title != null" >
         title = #{record.title,jdbcType=VARCHAR},
@@ -198,6 +241,18 @@
       <if test="record.edittime != null" >
         editTime = #{record.edittime,jdbcType=INTEGER},
       </if>
+      <if test="record.spare1 != null" >
+        spare_1 = #{record.spare1,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare2 != null" >
+        spare_2 = #{record.spare2,jdbcType=INTEGER},
+      </if>
+      <if test="record.spare3 != null" >
+        spare_3 = #{record.spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.spare4 != null" >
+        spare_4 = #{record.spare4,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
@@ -206,13 +261,18 @@
   <update id="updateByExample" parameterType="map" >
     update question
     set questionId = #{record.questionid,jdbcType=INTEGER},
+      questionSkill = #{record.questionskill,jdbcType=VARCHAR},
       title = #{record.title,jdbcType=VARCHAR},
       options = #{record.options,jdbcType=VARCHAR},
       answer = #{record.answer,jdbcType=VARCHAR},
       questionType = #{record.questiontype,jdbcType=INTEGER},
       analysis = #{record.analysis,jdbcType=VARCHAR},
       difficultDegree = #{record.difficultdegree,jdbcType=INTEGER},
-      editTime = #{record.edittime,jdbcType=INTEGER}
+      editTime = #{record.edittime,jdbcType=INTEGER},
+      spare_1 = #{record.spare1,jdbcType=INTEGER},
+      spare_2 = #{record.spare2,jdbcType=INTEGER},
+      spare_3 = #{record.spare3,jdbcType=VARCHAR},
+      spare_4 = #{record.spare4,jdbcType=VARCHAR}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -220,6 +280,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.Question" >
     update question
     <set >
+      <if test="questionskill != null" >
+        questionSkill = #{questionskill,jdbcType=VARCHAR},
+      </if>
       <if test="title != null" >
         title = #{title,jdbcType=VARCHAR},
       </if>
@@ -241,25 +304,35 @@
       <if test="edittime != null" >
         editTime = #{edittime,jdbcType=INTEGER},
       </if>
+      <if test="spare1 != null" >
+        spare_1 = #{spare1,jdbcType=INTEGER},
+      </if>
+      <if test="spare2 != null" >
+        spare_2 = #{spare2,jdbcType=INTEGER},
+      </if>
+      <if test="spare3 != null" >
+        spare_3 = #{spare3,jdbcType=VARCHAR},
+      </if>
+      <if test="spare4 != null" >
+        spare_4 = #{spare4,jdbcType=VARCHAR},
+      </if>
     </set>
     where questionId = #{questionid,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Question" >
     update question
-    set title = #{title,jdbcType=VARCHAR},
+    set questionSkill = #{questionskill,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
       options = #{options,jdbcType=VARCHAR},
       answer = #{answer,jdbcType=VARCHAR},
       questionType = #{questiontype,jdbcType=INTEGER},
       analysis = #{analysis,jdbcType=VARCHAR},
       difficultDegree = #{difficultdegree,jdbcType=INTEGER},
-      editTime = #{edittime,jdbcType=INTEGER}
+      editTime = #{edittime,jdbcType=INTEGER},
+      spare_1 = #{spare1,jdbcType=INTEGER},
+      spare_2 = #{spare2,jdbcType=INTEGER},
+      spare_3 = #{spare3,jdbcType=VARCHAR},
+      spare_4 = #{spare4,jdbcType=VARCHAR}
     where questionId = #{questionid,jdbcType=INTEGER}
   </update>
-  <select id="getQuestionByPaperId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from question,answer_info
-    where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
-  </select>
-  
 </mapper>
