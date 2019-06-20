@@ -1,15 +1,19 @@
-package com.neuedu.JiemoTest.service;
+package com.neuedu.JiemoTest.redis;
 
 import java.util.List;
 
 import org.springframework.cache.annotation.Cacheable;
 
-import com.alibaba.fastjson.JSON;
 import com.neuedu.JiemoTest.entity.Bank;
 import com.neuedu.JiemoTest.entity.UserInfo;
 
 public interface QuestionBankService {
 	
-	List<Bank> selectByUser(UserInfo user);
+	//redis中找查找bank
+	@Cacheable("user_banks")
+	public List<Bank> selectByUser(UserInfo user);
+	
+	
+	
 
 }
