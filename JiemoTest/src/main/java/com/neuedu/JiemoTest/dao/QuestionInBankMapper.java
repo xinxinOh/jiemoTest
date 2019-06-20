@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.neuedu.JiemoTest.entity.Question;
 import com.neuedu.JiemoTest.entity.QuestionInBankExample;
 import com.neuedu.JiemoTest.entity.QuestionInBankKey;
 @Mapper
@@ -24,4 +25,6 @@ public interface QuestionInBankMapper {
     int updateByExampleSelective(@Param("record") QuestionInBankKey record, @Param("example") QuestionInBankExample example);
 
     int updateByExample(@Param("record") QuestionInBankKey record, @Param("example") QuestionInBankExample example);
+    
+    List<Question> selectQuestionByQuestionBank(Integer bankid);
 }
