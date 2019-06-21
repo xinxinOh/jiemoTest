@@ -14,3 +14,48 @@
 	overflow:hidden;vertical-align:middle;display:block;width: 200px;height: 40px;font-size: 16px;
 }
 
+.choose-container{
+	display:inline-block;
+	width: 550px!important;
+	height: 250px!important;
+}
+
+.hand-movement{
+	z-index:9999;
+	cursor:pointer;
+	position:absolute;
+	left:95px;
+	top:60px;
+	width: 160px;
+	height: 120px;
+	border: 1px solid gainsboro;
+}
+
+.voluntarily{
+	z-index:9999;
+	cursor:pointer;
+	position:absolute;
+	top:60px;
+	left:315px;
+	width: 160px;
+	height: 120px;
+	border: 1px solid gainsboro;
+}
+
+.hand-movement-img{
+	margin-left: 60px;
+	margin-top: 10px;
+}
+
+.voluntarily-img{
+	margin-left: 60px;
+	margin-top: 10px;
+}
+
+.choose-info{
+	color: #888888;
+}
+
+.choose-title{
+	color: #222222;
+}
