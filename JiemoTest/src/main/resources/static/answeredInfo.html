@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<table width="500" border="1" cellspacing="0" cellpadding="0">
+	<tr><td>教师端查看试卷</td><td>列名</td><td>列名</td><td>列名</td><td>列名</td></tr>
+	<tr th:each="question:${questions}">
+		<td th:text="${question.questionId}"></td>
+		<td th:text="${question.title}"></td>
+		<td th:text="${question.options}"></td>
+		<td th:text="${question.answer}"></td>
+		<td th:text="${question.questionType}"></td>
+		<td th:text="${question.analysis}"></td>
+		<td th:text="${question.difficultDegree}"></td>
+		<td th:text="${question.editTime}"></td>
+	</tr>
+</table>
+
+<table width="500" border="1" cellspacing="0" cellpadding="0">
+	<tr><td>学生端查看试卷</td><td>列名</td><td>列名</td><td>列名</td><td>列名</td></tr>
+	<tr th:each="paper:${pt1}">
+		<td th:text="${paper.paperid}"></td>
+		<td th:text="${paper.examid}"></td>
+		<td th:text="${paper.userid}"></td>
+		<td th:text="${paper.examtitle}"></td>
+		<td th:text="${paper.paperstate}"></td>
+		<td th:text="${paper.participatetime}"></td>
+		<td th:text="${paper.submittime}"></td>
+		<td th:text="${paper.changewindowsnum}"></td>
+		<td th:text="${paper.ifteacherdelete}"></td>
+		<td th:text="${paper.studentgrade}"></td>	
+	</tr>
+</table>
+
+<table width="500" border="1" cellspacing="0" cellpadding="0">
+	<tr><td>问题</td><td>列名</td><td>列名</td><td>列名</td><td>列名</td></tr>
+	<tr th:each="question:${questions}">
+		<td th:text="${question.questionid}"></td>
+		<td th:text="${question.title}"></td>
+		<td th:text="${question.options}"></td>
+		<td th:text="${question.answer}"></td>
+		<td th:text="${question.questiontype}"></td>
+		<td th:text="${question.analysis}"></td>
+		<td th:text="${question.difficultdegree}"></td>
+		<td th:text="${question.edittime}"></td>
+	</tr>
+</table>
+
+<table width="500" border="1" cellspacing="0" cellpadding="0">
+	<tr><td>答案</td><td>列名</td><td>列名</td><td>列名</td><td>列名</td></tr>
+	<tr th:each="answer:${answer_infos}">
+		<td th:text="${answer.paperid}"></td>
+		<td th:text="${answer.questionid}"></td>
+		<td th:text="${answer.questionserialnum}"></td>
+		<td th:text="${answer.answercontent}"></td>
+		<td th:text="${answer.score}"></td>
+		<td th:text="${answer.correctstate}"></td>
+	</tr>
+</table>
+
+</body>
+</html>
