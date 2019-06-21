@@ -13,6 +13,22 @@
     <result column="spare_3" property="spare3" jdbcType="VARCHAR" />
     <result column="spare_4" property="spare4" jdbcType="VARCHAR" />
   </resultMap>
+  
+   <resultMap id="BaseResultMap2" type="com.neuedu.JiemoTest.entity.QuestionAnswerVO" >
+    <id column="paperId" property="paperid" jdbcType="INTEGER" />
+    <id column="questionId" property="questionid" jdbcType="INTEGER" />
+    <result column="questionskill" property="questionskill" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="answer" property="answer" jdbcType="INTEGER" />
+    <result column="questiontype" property="questiontype" jdbcType="INTEGER" />
+    <result column="analysis" property="analysis" jdbcType="INTEGER" />
+    <result column="difficultdegree" property="difficultdegree" jdbcType="VARCHAR" />
+    <result column="questionserialnum" property="questionserialnum" jdbcType="INTEGER" />
+    <result column="answercontent" property="answercontent" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="correctstate" property="correctstate" jdbcType="INTEGER" />
+  </resultMap>
+  
   <sql id="Example_Where_Clause" >
     <where >
       <foreach collection="oredCriteria" item="criteria" separator="or" >
@@ -88,6 +104,15 @@
     <if test="orderByClause != null" >
       order by ${orderByClause}
     </if>
+  </select>
+  
+   <select id="getQuestionAndAnswerByPaperId" resultMap="BaseResultMap2" parameterType="java.lang.Integer" >
+    select answer_info.paperId as paperid,answer_info.questionId as questionid,question.questionskill as questionskill,question.title as title,
+    question.answer as answer,question.questiontype as questiontype,question.analysis as analysis,question.difficultdegree as difficultdgree,
+    answer_info.questionserialnum as questionserialnum,answer_info.answercontent as answercontent,answer_info.score as score,answer_info.correctstate as correctstate       
+    
+    from question,answer_info
+    where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.Answer_infoKey" >
     select 

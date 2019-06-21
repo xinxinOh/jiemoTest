@@ -16,6 +16,7 @@ import com.neuedu.JiemoTest.entity.PaperTest;
 import com.neuedu.JiemoTest.entity.PaperTestExample;
 import com.neuedu.JiemoTest.entity.PaperTestExample.Criteria;
 import com.neuedu.JiemoTest.entity.Question;
+import com.neuedu.JiemoTest.entity.QuestionAnswerVO;
 import com.neuedu.JiemoTest.entity.QuestionExample;
 import com.neuedu.JiemoTest.entity.QuestionExample.Criterion;
 import com.neuedu.JiemoTest.service.AnsweredPapersService;
@@ -60,8 +61,8 @@ public class AnsweredPapersServiceImpl implements AnsweredPapersService{
 
 	@Override
 	public List<Question> showPaperQuestion(int paperID) {
-		
-		return null;
+		List<Question> questions=questionMapper.getQuestionByPaperId(paperID);
+		return questions;
 	}
 
 	@Override
@@ -72,6 +73,13 @@ public class AnsweredPapersServiceImpl implements AnsweredPapersService{
 		criteria.andPaperidEqualTo(paperID);
 		List<Answer_info> answer_infos=answer_infoMapper.selectByExample(example);
 		return answer_infos;
+	}
+
+	@Override
+	public List<QuestionAnswerVO> showQuestionAndAnswer(int paperID) {
+		List<QuestionAnswerVO> questionAnswerVOs=answer_infoMapper.getQuestionAndAnswerByPaperId(paperID);
+		// TODO Auto-generated method stub
+		return questionAnswerVOs;
 	}
 
 }
