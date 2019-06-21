@@ -155,8 +155,8 @@
   		 	<div class="bank-bottom">
   		 		<hr style="height:1px;">
   		 		<span>
-  		 		<p class="bank-time"></p>
-  		 		<a class="add-question" href="">添加题目</a>
+  		 		<a th:href="@{'/deleteBank?id='+${bank.bankid}}"  class = "question-footer">删除题库</a>
+  		 		<a class="question-footer" href="">编辑题库</a>
   		 		</span>
   		 	</div>
 		

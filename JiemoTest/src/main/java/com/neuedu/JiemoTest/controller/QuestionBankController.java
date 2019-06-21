@@ -72,12 +72,28 @@ public class QuestionBankController {
 	public String deleteBank(HttpServletRequest request , Model model) {
 		//放入回收站
 		int id = Integer.parseInt(request.getParameter("id"));
+		System.out.println("start delet    !"+id);
 		questionBankService.deletBank(id);
+		System.out.println("deleted!!!!!!!!!!!!");
 		//更新model
 		UserInfo user = (UserInfo) request.getSession().getAttribute("user");
 		List<Bank> banks = questionBankService.selectByUser(user, 1);
 		model.addAttribute("banksList",banks);
-		return "thymeleaft:bank/banks";
+		return "bank/banks";
 	}
 	
+	//恢复题库
+		@RequestMapping("/recoverBank")
+		public String recoverBank(HttpServletRequest request , Model model) {
+			//放入回收站
+			int id = Integer.parseInt(request.getParameter("id"));
+			//System.out.println("start delet    !"+id);
+			questionBankService.recoverBank(id);
+			//System.out.println("deleted!!!!!!!!!!!!");
+			//更新model
+			UserInfo user = (UserInfo) request.getSession().getAttribute("user");
+			List<Bank> banks = questionBankService.selectByUser(user, 0);
+			model.addAttribute("banksList",banks);
+			return "bank/ashBin";
+		}
 }
