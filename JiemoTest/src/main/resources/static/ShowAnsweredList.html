@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+
+		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
+
+		<script type="text/javascript">
+		function getPaperInfo(paperID){
+			//layer.msg('进来了');
+	      /*  var pararms ={'paperID':paperID};// 定义一个js对象
+	          $.ajax({
+				url:'getPaperInfo',
+				type:'post',
+				contentType:'application/json;charset=UTF-8',//request请求的类型是json类型,字符编码是utf-8
+				data:JSON.stringify(pararms),//将json对象转换成字符串,再向后台传递
+				success:function(){},
+				error:function(e){
+					console.log(e);
+			    }
+		     });*/
+			window.location.href="getPaperInfo?paperID="+paperID;
+					
+		}
+			//JavaScript代码区域
+			layui.use('element', function() {
+				var element = layui.element;
+
+			});
+			$(document).ready(function() {
+
+				$("body").on("hover", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+
+			});
+			
+		</script>
+
+	</head>
+
+	<body>
+
+		<body class="layui-layout-body">
+			<div class="layui-layout layui-layout-admin header-border" >
+				<div class="layui-header " style="background-color:#FFFFFF;">
+					<div class="layui-logo">
+						<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+					</div>
+					<!-- 头部区域（可配合layui已有的水平导航） -->
+					<div class="layui-nav layui-layout-left">
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">考试</a>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">题库</a>
+						</li>
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">商店</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">购买考试</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">购买题库</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">群组</a>
+						</li>
+					</div>
+					<ul class="layui-nav layui-layout-right">
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">
+								<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+							</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">基本资料</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">交易中心</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item header-font-color">
+							<a class="header-font-color" href="">退出登录</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
+					<div class="layui-side-scroll">
+						<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+						<ul class="layui-nav-tree" lay-filter="test">
+
+							<li class="NavBar-item">
+
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>创建考试</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;margin-top: 0px;padding-top: 0px;">
+					<!-- 内容主体区域 -->
+					<div style="margin-top: 0px;padding-top: 0px;">
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+						<table class="layui-hide" id="demo" lay-filter="test"></table>
+
+						<script type="text/html" id="barDemo">
+							<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+							<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+							<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+						</script>
+						<script>
+							layui.config({
+								version: '1560414887305' //为了更新 js 缓存，可忽略
+							});
+
+							layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function() {
+								var laydate = layui.laydate //日期
+									,
+									laypage = layui.laypage //分页
+									,
+									layer = layui.layer //弹层
+									,
+									table = layui.table //表格
+									,
+									carousel = layui.carousel //轮播
+									,
+									upload = layui.upload //上传
+									,
+									element = layui.element //元素操作
+									,
+									slider = layui.slider //滑块
+
+								//向世界问个好
+								//layer.msg('Hello World');
+
+								//监听Tab切换
+								element.on('tab(demo)', function(data) {
+									layer.tips('切换了 ' + data.index + '：' + this.innerHTML, this, {
+										tips: 1
+									});
+								});
+
+								//执行一个 table 实例
+								table.render({
+									elem: '#demo',
+									height: 520,
+									url: 'showAnswered' //数据接口
+										,
+									title: '试卷表',
+									page: true //开启分页
+										,
+									toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+										,
+									totalRow: true //开启合计行
+										,
+									cols: [
+										[ //表头
+											{
+												type: 'checkbox',
+												fixed: 'left'
+											}, {
+												field: 'paperid',
+												title: '试卷ID',
+												width: 80,
+												sort: true,
+												fixed: 'left',
+												totalRowText: '合计：'
+											}, {
+												field: 'examid',
+												title: '考试ID',
+												sort: true,
+												width: 80
+											}, {
+												field: 'userid',
+												title: '考生ID',
+												width: 80,
+												sort: true,
+												totalRow: true
+											}, {
+												field: 'examtitle',
+												title: '考试名称',
+												width: 180,
+												sort: true
+											}, {
+												field: 'paperstate',
+												title: '状态',
+												width: 80,
+												sort: true,
+												totalRow: true,
+												templet:function(d){
+            return  d.paperstate == '0' ? "未作答":"<span class='layui-red'>已作答</span>";
+        }
+											}, {
+												field: 'participatetime',
+												title: '参加考试时间',
+												width: 140,
+												sort: true
+											}, {
+												field: 'submittime',
+												title: '提交考试时间',
+												sort: true,
+												width: 140
+											}, {
+												field: 'changewindowsnum',
+												title: '切换窗口次数',
+												sort: true,
+												width: 140
+											}, {
+												field: 'studentgrade',
+												title: '学生成绩',
+												width: 115,
+												sort: true,
+												totalRow: true
+											}, {
+												fixed: 'right',
+												width: 165,
+												align: 'center',
+												toolbar: '#barDemo'
+											}
+										]
+									]
+								});
+
+								//监听头工具栏事件
+								table.on('toolbar(test)', function(obj) {
+									var checkStatus = table.checkStatus(obj.config.id),
+										data = checkStatus.data; //获取选中的数据
+									switch(obj.event) {
+										case 'add':
+											layer.msg('添加');
+											break;
+										case 'update':
+											if(data.length === 0) {
+												layer.msg('请选择一行');
+											} else if(data.length > 1) {
+												layer.msg('只能同时编辑一个');
+											} else {
+												layer.alert('编辑 [id]：' + checkStatus.data[0].paperid);
+											}
+											break;
+										case 'delete':
+											if(data.length === 0) {
+												layer.msg('请选择一行');
+											} else {
+												layer.msg('删除');
+											}
+											break;
+									};
+								});
+
+								//监听行工具事件
+								table.on('tool(test)', function(obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+									var data = obj.data //获得当前行数据
+										,
+										layEvent = obj.event; //获得 lay-event 对应的值
+									if(layEvent === 'detail') {
+										layer.msg('查看操作paperid:'+data.paperid);
+										getPaperInfo(data.paperid);
+									} else if(layEvent === 'del') {
+										layer.confirm('真的删除行么', function(index) {
+											obj.del(); //删除对应行（tr）的DOM结构
+											layer.close(index);
+											//向服务端发送删除指令
+										});
+									} else if(layEvent === 'edit') {
+										layer.msg('编辑操作');
+									}
+								});
+
+								//执行一个轮播实例
+								carousel.render({
+									elem: '#test1',
+									width: '100%' //设置容器宽度
+										,
+									height: 200,
+									arrow: 'none' //不显示箭头
+										,
+									anim: 'fade' //切换动画方式
+								});
+
+								//分页
+								laypage.render({
+									elem: 'pageDemo' //分页容器的id
+										,
+									count: 100 //总页数
+										,
+									skin: '#1E9FFF' //自定义选中色值
+										//,skip: true //开启跳页
+										,
+									jump: function(obj, first) {
+										if(!first) {
+											layer.msg('第' + obj.curr + '页', {
+												offset: 'b'
+											});
+										}
+									}
+								});
+
+
+								slider.render({
+									elem: '#sliderDemo',
+									input: true //输入框
+								});
+
+								
+							});
+							
+						</script>
+
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+					</div>
+				</div>
+
+				
+			</div>
+
+		</body>
+
+</html>
