@@ -26,5 +26,5 @@ public interface QuestionInBankMapper {
 
     int updateByExample(@Param("record") QuestionInBankKey record, @Param("example") QuestionInBankExample example);
     
-    List<Question> selectQuestionByQuestionBank(Integer bankid);
+    List<Question> selectQuestionByQuestionBank(@Param("bankid") Integer bankid, @Param("start") int start, @Param("count") int count);
 }
