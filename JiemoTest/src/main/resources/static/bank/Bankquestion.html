@@ -5,6 +5,7 @@
 		<title>Insert title here</title>
 		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
 		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
 		<link type="text/css" rel="styleSheet" href="css/bank.css" th:href="@{static/css/bank.css}" />
 		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
 		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
@@ -26,19 +27,6 @@
 					$(this).css("background-color", "#FFFFFF");
 				});
 				
-			});
-			
-			$(function(){
-				var totle = [[${totle}]];
-				//var questions = [[${questions}]];
-				var h1 = '[[${questions}]]';
-				var questions = JSON.parse(h1);
-				alert(totle);
-				// var questions = [[${questions}]];
-				//alert(questions);
-				$.each(questions,function(index,question){
-			    	alert(question.title);    
-				}); 
 			});
 			
 		</script>
@@ -126,7 +114,95 @@
 	</div>
 	<hr style="height:1px;">
 	<div class = "bank_questions" id="bank_questions">
-		
+		<fieldset style="border: 1px solid #D2D2D2;">
+			<div class="question-container" id="question-container">
+				<!-- 遍历题目 -->
+				<div class="one-question" style="margin-left: 10px;margin-top: 15px;"  th:each="question,questionStat:${questions}"  >
+					<div class="one-question-introduction">
+						<div class="layui-form" style="display: inline;margin-right: 0px;margin-top: 0px;">
+							<input type="checkbox" name="" title="" lay-skin="primary">
+						</div>
+						
+						<div class="one-question-serial" style="display: inline;">
+							<span style="font-size: 20px;color: #5FB878;" th:text="${questionStat.index+begin}+'、'">&nbsp;&nbsp;</span>
+						</div>
+                                                                              
+                        <!--题型 填空选择-->
+						<div class="one-question-type" style="display: inline;margin-right: 5px;" th:switch="${question.questiontype}">
+							<span th:case="'0'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;单选题&nbsp;</span>
+								<span th:case="'1'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;多选题&nbsp;</span>
+								<span th:case="'2'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;判断题&nbsp;</span>
+								<span th:case="'3'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;填空题&nbsp;</span>
+								<span th:case="'4'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;问答题&nbsp;</span>	
+								<span th:case="'*'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;其他&nbsp;</span>						
+						</div>
+
+						<div class="one-question-skill" style="display: inline;margin-right: 5px;" th:switch="${question.questionskill}">
+						<!--问题技能-->
+							<span th:case="0" class="layui-badge" style="background-color:#5FB878;"> &nbsp;分析能力&nbsp;</span>
+							<span th:case="1" class="layui-badge" style="background-color:#5FB878;"> &nbsp;思辨能力&nbsp;</span>										<span th:case="2" class="layui-badge" style="background-color:#5FB878;"> &nbsp;计算能力&nbsp;</span>
+							<span th:case="3" class="layui-badge" style="background-color:#5FB878;"> &nbsp;综合能力&nbsp;</span>
+							<span th:case="4" class="layui-badge" style="background-color:#5FB878;"> &nbsp;语言表达能力&nbsp;</span>
+						</div>
+
+						<div class="one-question-degree" style="display: inline;margin-right: 5px;" th:switch="${question.difficultdegree}">
+							<span th:case="'0'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;难度：简单&nbsp;</span>
+							<span th:case="'1'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;难度：一般&nbsp;</span>
+							<span th:case="'2'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;难度：困难&nbsp;</span>
+						</div>
+
+						</div>
+						<div class="one-question-title" style="margin-top: 30px;margin-left: 20px;">
+							<span style="color: #333333;font-size: 17px;" th:text="${question.title}"> 以下配置，当Spring容器启动完成后，哪个描述是正确的？
+						</div>
+						<div class="one-question-detial" style="margin-top: 30px;margin-left: 20px;">					
+							<div class="choice" style="border-left: 4px solid #5FB878;">
+								<div class="layui-form" style="margin-left: 3px;">
+								<!-- asfdsgffdffdsg循环展示一个 -->
+								<div class="layui-form-item" th:each="option:${#strings.arraySplit(question.options, '#^#')}">
+									<input type="radio" name="sex">
+									<span  th:text="${option}" ></span>
+									<br>					
+								</div>
+								<!-- asfdsgffdffdsg循环展示一个 -->
+								<div class="layui-form-item">
+									<input type="radio" name="sex" title="A、 bean 都不会创建">
+									<br>
+										<input type="radio" name="sex" size="12" title="B、 bean 都不会创建 bean 都不会创建 bean 都不会创建 bean 都不会创建 bean 都不会创建 bean 都不会创建 bean 都不会创建 bean 都不会创建">
+									<br>
+										<input type="radio" name="sex" title="C、 bean 都不会创建">
+									<br>
+										<input type="radio" name="sex" title="D、 bean 都不会创建">															
+								</div>																
+								</div>
+
+							</div>
+							<div class="right-answer" style="border-left: 4px solid #FF5722;margin-top: 15px;">	
+								<div class ="right-answer-title" style="margin-left: 5px;">
+									<span style="color: #333333;font-size: 16px;"> 正确答案 </span>
+								</div>
+								<br>
+								<div class ="right-answer-info" style="margin-left: 5px;" th:each="answer: ${#strings.arraySplit(question.answer, '#^#')}">
+                                    <a th:text="${answer}"></a>     
+								</div>
+
+							</div>
+											
+							<div class="answer-jiexi" style="border-left: 4px solid #FFB800;margin-top: 15px;">
+								<div class ="right-answer-title" style="margin-left: 5px;">
+									<span style="color: #333333;font-size: 16px;" > 试题解析 </span>
+								</div>
+								<br>
+									<div class ="right-answer-info" style="margin-left: 5px;">
+										<span th:text="${question.analysis}">  </span>
+									</div>
+							</div>					
+						</div>							
+					<hr>
+				</div>							
+			</div>
+
+		</fieldset>
 	</div>
 				</div>
 

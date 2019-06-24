@@ -1,6 +1,6 @@
 package com.neuedu.JiemoTest.entity;
 
-public class Order {
+public class Order1 {
     private Integer orderid;
 
     private Integer userid;

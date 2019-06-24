@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.neuedu.JiemoTest.dao.GroupMapper" >
-  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Group" >
+<mapper namespace="com.neuedu.JiemoTest.dao.Group1Mapper" >
+  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Group1" >
     <id column="groupId" property="groupid" jdbcType="INTEGER" />
     <result column="createUserId" property="createuserid" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
@@ -74,13 +74,13 @@
     groupId, createUserId, name, introduction, createTime, spare_1, spare_2, spare_3, 
     spare_4
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.GroupExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.Group1Example" >
     select
     <if test="distinct" >
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from group
+    from group1
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
@@ -91,21 +91,21 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    from group
+    from group1
     where groupId = #{groupid,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from group
+    delete from group1
     where groupId = #{groupid,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.GroupExample" >
-    delete from group
+  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.Group1Example" >
+    delete from group1
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Group" >
-    insert into group (groupId, createUserId, name, 
+  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Group1" >
+    insert into group1 (groupId, createUserId, name, 
       introduction, createTime, spare_1, 
       spare_2, spare_3, spare_4
       )
@@ -114,8 +114,8 @@
       #{spare2,jdbcType=INTEGER}, #{spare3,jdbcType=VARCHAR}, #{spare4,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.Group" >
-    insert into group
+  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.Group1" >
+    insert into group1
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="groupid != null" >
         groupId,
@@ -175,14 +175,14 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.GroupExample" resultType="java.lang.Integer" >
-    select count(*) from group
+  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.Group1Example" resultType="java.lang.Integer" >
+    select count(*) from group1
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map" >
-    update group
+    update group1
     <set >
       <if test="record.groupid != null" >
         groupId = #{record.groupid,jdbcType=INTEGER},
@@ -217,7 +217,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map" >
-    update group
+    update group1
     set groupId = #{record.groupid,jdbcType=INTEGER},
       createUserId = #{record.createuserid,jdbcType=INTEGER},
       name = #{record.name,jdbcType=VARCHAR},
@@ -231,8 +231,8 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.Group" >
-    update group
+  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.Group1" >
+    update group1
     <set >
       <if test="createuserid != null" >
         createUserId = #{createuserid,jdbcType=INTEGER},
@@ -261,8 +261,8 @@
     </set>
     where groupId = #{groupid,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Group" >
-    update group
+  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Group1" >
+    update group1
     set createUserId = #{createuserid,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
       introduction = #{introduction,jdbcType=VARCHAR},
