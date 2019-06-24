@@ -156,18 +156,19 @@
     <result column="questionType" property="questiontype" jdbcType="INTEGER" />
     <result column="analysis" property="analysis" jdbcType="VARCHAR" />
     <result column="difficultDegree" property="difficultdegree" jdbcType="INTEGER" />
-    <result column="edit_time" property="editTime" jdbcType="INTEGER" />
+    <result column="editTime" property="edittime" jdbcType="INTEGER" />
   </resultMap>
   
   <!-- 查询语句 -->
-  <!-- select * from question where questionId in (select questionId from question_in_bank where bankId = 1) -->
+  <!-- select * from question where questionId in (select questionId from question_in_bank where bankId = 1 order by questionId desc)limit 1,2 -->
   <sql id="Question_List" >
-    questionId, title, options, answer, questionType, analysis, difficultDegree, edit_time
+    questionId, questionSkill , title, options, answer, questionType, analysis, difficultDegree, editTime
   </sql>
-  <select id="selectQuestionByQuestionBank" resultMap="QuestionResultMap" parameterType="java.lang.Integer">
+  <select id="selectQuestionByQuestionBank" resultMap="QuestionResultMap">
     select 
     <include refid="Question_List" />
     from question
-    where questionId in(select questionId from question_in_bank where bankId = #{bankid,jdbcType=INTEGER})
+    where questionId in(select questionId from question_in_bank where bankId = #{bankid,jdbcType=INTEGER} order by questionId desc)
+    limit #{start,jdbcType=INTEGER} , #{count,jdbcType=INTEGER}
   </select>
 </mapper>

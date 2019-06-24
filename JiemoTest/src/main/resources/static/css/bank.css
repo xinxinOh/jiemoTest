@@ -1,1 +1,120 @@
 @charset "UTF-8";
+.sigle_bank{
+	width:120px;
+	height:90px;	
+}
+		
+.listbox .list-hover span {
+    display: none;
+    position: absolute;
+    width: 100px;
+    text-decoration: none;
+    background: white;
+    border: #B9B9B9 solid 1px;
+    -webkit-border-radius: 5px;
+    z-index:9;
+}
+
+.listcontext li a:hover {
+    color: #ff8c00;
+}
+
+
+
+.listcontext li{
+    line-height: 20px;
+	font-size:13px;
+	text-context:center;
+	text-align: center;
+    margin-top: 3px;
+}
+
+.listcontext li a{
+	color:#60636C;
+}
+
+.listbox .list-hover:hover span{
+	display: block;
+}
+
+.sigle_bank:hover > .bank-top {
+    background: #E98835;
+}
+
+
+.sigle_bank {
+    width: 200px;
+    height: 150px;
+    display: inline-block;
+    margin-left: 20px;
+    margin-top: 20px;
+    border: #8FBC8F solid 1px;
+    -webkit-border-radius: 8px;
+    text-overflow: ellipsis;
+}
+
+.bank-top {
+    height: 10px;
+    background: #8FBC8F;
+    margin-top: -1px;
+    -webkit-border-radius: 10px;
+}
+
+.bank-context {
+    margin-top: 10px;
+    margin-left: 10px;
+    height: 55%;
+    position: relative;
+}
+
+.bank-left {
+    display: inline-block;
+    width: 80%;
+    text-overflow: ellipsis;
+    height: 80%;
+}
+
+.bank-name {
+    font-size: 18px;
+    display: block;
+    margin-bottom: 5%;
+    margin-top: 5%;
+}
+
+.bank-intro {
+    color: #b9b9b9;
+}
+
+.bank-right {
+    display: inline-block;
+    width: 10%;
+    position: absolute;
+    margin-top: 5%;
+}
+
+.question-footer {
+    display: inline-block;
+    color: #0078d7;
+    width: 49%;
+    text-align: center;
+}
+
+.question-footer:hover {
+    color: #E98835;
+}
+
+.bank-time {
+    display: inline-block;
+    margin-left: 5%;
+    width: 63%;
+    color: #777;
+}
+.add-bank {
+    margin-left: 20px;
+    margin-top: 10px;
+    line-height: 30px;
+}
+.bank-label {
+    color: black;
+}
+

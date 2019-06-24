@@ -4,12 +4,13 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Insert title here</title>
-		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
 		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
-		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
 
-		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script src="layui/layui.js" th:src="@{static/layui/layui.all.js}"></script>
+		<script src="layui/layer/layer.js" th:src="@{static/layui/layer/layer.js}"></script>
 
 		<script type="text/javascript">
 			//JavaScript代码区域
@@ -17,22 +18,108 @@
 				var element = layui.element;
 
 			});
-$(document).ready(function() {
-	
-	
-			$("body").on("hover", ".NavBar-item", function() {
+
+			function CreateExam() {
+				layui.use('form', function() {
+					var form = layui.form;
+
+					layer.open({
+						type: 1,
+						area: ['600px', '350px'],
+						shadeClose: true, //点击遮罩关闭
+						content: '<div class="choice-container">'+
+						'<div class="hand-movement">'+
+							'<div class="hand-movement-img">'+
+								'<i class="layui-icon layui-icon-friends" style="font-size: 30px; color: #1E9FFF;"></i>'  +
+							'</div>'+
+							'<div class="hand-movement-title" style="margin-left: 45px;margin-top: 5px;margin-bottom: 5px;">'+
+								'<span style="color: #666666;"> 手工组卷 </span>'+
+							'</div>' +
+							'<div class="hand-movement-info" style="margin-left: 3px;">'+
+								'<span style="color: #333333;"> 从已有题库手动选择试题 </span>'+
+							'</div>'+
+						'</div>'+
+						'<div class="voluntarily">'+
+							'<div class="voluntarily-img">'+
+								'<i class="layui-icon layui-icon-upload-drag" style="font-size: 30px; color: #1E9FFF;"></i>'  +
+							'</div>'+
+							'<div class="voluntarily-title" style="margin-left: 45px;margin-top: 5px;margin-bottom: 5px;">'+
+								'<span style="color: #666666;"> 智能组卷 </span>'+
+							'</div>'+
+							'<div class="voluntarily-info" style="margin-left: 12px;">'+
+								'<span style="color: #333333;"> 选择题库自动生成试卷 </span>'+
+							'</div>'+
+						'</div>'+
+					'</div>'
+
+						//各种基于事件的操作，下面会有进一步介绍
+
+					});
+					
+					//  form.render('checkbox'); 
+					//  form.render('radio'); 
+
+					//监听提交
+					/* form.on('submit(formDemo)', function(data){
+			    layer.msg(JSON.stringify(data.field));
+		  
+			    return false;
+			  });*/
+				});
+			};
+
+			$(document).ready(function() {
+
+				$("body").on("hover", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+				
+				$("body").on("hover", ".hand-movement", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".hand-movement", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+				
+				$("body").on("hover", ".voluntarily", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".voluntarily", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
 				
 				
-				$(this).css("background-color", "#BCDDBC");
+				
+				$("body").on("click", ".hand-movement", function() {
 
-			});
-			
-			$("body").on("mouseout", ".NavBar-item", function() {
+					window.location.href="HandMovement";
 
-				$(this).css("background-color", "#FFFFFF");
+				});
+				
+				$("body").on("click", ".create-exam", function() {
 
-			});
-			
+					CreateExam();
+
+				});
+
 			});
 		</script>
 
@@ -93,19 +180,18 @@ $(document).ready(function() {
 					<div class="layui-side-scroll">
 						<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
 						<ul class="layui-nav-tree" lay-filter="test">
-							
-							
+
 							<li class="NavBar-item">
-								
-								<a class="NavBar-a" href="" ><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
+
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item create-exam">
+								<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>创建考试</a>
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
-								<a class="NavBar-a" href="" ><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>创建考试</a>
-							</li>
-							<hr style="height:1px;">
-							<li class="NavBar-item">
-								<a class="NavBar-a" href="" ><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
@@ -114,15 +200,15 @@ $(document).ready(function() {
 						</ul>
 					</div>
 				</div>
-
-				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;" >
+				
+				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;">
 					<!-- 内容主体区域 -->
-					<div style="padding: 15px;">内容主体区域</div>
+					4324
 				</div>
 
 				<div class="layui-footer" style="margin-left: 20px;border-left: 1px solid darkseagreen;background-color: #FFF;">
 					<!-- 底部固定区域 -->
-					© layui.com - 底部固定区域
+					? layui.com - 底部固定区域
 				</div>
 			</div>
 

@@ -27,6 +27,10 @@
 					$(this).css("background-color", "#FFFFFF");
 				});
 				
+				$("body").on("mouseout", ".sigle-bank", function() {
+					$(this" > bank-top").css("color", "#F6BB49");
+				});
+				
 			});
 			
 			function timetemple(data) {
@@ -39,110 +43,6 @@
 				  var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
 				  return Y + M + D + h + m + s
 			}
-			
-			layui.use('layer', function(){
-				  var layer = layui.layer;
-			});
-			
-			function editBank(id , name , intro){
-				layer.open({
-					title: '编辑题库'
-					,btn:['确定','返回']
-					,anim:0
-					,area: ['400px', '330px']
-					,offset: 'auto'
-					,content:'<div class="layui-form layui-form-pane">'
-							+'	<div class="layui-form-item">'
-				    		+'		<label class="layui-form-label" style="color: black;">题库名</label>'
-				    		+'		<div class="layui-input-inline">'
-				      		+'			<input id="edit-bank-name" class="layui-input" type="text" placeholder="'+name+'" autocomplete="off" lay-verify="required">'
-				    		+'		</div>'
-				  			+'	</div>'
-
-				  
-				  			+'<div class="layui-form-item layui-form-text">'
-				    		+'	<label class="layui-form-label" style="color: black;">介绍</label>'
-				    		+'	<div class="layui-input-block">'
-				      		+'		<textarea id="edit-bank-intro"class="layui-textarea" placeholder="'+intro+'"></textarea>'
-				    		+'	</div>'
-				  			+'</div>'
-					  		+'</div>'
-					,btn1:function(index,layero){
-						var name_in = document.getElementById("edit-bank-name").value;
-						var intro_in = document.getElementById("edit-bank-intro").value;
-						
-						name = name_in==''?name:name_in;
-						intro = intro_in==''?intro:intro_in;
-						
-						$.ajax({
-							url:"/editBank?id="+id+"&&name="+name+"&&intro="+intro
-							,success:function(message){
-								layer.closeAll();
-								location.reload(true);
-							}
-							,error: function (message){
-								layer.msg("编辑失败，请重试");
-								location.reload(true);
-							}
-						});
-					}
-					,btn2:function(index,layero){
-							  
-					}
-					}); 
-				
-			}
-			
-			function createBank(){
-				layer.open({
-					title: '新建题库'
-					,btn:['确定','返回']
-					,anim:0
-					,area: ['400px', '330px']
-					,offset: 'auto'
-					,content:'<div class="layui-form layui-form-pane">'
-							+'	<div class="layui-form-item">'
-				    		+'		<label class="layui-form-label" style="color: black;" >题库名</label>'
-				    		+'		<div class="layui-input-inline">'
-				      		+'			<input id="creat-bank-name" class="layui-input" type="text" autocomplete="off" lay-verify="required">'
-				    		+'		</div>'
-				  			+'	</div>'
-
-				  
-				  			+'<div class="layui-form-item layui-form-text">'
-				    		+'	<label class="layui-form-label" style="color: black;">介绍</label>'
-				    		+'	<div class="layui-input-block">'
-				      		+'		<textarea id="creat-bank-intro"class="layui-textarea"></textarea>'
-				    		+'	</div>'
-				  			+'</div>'
-					  		+'</div>'
-					,btn1:function(index,layero){
-						var name = document.getElementById("creat-bank-name").value;
-						var intro = document.getElementById("creat-bank-intro").value;
-						
-						if(name == ''){
-							layer.msg("请输入题库名！");
-							return;
-						}
-						$.ajax({
-							url:"/createBank?name="+name+"&&intro="+intro
-							,success:function(message){
-								layer.closeAll();
-								location.reload(true);
-							}
-							,error: function (message){
-								layer.msg("创建失败，请重试");
-								location.reload(true);
-							}
-						});
-					}
-					,btn2:function(index,layero){
-							  
-					}
-					}); 
-				
-			}
-
 		</script>
 		
 
@@ -223,10 +123,6 @@
 
 				<div class="layui-body" id="main-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;" >
 					<!-- 内容主体区域 -->
-					<div class = "add-bank">
-		<a id = "add_bank" onclick="createBank()"><i class="layui-icon layui-icon-add-circle" style="font-size: 30px; color: darkseagreen;"></i>创建题库</a>
-	</div>
-	<hr style="height:1px;">
 	<div class = "my_banks" id="my_banks">
 		<div th:each = "bank:${banksList}" class="sigle_bank">
 	
@@ -241,11 +137,8 @@
     				<div class="list-hover"><a  class="layui-icon layui-icon-triangle-d" style="font-size: 15px; color: darkseagreen;"></a>
     				<span>
     					<ul class="listcontext"> <!-- 二级菜单 -->
-      					<li><a th:onclick="editBank([[${bank.bankid}]],[[${bank.bankname}]],[[${bank.bankintroduction}]])" class = "layui-icon layui-icon-edit">编辑题库</a></li>
-      					<li><a th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=3'" class = "layui-icon layui-icon-read" >查看题目</a></li>
-      					<li><a href="" class = "layui-icon layui-icon-release" >分享题库</a></li>
-      					<li><a href="" class = "layui-icon layui-icon-cart" >出售题库</a></li>
-      					<li><a th:href="@{'/deleteBank?id='+${bank.bankid}}"  class = "layui-icon layui-icon-delete">删除题库</a></li>
+      					<li><a href="" class = "layui-icon layui-icon-edit">永久删除</a></li>
+      					<li><a th:href="@{'/recoverBank?id='+${bank.bankid}}" class = "layui-icon layui-icon-read" >恢复</a></li>
     					</ul>
     				</span>
     				</div>
@@ -254,8 +147,8 @@
   		 	<div class="bank-bottom">
   		 		<hr style="height:1px;">
   		 		<span>
-  		 		<a th:href="@{'/deleteBank?id='+${bank.bankid}}"  class = "question-footer">删除题库</a>
-  		 		<a class="question-footer" th:onclick="editBank([[${bank.bankid}]],[[${bank.bankname}]],[[${bank.bankintroduction}]])">编辑题库</a>
+  		 		<a href=""  class = "question-footer">永久删除</a>
+  		 		<a class="question-footer" th:href="@{'/recoverBank?id='+${bank.bankid}}">恢复</a>
   		 		</span>
   		 	</div>
 		
