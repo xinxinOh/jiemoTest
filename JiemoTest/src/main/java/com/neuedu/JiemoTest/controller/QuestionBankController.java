@@ -177,12 +177,12 @@ public class QuestionBankController {
 		List<Question> questions = questionService.selectByBank(bankId,start,count);
 		Bank bank = questionBankService.selectByPrimaryKey(bankId);
 		Integer totle = questionService.totleInBank(bankId);
-		Integer begin = start*count+1;
+		//Integer begin = start*count+1;
 		
 		model.addAttribute("bankName",bank.getBankname());
 		model.addAttribute("questions",questions);
 		model.addAttribute("totle",totle);
-		model.addAttribute("begin",begin);
+		model.addAttribute("start_",start);
 		model.addAttribute("bankId",bankId);
 		model.addAttribute("curr",start/count+1);
 		

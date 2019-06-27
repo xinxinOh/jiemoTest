@@ -121,7 +121,13 @@
 						var intro = document.getElementById("creat-bank-intro").value;
 						
 						if(name == ''){
-							layer.msg("请输入题库名！");
+							layer.msg('请输入题库名', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						      });
 							return;
 						}
 						$.ajax({
@@ -234,8 +240,8 @@
     		</div>
     		<div class="bank-context">	
     			<div class="bank-left">
-    				<a th:text = "${bank.bankname}" class = "bank-name"></a>
-    				<a th:text = "${bank.bankintroduction}" class = "bank-intro"></a>
+    				<a th:text = "${bank.bankname}" th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "bank-name"></a>
+    				<a th:text = "${bank.bankintroduction}" th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "bank-intro"></a>
     			</div>
     			<div class="bank-right listbox">
     				<div class="list-hover"><a  class="layui-icon layui-icon-triangle-d" style="font-size: 15px; color: darkseagreen;"></a>

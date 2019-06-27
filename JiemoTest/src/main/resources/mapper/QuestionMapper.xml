@@ -263,4 +263,12 @@
     where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
   </select>
   
+   <!-- ========================选择最新插入数据的id========================== -->
+  <resultMap id="id_int" type="java.lang.Integer" >
+    <id column="max(questionId)" property="questionid" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectLastInsert" resultType="java.lang.Integer">
+    select max(questionId) from question
+  </select>
+  
 </mapper>

@@ -20,4 +20,7 @@ public interface QuestionService {
 	void delete(Integer questionid);
 
 	void update(int bankid, Question question);
+
+	@Transactional
+	void create(int bankid, Question question);
 }

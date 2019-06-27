@@ -229,14 +229,14 @@
 							answer = ans==''?answer:ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
-							alert(opt);
+							//alert(opt);
 							//var jsdata = '{"id":'+questionid+',"title":'+title+',"answer":'+ans+',"analysis":'+analysis+',"bankId":'+[[${bankId}]]+',"option":'+opt+',"type":0,"skill":'+questionskill+',"degree":'+difficultdegree+'}';
 							//alert(jsdata);
 							var Jsdata = '{"id":'+questionid+',"title":"'+title+'","answer":"'+ans+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"'+opt+'","type":0,"skill":"'+questionskill+'","degree":'+difficultdegree+'}';
 							//alert(Jsdata);
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -404,7 +404,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -514,7 +514,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -643,7 +643,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -754,7 +754,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -965,7 +965,7 @@
 				        var answer = '';
 				        if (type=='0'||type=='4') {
 				        	//单选和问答，从单选框中获取答案
-				        	ansert = $("#edit-bank-answer").val();
+				        	answer = $("#edit-bank-answer").val();
 				        }else if (type == '1'||type=='3') {
 							//多选和填空，从多选中组合答案
 				        	var sig_answers = $("#ed-answer-box").find(".ans-text");
@@ -1000,20 +1000,19 @@
 				        
 				        $.ajax({
 							type:"POST"
-							,dataType:'json'
+							,dataType:'text'
 							,contentType: "application/json;charset=UTF-8"
 							,data:Jsdata
 							,url:"/createQuestion"
-							,success:function(message){/* 
-								var start = 0;
-								var count1 = 5;
-								var tot = [[${totle}]]; */
+							,success:function(message){
 								var st = start;
 								var tot_add = tot+1;
-								if(tot_add%count1>0){
-									st = (tot_dd/count1)*count1-1;
+								if(tot_add%count1!=0){
+									st = parseInt(tot_add/count1)*count1;
+									//alert(">0++++++++"+st);
 								}else {
-									st = (tot_dd/count1-1)*count1-1;
+									st = (parseInt(tot_add/count1)-1)*count1;
+									//alert("=0++++++++"+st);
 								}
 								location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+st+"&count="+count1;
 								layer.closeAll();
@@ -1355,7 +1354,7 @@
 						</div>
 						
 						<div class="one-question-serial" style="display: inline;">
-							<span style="font-size: 20px;color: #5FB878;" th:text="${questionStat.index+begin}+'、'">&nbsp;&nbsp;</span>
+							<span style="font-size: 20px;color: #5FB878;" th:text="${questionStat.index+start_+1}+'、'">&nbsp;&nbsp;</span>
 						</div>
                                                                               
                         <!--题型 填空选择-->
