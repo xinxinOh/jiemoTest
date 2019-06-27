@@ -1,7 +1,14 @@
 package com.neuedu.JiemoTest.entity;
 
+import org.springframework.data.annotation.Id;
+
 public class Exam {
+	@Id
     private Integer examid;
+
+    private String examtitle;
+
+    private String examintroduction;
 
     private Integer userid;
 
@@ -16,12 +23,20 @@ public class Exam {
     private Integer duration;
 
     private Integer maxtimes;
-
+    
     private Integer questionnum;
 
     private Integer pointssum;
 
     private Integer examstate;
+
+    private Integer spare1;
+
+    private Integer spare2;
+
+    private String spare3;
+
+    private String spare4;
 
     public Integer getExamid() {
         return examid;
@@ -29,6 +44,22 @@ public class Exam {
 
     public void setExamid(Integer examid) {
         this.examid = examid;
+    }
+
+    public String getExamtitle() {
+        return examtitle;
+    }
+
+    public void setExamtitle(String examtitle) {
+        this.examtitle = examtitle == null ? null : examtitle.trim();
+    }
+
+    public String getExamintroduction() {
+        return examintroduction;
+    }
+
+    public void setExamintroduction(String examintroduction) {
+        this.examintroduction = examintroduction == null ? null : examintroduction.trim();
     }
 
     public Integer getUserid() {
@@ -109,5 +140,37 @@ public class Exam {
 
     public void setExamstate(Integer examstate) {
         this.examstate = examstate;
+    }
+
+    public Integer getSpare1() {
+        return spare1;
+    }
+
+    public void setSpare1(Integer spare1) {
+        this.spare1 = spare1;
+    }
+
+    public Integer getSpare2() {
+        return spare2;
+    }
+
+    public void setSpare2(Integer spare2) {
+        this.spare2 = spare2;
+    }
+
+    public String getSpare3() {
+        return spare3;
+    }
+
+    public void setSpare3(String spare3) {
+        this.spare3 = spare3 == null ? null : spare3.trim();
+    }
+
+    public String getSpare4() {
+        return spare4;
+    }
+
+    public void setSpare4(String spare4) {
+        this.spare4 = spare4 == null ? null : spare4.trim();
     }
 }
