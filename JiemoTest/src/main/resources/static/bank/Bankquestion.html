@@ -181,9 +181,29 @@
 				            var ed_skill = $("#skill option:selected").val();
 				            var ed_dif = $("#difficult option:selected").val();
 				            
-
 							var ans=document.getElementById("edit-bank-answer").value;
 							
+							if(ed_title == ''){
+					        	layer.msg('题目不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+							
+							if(ans == ''){
+					        	layer.msg('答案不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
 				            
 				            var sig_opts = $("#question-option").find(".op-text");
 				            $.each(sig_opts,function(index,sig_opt){
@@ -192,11 +212,20 @@
 				            	//alert(opt)
 				            	opt=opt+"#^#";
 				            });
-				            
+				            if(opt == ''){
+					        	layer.msg('选项不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
 				            opt = opt.substring(0,opt.length-3);
 				            //alert("opts++++++++++++++++++++++++++++++++++++++++++"+opt);
-							title = ed_title==''?title:ed_title;
-							analysis = ed_analysis==''?analysis:ed_analysis;
+							title = ed_title;
+							analysis = ed_analysis;
 							answer = ans==''?answer:ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
@@ -212,12 +241,11 @@
 								,data:Jsdata
 								,url:"/editQuestion"
 								,success:function(message){
-									layer.closeAll();
 									location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
+									layer.closeAll();
 								}
 								,error: function (message){
 									layer.msg("编辑失败，请重试");
-									layer.closeAll();
 								}
 							});
 						}
@@ -314,12 +342,32 @@
 				            var ed_skill = $("#skill option:selected").val();
 				            var ed_dif = $("#difficult option:selected").val();
 				            
+				            if(ed_title == ''){
+					        	layer.msg('题目不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				            
 				            var sig_answers = $("#ed-answer-box").find(".ans-text");
 				            $.each(sig_answers,function(index,sig_ans){
 				            	ans=ans+$(sig_ans).text();
 				            	ans=ans+"#^#";
 				            });
-				            
+				            if(ans == ''){
+					        	layer.msg('答案不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
 				            ans = ans.substring(0,ans.length-3);
 				            
 				            
@@ -328,11 +376,24 @@
 				            	opt=opt+$(sig_opt).val();
 				            	opt=opt+"#^#";
 				            });
+				            
+				            if(opt == ''){
+					        	layer.msg('选项不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				            ans = ans.substring(0,ans.length-3);
+
 				            opt = opt.substring(0,opt.length-3);
 				            //alert(opt);
 				            
-							title = ed_title==''?title:ed_title;
-							analysis = ed_analysis==''?analysis:ed_analysis;
+							title = ed_title;
+							analysis = ed_analysis;
 							answer = ans==''?answer:ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
@@ -348,12 +409,11 @@
 								,data:Jsdata
 								,url:"/editQuestion"
 								,success:function(message){
-									layer.closeAll();
 									location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
+									layer.closeAll();
 								}
 								,error: function (message){
 									layer.msg("编辑失败，请重试");
-									layer.closeAll();
 								}
 							});
 						}
@@ -401,9 +461,10 @@
 					  		    +'</div>'
 					  		    +'</div>'
 								
-					  			+'<div class="layui-input-block">'
-					  	      	+'<input type="radio" name="judge" value="1" title="对">'
-					  	      	+'<input type="radio" name="judge" value="0" title="错">'  
+					  			+'<div class="layui-input-block" style="margin: 0px; border: 1px solid rgb(230, 230, 230); border-image: none; color: black;">'
+					  			+'<label class="layui-form-label" style="color: black;">答案</label>'
+					  	      	+'<input type="radio" name="judge" value="对" title="对">'
+					  	      	+'<input type="radio" name="judge" value="错" title="错">'  
 					  	    	+'</div>'
 					  
 					  			+'<div class="layui-form-item layui-form-text">'
@@ -421,8 +482,29 @@
 				            var ed_skill = $("#skill option:selected").val();
 				            var ed_dif = $("#difficult option:selected").val();
 				            
-							title = ed_title==''?title:ed_title;
-							analysis = ed_analysis==''?analysis:ed_analysis;
+				            if(ans == ''){
+					        	layer.msg('答案不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				            
+				            if(ed_title == ''){
+					        	layer.msg('题目不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				            title = ed_title;
+							analysis = ed_analysis;
 							answer = ans==''?answer:ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
@@ -437,12 +519,11 @@
 								,data:Jsdata
 								,url:"/editQuestion"
 								,success:function(message){
+									location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;	
 									layer.closeAll();
-									location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
 								}
 								,error: function (message){
 									layer.msg("编辑失败，请重试");
-									layer.closeAll();
 								}
 							});
 						}
@@ -527,10 +608,31 @@
 				            	ans=ans+$(sig_ans).text();
 				            	ans=ans+"#^#";
 				            })
-				             ans = ans.substring(0,ans.length-3);
+				            if(ed_title == ''){
+					        	layer.msg('题目不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				            if(ans == ''){
+					        	layer.msg('答案不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
 				            
-							title = ed_title==''?title:ed_title;
-							analysis = ed_analysis==''?analysis:ed_analysis;
+				            ans = ans.substring(0,ans.length-3);
+				            
+							title = ed_title;
+							analysis = ed_analysis;
 							answer = ans==''?answer:ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
@@ -547,12 +649,11 @@
 								,url:"/editQuestion"
 
 								,success:function(message){
-									layer.closeAll();
 									location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
+									layer.closeAll();
 								}
 								,error: function (message){
 									layer.msg("编辑失败，请重试");
-									layer.closeAll();
 								}
 							});
 						}
@@ -621,14 +722,35 @@
 				            var ed_skill = $("#skill option:selected").val();
 				            var ed_dif = $("#difficult option:selected").val();
 				            
-							
-							title = ed_title==''?title:ed_title;
-							analysis = ed_analysis==''?analysis:ed_analysis;
-							answer = ans==''?answer:ans;
+				            if(ed_title == ''){
+					        	layer.msg('题目不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				            
+							title = ed_title;
+							analysis = ed_analysis;
+							answer = ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
 							
-							var Jsdata = '{"id":'+questionid+',"title":"'+title+'","answer":"'+ans+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"","type":4,"skill":"'+questionskill+'","degree":'+difficultdegree+'}';
+							if(answer == ''){
+					        	layer.msg('答案不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+							
+							var Jsdata = '{"id":'+questionid+',"title":"'+title+'","answer":"'+answer+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"","type":4,"skill":"'+questionskill+'","degree":'+difficultdegree+'}';
 							
 							$.ajax({
 								type:"POST"
@@ -637,12 +759,11 @@
 								,data:Jsdata
 								,url:"/editQuestion"
 								,success:function(message){
-									layer.closeAll();
 									location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
+									layer.closeAll();
 								}
 								,error: function (message){
 									layer.msg("编辑失败，请重试");
-									layer.closeAll();
 								}
 							});
 						}
@@ -674,6 +795,7 @@
 			//新建题目///////////////////////////////////////////////////////////////
 			function creat_question(){
 				var layer = layui.layer;
+				var form = layui.form;
 				layer.open({
 					title: '新建题目'
 					,btn:['确定','返回']
@@ -686,7 +808,7 @@
 							+'<div class="layui-form-item">'
 				  			+'<label class="layui-form-label" style="color: black;">题型选择设置</label>'
 				  		    +'<div class="layui-input-inline">'
-				  		    +'<select id="q_type">'
+				  		    +'<select id="q_type" lay-filter="q_type">'
 				  		    +'    <option value="">题型选择</option>'
 				  		    +'    <option value="0">单选题</option>'
 				  		    +'    <option value="1">多选题</option>'
@@ -694,15 +816,10 @@
 				  		    +'    <option value="3">填空题</option>'
 				  		    +'    <option value="4">问答题</option>'
 				  		    +'</select>'
+				  		    +'</div>'
+				  		    +'</div>'
 				  		    
-							+'	<div class="layui-form-item layui-form-text">'
-				    		+'		<label class="layui-form-label" style="color: black;">题目</label>'
-				    		+'		<div class="layui-input-block">'
-				      		+'			<textarea id="edit-bank-title" class="layui-textarea" style="height:100px;" placeholder="'+title+'" autocomplete="off" lay-verify="required" lay-reqtext="题目不能为空">'+title+'</textarea>'
-				    		+'		</div>'
-				  			+'	</div>'
-							
-				  			+'<div class="layui-form-item">'
+				  		  	+'<div class="layui-form-item">'
 				  			+'<label class="layui-form-label" style="color: black;">题目设置</label>'
 				  		    +'<div class="layui-input-inline">'
 				  		    +'<select id="difficult">'
@@ -725,82 +842,352 @@
 				  		    +'</div>'
 				  		    +'</div>'
 				  		    
-				  		 	+'<div class="layui-form-item layui-form-text">'
-				    		+'	<label class="layui-form-label" style="color: black;">选项</label>'
-				    		+'	<div class="layui-input-block">'
-				      		+			optStr
-				      		+'	</div>'
+							+'	<div class="layui-form-item layui-form-text">'
+				    		+'		<label class="layui-form-label" style="color: black;">题目</label>'
+				    		+'		<div class="layui-input-block">'
+				      		+'			<textarea id="edit-bank-title" class="layui-textarea" style="height:100px;" placeholder="请输入题目"></textarea>'
+				    		+'		</div>'
+				  			+'	</div>'
+							
+				  		 	+'<div class="layui-form-item layui-form-text" id = "creat-option">'
 				      	    +'</div>'
 				      	    
-				      	    +'<div class="layui-form-item layui-form-text">'
-				      	    +'<label class="layui-form-label" style="width: 18%; color: black; display: inline-block;">新建选项</label>'
-				      	    +'<div class="layui-input-inline" style="width: 80%; display: inline-block; float: right;">'
-				      	    +'  <input id="new-opt" class="layui-input" type="text" placeholder="请输入" style="width: 85%; display: inline;"/>'
-				      	  	+'  <button class="layui-btn layui-btn-normal" type="button" onclick="add_opt()">添加</button>'
+				      	    +'<div class="layui-form-item layui-form-text" id = "creat-option-input">'
 				      	    +'</div>'
+				      	    
+				      	    +'<div class="layui-input-block" id="creat-radio-ans" style="margin: 0px; border: 1px solid rgb(230, 230, 230); border-image: none; color: black;">'
+				  	    	+'</div>'
+				      	    
+				      	    +'<div class="layui-form-item layui-form-text" id = "creat-ans-many">'
 				      	    +'</div>'
-				  		    
-				      	    +'<div class="layui-form-item layui-form-text">'
-				    		+'	<label class="layui-form-label" style="color: black; ">参考答案</label>'
-				    		+'	<div class="layui-input-block">'
-				      		+'		<textarea id="edit-bank-answer"class="layui-textarea" style="height:20px;" placeholder="'+answer+'">'+answer+'</textarea>'
-				    		+'	</div>'
+				      	    
+				      		+'<div class="layui-form-item layui-form-text" id="creat-ans-many-input">'
+				      	    +'</div>'
+				      	    
+				      	    +'<div class="layui-form-item layui-form-text" id="creat-ans-one">'
 				  			+'</div>'
 		
 				  			+'<div class="layui-form-item layui-form-text">'
 				    		+'	<label class="layui-form-label" style="color: black;">解析</label>'
 				    		+'	<div class="layui-input-block">'
-				      		+'		<textarea id="edit-bank-analysis"class="layui-textarea" style="height:200px;" placeholder="'+analysis+'">'+analysis+'</textarea>'
+				      		+'		<textarea id="edit-bank-analysis"class="layui-textarea" style="height:200px;" placeholder="请输入解析"></textarea>'
 				    		+'	</div>'
 				  			+'</div>'
 				  		
 					  		+'</div>'
 					,btn1:function(index,layero){
-						var ed_title = document.getElementById("edit-bank-title").value;
-						var ed_analysis = document.getElementById("edit-bank-analysis").value;
-						var ans=document.getElementById("edit-bank-answer").value;
-						var opt='';
-			            var ed_skill = $("#skill option:selected").val();
-			            var ed_dif = $("#difficult option:selected").val();
-			            
-
-						var ans=document.getElementById("edit-bank-answer").value;
-						
-			            
-			            var sig_opts = $("#question-option").find(".op-text");
-			            $.each(sig_opts,function(index,sig_opt){
-			            	opt=opt+$(sig_opt).val();
-			            	//alert(index);
-			            	//alert(opt)
-			            	opt=opt+"#^#";
-			            });
-			            
-			            opt = opt.substring(0,opt.length-3);
-						var Jsdata = '{"id":'+questionid+',"title":"'+title+'","answer":"'+ans+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"'+opt+'","type":0,"skill":"'+questionskill+'","degree":'+difficultdegree+'}';
-						//alert(Jsdata);
-						if($("#q_type").val=''){
-							layer.msg("请选择题型");
+						//获取题型
+						var type='';
+						if($("#q_type option:selected").val()==''){
+							layer.msg('请选择题型', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						      });
+							return;
+						}else {
+							var type = $("#q_type option:selected").val();
 						}
-						$.ajax({
+						//alert(type);
+						
+						//获取难度
+						var difficult = -1;
+						if ( $("#difficult option:selected").val()=='') {
+							layer.msg('请选择题目难度', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						      });
+							return;
+						}else {
+							difficult = $("#difficult option:selected").val();
+						}
+						//alert(difficult);
+						
+						//获取技能
+						var skill = '';
+						if ( $("#skill option:selected").val()=='') {
+							layer.msg('请选择题目技能', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						      });
+							return;
+						}else {
+							var skill = $("#skill option:selected").val();
+						}
+						//alert(skill);
+						
+						//获取题目
+						var title=''
+						if ($("#edit-bank-title").val() == '') {
+							layer.msg('请输入题目', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+							return
+						}else {
+							title = $("#edit-bank-title").val();				
+						}
+						//alert(title);
+						
+						//获取选项
+						var option = '';
+						var sig_opts = $("#question-option").find(".op-text");
+				            $.each(sig_opts,function(index,sig_opt){
+				            	option=option+$(sig_opt).val();
+				            	//alert(index);
+				            	//alert(opt)
+				            	option=option+"#^#";
+				        });
+				        if(option == ''&&(type == '1'||type == '0')){
+					        	layer.msg('选项不能为空', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+					        }
+				        option = option.substring(0,option.length-3);
+						//alert(option);
+				        //获取答案
+				        var answer = '';
+				        if (type=='0'||type=='4') {
+				        	//单选和问答，从单选框中获取答案
+				        	ansert = $("#edit-bank-answer").val();
+				        }else if (type == '1'||type=='3') {
+							//多选和填空，从多选中组合答案
+				        	var sig_answers = $("#ed-answer-box").find(".ans-text");
+				            $.each(sig_answers,function(index,sig_ans){
+				            	answer=answer+$(sig_ans).text();
+				            	answer=answer+"#^#";
+				            })
+				             answer = answer.substring(0,answer.length-3);
+						}else if (type == '2') {
+							//判断题，从单选框中获取答案
+							answer=$("input[name='judge'][checked]").val();
+						}
+				        
+				        if(answer == ''){
+				        	layer.msg('答案不能为空', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+				        	return;
+				        }
+						//alert(answer);
+				        //获取解析
+				        var analysis = $("#edit-bank-analysis").val();
+				        //alert(analysis);
+						
+				        //组合json信息
+				        var Jsdata = '{"title":"'+title+'","answer":"'+answer+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"'+option+'","type":'+type+',"skill":"'+skill+'","degree":'+difficult+'}';
+				        //alert(Jsdata);
+				        
+				        $.ajax({
 							type:"POST"
 							,dataType:'json'
 							,contentType: "application/json;charset=UTF-8"
 							,data:Jsdata
-							,url:"/editQuestion"
-							,success:function(message){
+							,url:"/createQuestion"
+							,success:function(message){/* 
+								var start = 0;
+								var count1 = 5;
+								var tot = [[${totle}]]; */
+								var st = start;
+								var tot_add = tot+1;
+								if(tot_add%count1>0){
+									st = (tot_dd/count1)*count1-1;
+								}else {
+									st = (tot_dd/count1-1)*count1-1;
+								}
+								location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+st+"&count="+count1;
 								layer.closeAll();
-								location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
 							}
 							,error: function (message){
-								layer.msg("编辑失败，请重试");
-								layer.closeAll();
+								layer.msg("添加失败，请重试");
 							}
 						});
-					}
+				   	}
 					,btn2:function(index,layero){
 							  
 					}
 				});
+				
+				form.render('select');
+				form.render('checkbox');
+				form.render('radio');
+				
+				$("#skill").val('');
+				$("#difficult").val('');
+			
+				$(".mov-answer").click(function(){
+					$(this).parent(".signal-answer").remove();
+				});
+				$(".mov-ad-option").click(function(){
+					$(this).parent().remove();
+				});
+				
+				form.on('select(q_type)', function(data){
+					  
+					var typeValue =  data.value; //得到被选中的值
+					 // console.log(data.othis); //得到美化后的DOM对象
+					switch (typeValue) {
+					case '0'://单选题
+					var option_box = '<label class="layui-form-label" style="color: black;">选项</label>'
+									+'	<div class="layui-input-block">'
+									+'  <div class="question-option boxs" id="question-option"></div>'
+									+'</div>';
+					
+					var option_add_butn = '<label class="layui-form-label" style="width: 18%; color: black; display: inline-block;">新建选项</label>'
+				      	    			+'<div class="layui-input-inline" style="width: 80%; display: inline-block; float: right;">'
+				      	    			+'  <input id="new-opt" class="layui-input" type="text" placeholder="请输入" style="width: 85%; display: inline;"/>'
+				      	  				+'  <button class="layui-btn layui-btn-normal" type="button" onclick="add_opt()">添加</button>'
+				      	    			+'</div>';
+				    
+				    $("#creat-radio-ans").empty();
+				    $("#creat-ans-many").empty();
+				    $("#creat-ans-many-input").empty();
+				    
+				    var ans_one = '	<label class="layui-form-label" style="color: black; ">参考答案</label>'
+				    			+'	<div class="layui-input-block">'
+				      			+'		<textarea id="edit-bank-answer"class="layui-textarea" style="height:40px;" placeholder="请输入参考答案"></textarea>'
+				    			+'	</div>';
+				    			
+				    if($("#creat-option").children().length<=0){	
+				    	$("#creat-option").append(option_box);
+				   	}
+				    if($("#creat-option-input").children().length<=0){
+				    	$("#creat-option-input").append(option_add_butn);
+				    }
+				    if($("#creat-ans-one").children().length<=0){
+						$("#creat-ans-one").append(ans_one);
+				    }
+					break;
+
+
+					case "1"://多选题
+					
+						var option_box = '<label class="layui-form-label" style="color: black;">选项</label>'
+							+'	<div class="layui-input-block">'
+							+'  <div class="question-option boxs" id="question-option"></div>'
+							+'</div>';
+			
+						var option_add_butn = '<label class="layui-form-label" style="width: 18%; color: black; display: inline-block;">新建选项</label>'
+		      	    			+'<div class="layui-input-inline" style="width: 80%; display: inline-block; float: right;">'
+		      	    			+'  <input id="new-opt" class="layui-input" type="text" placeholder="请输入" style="width: 85%; display: inline;"/>'
+		      	  				+'  <button class="layui-btn layui-btn-normal" type="button" onclick="add_opt()">添加</button>'
+		      	    			+'</div>';
+		    
+		    			$("#creat-radio-ans").empty();
+		   				$("#creat-ans-one").empty();
+		    
+		    			var ans_many = '	<label class="layui-form-label" style="color: black;">参考答案</label>'
+				    			+'	<div class="layui-input-block">'
+				      			+	'<div class="answer-box boxs" id="ed-answer-box"></div>'		
+				      			+'	</div>';
+				      	var ans_many_butn = '<label class="layui-form-label" style="width: 18%; color: black; display: inline-block;">新建答案</label>'
+				      	   		+'<div class="layui-input-inline" style="width: 80%; display: inline-block; float: right;">'
+				      	    	+'  <input id="new-ans" class="layui-input" type="text" placeholder="请输入" style="width: 85%; display: inline;"/>'
+				      	  		+'  <button class="layui-btn layui-btn-normal" type="button" onclick="add_answer()">添加</button>'
+				      	    	+'</div>';
+		    			
+		    			if($("#creat-ans-many-input").children().length<=0){
+							$("#creat-ans-many-input").append(ans_many_butn);
+		    			}
+				      	if($("#creat-ans-many").children().length<=0){
+				      		$("#creat-ans-many").append(ans_many);
+		    			}
+				      	if($("#creat-option").children().length<=0){
+				      		$("#creat-option").append(option_box);
+		    			}
+				      	if($("#creat-option-input").children().length<=0){
+				      		$("#creat-option-input").append(option_add_butn);
+		    			}	
+				      	
+					break;
+
+					case "2"://判断题
+						$("#creat-option-input").empty();
+						$("#creat-option").empty();
+						$("#creat-ans-many").empty();
+					    $("#creat-ans-many-input").empty();
+					    $("#creat-ans-one").empty();
+					    var redio_ans = '<label class="layui-form-label" style="color: black;">答案</label>'
+				  			+'<input type="radio" name="judge" value="对" title="对">'
+				  	      	+'<input type="radio" name="judge" value="错" title="错">'; 
+				  	     if ($("#creat-radio-ans").children().length<=0) {
+				  	    	$("#creat-radio-ans").append(redio_ans);
+						}
+					break;
+
+					case "3"://填空题
+						$("#creat-option-input").empty();
+						$("#creat-option").empty();
+					    $("#creat-ans-one").empty();
+					    $("#creat-radio-ans").empty();
+					    
+					    var ans_many = '	<label class="layui-form-label" style="color: black;">参考答案</label>'
+			    			+'	<div class="layui-input-block">'
+			      			+	'<div class="answer-box boxs" id="ed-answer-box"></div>'		
+			      			+'	</div>';
+			      		var ans_many_butn = '<label class="layui-form-label" style="width: 18%; color: black; display: inline-block;">新建答案</label>'
+			      	   		+'<div class="layui-input-inline" style="width: 80%; display: inline-block; float: right;">'
+			      	    	+'  <input id="new-ans" class="layui-input" type="text" placeholder="请输入" style="width: 85%; display: inline;"/>'
+			      	  		+'  <button class="layui-btn layui-btn-normal" type="button" onclick="add_answer()">添加</button>'
+			      	    	+'</div>';
+			      		if($("#creat-ans-many-input").children().length<=0){
+							$("#creat-ans-many-input").append(ans_many_butn);
+		    			}
+				      	if($("#creat-ans-many").children().length<=0){
+				      		$("#creat-ans-many").append(ans_many);
+		    			}
+				
+					break ;
+					
+
+					case "4"://问答题
+						$("#creat-option-input").empty();
+						$("#creat-option").empty();
+					    $("#creat-radio-ans").empty();
+						$("#creat-ans-many").empty();
+					    $("#creat-ans-many-input").empty();
+					    
+					    var ans_one = '	<label class="layui-form-label" style="color: black; ">参考答案</label>'
+			    			+'	<div class="layui-input-block">'
+			      			+'		<textarea id="edit-bank-answer"class="layui-textarea" style="height:40px;" placeholder="请输入参考答案"></textarea>'
+			    			+'	</div>';
+					    if($("#creat-ans-one").children().length<=0){
+							$("#creat-ans-one").append(ans_one);
+					    }
+					break;
+
+				default:
+					break;
+				}	
+					form.render('select');
+					form.render('checkbox');
+					form.render('radio');
+				});
+				
+				layui.use('layer', function(){
+					  var layer = layui.layer;
+				});
+				
 			}
 			
 			function add_answer(){
@@ -820,7 +1207,7 @@
 					});
 			}
 			function strToAns(str) {
-				var retrn = '<div class="answer-box" id="ed-answer-box">';
+				var retrn = '<div class="answer-box boxs" id="ed-answer-box">';
 				var array_str = str.split("#^#");
 				$.each(array_str,function(index,ans){
 					retrn = retrn + '<div class="signal-answer">'
@@ -833,7 +1220,7 @@
 			}
 			
 			function strToOption(str) {
-				var retrn = '<div class="question-option" id="question-option">';
+				var retrn = '<div class="question-option boxs" id="question-option">';
 				var array_str = str.split("#^#");
 				if (array_str[0] == '') {
 					retrn = retrn+'</div>'
@@ -871,7 +1258,6 @@
 				form.render('checkbox');
 				form.render('radio');
 			}
-			
 			
 		</script>
 		
@@ -955,7 +1341,7 @@
 			<a class = "question-footer">批量上传</a>
 			<a onclick="creat_question()" class = "question-footer">新建题目</a>
 		</div>
-		<a href= "" class="layui-icon layui-icon-close" style="color:red;font-size:20px;"></a>
+		<a href= "/showQuestionBanks" class="layui-icon layui-icon-close" style="color:red;font-size:20px;"></a>
 	</div>
 	<hr style="height:1px;">
 	<div class = "bank_questions" id="bank_questions">
@@ -1028,16 +1414,16 @@
 										<span style="color: #333333;font-size: 16px;" > 答案</span>
 										<div  th:case="2">
 											<div th:switch="${question.answer}">
-												<div class="layui-form" th:case="'1'">
+												<div class="layui-form" th:case="'对'">
 													<div class="layui-form-item">
-					  	      						<input type="radio" name="judge" value="1" title="对" checked disabled>
-					  	      						<input type="radio" name="judge" value="0" title="错" disabled>  
+					  	      						<input type="radio" name="judge" value="对" title="对" checked disabled>
+					  	      						<input type="radio" name="judge" value="错" title="错" disabled>  
 					  	    						</div>
 												</div>
-												<div class="layui-form" th:case="'0'">
+												<div class="layui-form" th:case="'错'">
 													<div class="layui-form-item">
-					  	      						<input type="radio" name="judge" value="1" title="对"  disabled>
-					  	      						<input type="radio" name="judge" value="0" title="错" checked disabled>
+					  	      						<input type="radio" name="judge" value="对" title="对"  disabled>
+					  	      						<input type="radio" name="judge" value="错" title="错" checked disabled>
 					  	    						</div>
 												</div>
 											</div>

@@ -70,7 +70,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 	public void save(Bank bank) {
 		// TODO Auto-generated method stub
 		System.out.println("start create");
-		int bankid = bankMapper.insert(bank);
+		bankMapper.insert(bank);
 		System.out.println("end!");
 	}
 

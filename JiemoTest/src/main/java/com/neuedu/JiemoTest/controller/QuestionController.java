@@ -22,19 +22,8 @@ public class QuestionController {
 	@RequestMapping("/editQuestion")
 	@ResponseBody
 	public String editQuestion(HttpServletRequest request , @RequestBody JSONObject data) {
-		//int questionid = Integer.parseInt(request.getParameter("id"));
-		//System.out.println(data);
-		//System.out.println("vfgkkffdsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		int bankid = data.getIntValue("bankId");/*
-		String title = request.getParameter("title");
-		String answer = request.getParameter("answer");
-		String analysis = request.getParameter("analysis");
-		String options = request.getParameter("option");
-		int degree = Integer.parseInt(request.getParameter("degree"));
-		String skill = request.getParameter("skill");
-		int type = Integer.parseInt(request.getParameter("type"));*/
-		//System.out.println(bankid+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-		//System.out.println(data.getIntValue("id")+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+		
+		int bankid = data.getIntValue("bankId");
 		
 		Question question = new Question();
 		question.setQuestionid(data.getIntValue("id"));
@@ -47,6 +36,31 @@ public class QuestionController {
 		question.setQuestiontype(data.getInteger("type"));
 		//System.out.println(skill);
 		questionService.update(bankid,question);
+		
+		return "bank/Bankquestion";
+	}
+	//var Jsdata = '{"title":"'+title+'","answer":"'+answer+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"'+option+'","type":'+type+',"skill":"'+skill+'","degree":'+difficult+'}';
+    
+	@RequestMapping("/createQuestion")
+	@ResponseBody
+	public String createQuestion(HttpServletRequest request , @RequestBody JSONObject data) {
+		
+		int bankid = data.getIntValue("bankId");
+		
+		Question question = new Question();
+		question.setTitle(data.getString("title"));
+		question.setAnswer(data.getString("answer"));
+		question.setAnalysis(data.getString("analysis"));
+		question.setDifficultdegree(data.getIntValue("degree"));
+		question.setOptions(data.getString("option"));
+		question.setQuestionskill(data.getString("skill"));
+		question.setQuestiontype(data.getInteger("type"));
+		
+		int seconds = (int) (System.currentTimeMillis() / 1000);
+		question.setEdittime(seconds);
+		
+		//System.out.println(skill);
+		questionService.create(bankid,question);
 		
 		return "bank/Bankquestion";
 	}

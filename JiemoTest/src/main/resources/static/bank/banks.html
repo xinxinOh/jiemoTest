@@ -242,7 +242,7 @@
     				<span>
     					<ul class="listcontext"> <!-- 二级菜单 -->
       					<li><a th:onclick="editBank([[${bank.bankid}]],[[${bank.bankname}]],[[${bank.bankintroduction}]])" class = "layui-icon layui-icon-edit">编辑题库</a></li>
-      					<li><a th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=3'" class = "layui-icon layui-icon-read" >查看题目</a></li>
+      					<li><a th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "layui-icon layui-icon-read" >查看题目</a></li>
       					<li><a href="" class = "layui-icon layui-icon-release" >分享题库</a></li>
       					<li><a href="" class = "layui-icon layui-icon-cart" >出售题库</a></li>
       					<li><a th:href="@{'/deleteBank?id='+${bank.bankid}}"  class = "layui-icon layui-icon-delete">删除题库</a></li>

@@ -101,7 +101,8 @@ public class QuestionServiceImpl implements QuestionService {
 			//复制源题库信息
 			Question sourceQuestion = questionMapper.selectByPrimaryKey(sourceId);
 			//新题库
-			int newid = questionMapper.insertSelective(question);
+			int a = questionMapper.insertSelective(question);
+			//int newid = questionMapper.selectLastInsert();
 			//删除旧信息
 			QuestionInBankExample example = new QuestionInBankExample();
 			Criteria criteria = example.createCriteria();
@@ -111,8 +112,21 @@ public class QuestionServiceImpl implements QuestionService {
 			//添加新信息
 			QuestionInBankKey record = new QuestionInBankKey();
 			record.setBankid(bankid);
-			record.setQuestionid(newid);
+			//record.setQuestionid(newid);
 			questionInBank.insert(record);
 		}
+	}
+
+	@Override
+	public void create(int bankid, Question question) {
+		// TODO Auto-generated method stub
+		questionMapper.insertSelective(question);
+		//int questionid = questionMapper.selectLastInsert();
+		
+		//System.out.println(questionid);
+		QuestionInBankKey key = new QuestionInBankKey();
+		key.setBankid(bankid);
+		//key.setQuestionid(questionid);
+		questionInBank.insert(key);
 	}
 }

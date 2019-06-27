@@ -30,16 +30,6 @@
 				
 			});
 			
-			function timetemple(data) {
-				  var date = new Date(data)
-				  var Y = date.getFullYear() + '-'
-				  var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
-				  var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
-				  var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
-				  var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
-				  var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
-				  return Y + M + D + h + m + s
-			}
 		</script>
 		
 
@@ -59,7 +49,7 @@
 							<a class="header-font-color" href="">考试</a>
 						</li>
 						<li class="layui-nav-item">
-							<a class="header-font-color" href="">题库</a>
+							<a class="header-font-color" href="/showQuestionBanks">题库</a>
 						</li>
 						<li class="layui-nav-item">
 							<a href="javascript:;" class="header-font-color">商店</a>
@@ -144,7 +134,7 @@
   		 	<div class="bank-bottom">
   		 		<hr style="height:1px;">
   		 		<span>
-  		 		<a href=""  class = "question-footer">永久删除</a>
+  		 		<a th:href="@{'/realDeletBank?id='+${bank.bankid}}"  class = "question-footer">永久删除</a>
   		 		<a class="question-footer" th:href="@{'/recoverBank?id='+${bank.bankid}}">恢复</a>
   		 		</span>
   		 	</div>
