@@ -101,7 +101,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Part" >
+  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Part"  keyProperty="partid" useGeneratedKeys="true" >
     insert into part (partId, examId, partName, 
       spare_1, spare_2, spare_3, 
       spare_4)

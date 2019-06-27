@@ -11,13 +11,129 @@
 		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
 		<script src="layui/layui.js" th:src="@{static/layui/layui.all.js}"></script>
 		<script src="layui/layer/layer.js" th:src="@{static/layui/layer/layer.js}"></script>
-
+		<script type="text/javascript" src="js/template.js" th:src="@{static/js/template.js}"></script>
 		<script type="text/javascript">
 			//JavaScript代码区域
-			layui.use('element', function() {
-				var element = layui.element;
 
-			});
+			var nowManageExam = -1;
+			var index = -1;
+			//检查是否已过考试时间
+			function checkIfCanAddStudent() {
+
+				var examList = $(".one-exam");
+
+				for(var i = 0; i < examList.length; i++) {
+					var startTime = examList.eq(i).attr("data-InTime");
+					var endTime = examList.eq(i).attr("data-InTimea");
+					var nowTime = Date.parse(new Date()) / 1000;
+					if(endTime != "") {
+						examList.eq(i).attr("data-InTime", "1");
+						examList.eq(i).removeAttr("data-InTimea");
+					} else {
+						examList.eq(i).attr("data-InTime", "0");
+						examList.eq(i).removeAttr("data-InTimea");
+					}
+				}
+
+			}
+
+			function addOneStudent() {
+				var username = $(".student-name-input").val();
+				var userinfo = $(".student-info-input").val();
+				var examTitle = $("[data-examid='" + nowManageExam + "'").children(".one-exam-header").children(".one-exam-title").children("span").text();
+				var infoType = -1;
+				if(username == "" || userinfo == "") {
+					layer.msg("输入不能为空");
+					return;
+				}
+				if(userinfo.match(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/)) {
+					infoType = 0;
+				} else if(userinfo.match(/^1[3|4|5|8][0-9]\d{4,8}$/)) {
+					infoType = 1;
+				} else {
+					layer.msg("邮箱或手机号格式输入有误");
+					return;
+				}
+
+				var a = {
+					'examid': nowManageExam,
+					'username': username,
+					'userphoneOrEmail': userinfo,
+					'infoType': infoType,
+					'examTitle': examTitle
+				};
+
+				$.ajax({
+					async: false,
+					url: 'addOneStudent',
+					type: 'get',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					data: a,
+					success: function(e) {
+
+						if(e.split(" ")[0] == "1") {
+							layer.msg("录入成功！");
+						}
+						if(e.split(" ")[0] == "0") {
+							layer.msg(e.split(" ")[1]);
+						}
+
+					},
+					error: function() {
+						alert('请先登陆');
+					}
+				});
+
+			}
+
+			function getMyDate(str) {
+				var oDate = new Date(str),
+					oYear = oDate.getFullYear(),
+					oMonth = oDate.getMonth() + 1,
+					oDay = oDate.getDate(),
+					oHour = oDate.getHours(),
+					oMin = oDate.getMinutes(),
+					oSen = oDate.getSeconds(),
+					oTime = oYear + '-' + getzf(oMonth) + '-' + getzf(oDay) + ' ' + getzf(oHour) + ':' + getzf(oMin) + ':' + getzf(oSen); //最后拼接时间  
+				return oTime;
+			};
+			//补0操作
+			function getzf(num) {
+				if(parseInt(num) < 10) {
+					num = '0' + num;
+				}
+				return num;
+			}
+
+			function SearchExam() {
+
+				$.ajax({
+					async: false,
+					url: 'getExamList',
+					type: 'get',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					success: function(e) {
+
+						if(e == "请先登录") {
+							layer.msg("请先登录");
+							return;
+						}
+
+						var obj = JSON.parse(e); //将字符串转换成json对象
+
+						var new_html = template("loadExam", obj); //将json对象绑定到artTemplate模板上
+
+						$('#Exam-container').html(new_html);
+
+						var allTime = $(".one-exam-time").children("span");
+						for(var i = 0; i < allTime.length; i++) {
+							var editTime = allTime.eq(i).text();
+							allTime.eq(i).text("编辑于 " + getMyDate(parseInt(editTime) * 1000));
+						}
+					}
+
+				});
+			}
 
 			function CreateExam() {
 				layui.use('form', function() {
@@ -27,35 +143,35 @@
 						type: 1,
 						area: ['600px', '350px'],
 						shadeClose: true, //点击遮罩关闭
-						content: '<div class="choice-container">'+
-						'<div class="hand-movement">'+
-							'<div class="hand-movement-img">'+
-								'<i class="layui-icon layui-icon-friends" style="font-size: 30px; color: #1E9FFF;"></i>'  +
-							'</div>'+
-							'<div class="hand-movement-title" style="margin-left: 45px;margin-top: 5px;margin-bottom: 5px;">'+
-								'<span style="color: #666666;"> 手工组卷 </span>'+
+						content: '<div class="choice-container">' +
+							'<div class="hand-movement">' +
+							'<div class="hand-movement-img">' +
+							'<i class="layui-icon layui-icon-friends" style="font-size: 30px; color: #1E9FFF;"></i>' +
 							'</div>' +
-							'<div class="hand-movement-info" style="margin-left: 3px;">'+
-								'<span style="color: #333333;"> 从已有题库手动选择试题 </span>'+
-							'</div>'+
-						'</div>'+
-						'<div class="voluntarily">'+
-							'<div class="voluntarily-img">'+
-								'<i class="layui-icon layui-icon-upload-drag" style="font-size: 30px; color: #1E9FFF;"></i>'  +
-							'</div>'+
-							'<div class="voluntarily-title" style="margin-left: 45px;margin-top: 5px;margin-bottom: 5px;">'+
-								'<span style="color: #666666;"> 智能组卷 </span>'+
-							'</div>'+
-							'<div class="voluntarily-info" style="margin-left: 12px;">'+
-								'<span style="color: #333333;"> 选择题库自动生成试卷 </span>'+
-							'</div>'+
-						'</div>'+
-					'</div>'
+							'<div class="hand-movement-title" style="margin-left: 45px;margin-top: 5px;margin-bottom: 5px;">' +
+							'<span style="color: #666666;"> 手工组卷 </span>' +
+							'</div>' +
+							'<div class="hand-movement-info" style="margin-left: 3px;">' +
+							'<span style="color: #333333;"> 从已有题库手动选择试题 </span>' +
+							'</div>' +
+							'</div>' +
+							'<div class="voluntarily">' +
+							'<div class="voluntarily-img">' +
+							'<i class="layui-icon layui-icon-upload-drag" style="font-size: 30px; color: #1E9FFF;"></i>' +
+							'</div>' +
+							'<div class="voluntarily-title" style="margin-left: 45px;margin-top: 5px;margin-bottom: 5px;">' +
+							'<span style="color: #666666;"> 智能组卷 </span>' +
+							'</div>' +
+							'<div class="voluntarily-info" style="margin-left: 12px;">' +
+							'<span style="color: #333333;"> 选择题库自动生成试卷 </span>' +
+							'</div>' +
+							'</div>' +
+							'</div>'
 
 						//各种基于事件的操作，下面会有进一步介绍
 
 					});
-					
+
 					//  form.render('checkbox'); 
 					//  form.render('radio'); 
 
@@ -68,12 +184,156 @@
 				});
 			};
 
+			function ShowPublishExam() {
+				layui.use('form', function() {
+					var form = layui.form;
+
+					index = layer.open({
+						type: 1,
+						area: ['700px', '500px'],
+						shadeClose: true, //点击遮罩关闭
+						content: '﻿<div class="publish-exam-container" style="padding: 15px;width: 600px;margin-left:30px;">' +
+							'<div class="publish-exam">' +
+							'<div class="publish-exam-title" style="padding:7px;background-color: #5FB878;border-radius: 5px;">' +
+							'<span style="font-size: 18px;color: #FFF;">设置考试</span>' +
+							'</div>' +
+							'<div class="publish-exam-startTime" style="margin-top: 25px;">' +
+							'<label class="layui-form-label" style="color: #333333;font-size: 15px;">开始时间</label>' +
+							'<div class="layui-input-block">' +
+							'<input type="text" class="layui-input" style="width: 92%;" id="startTime">' +
+							'</div>' +
+							'</div>' +
+							'<div class="publish-exam-endTime" style="margin-top: 25px;">' +
+							'<label class="layui-form-label" style="color: #333333;font-size: 15px;">结束时间</label>' +
+							'<div class="layui-input-block">' +
+							'<input type="text" class="layui-input" style="width: 92%;" id="endTime">' +
+							'</div>' +
+							'</div>' +
+							'<div class="publish-exam-windows-time" style="margin-top: 25px;">' +
+							'<label class="layui-form-label" style="color: #333333;font-size: 15px;">切换次数</label>' +
+							'<div class="layui-input-block">' +
+							'<input type="text" name="title" required lay-verify="required" placeholder="请输入考生最多切换窗口次数（必填）" autocomplete="off" class="layui-input publish-exam-windows-time-input" style="width: 92%;">' +
+							'</div>' +
+							'</div>' +
+							'<div class="add-publish-exam-btn" style="margin-top:25px;margin-left:35px;width: 88%;">' +
+							'<button class="layui-btn layui-btn-fluid layui-btn-normal" style="border-radius: 7px;">发布考试</button>' +
+							'</div>' +
+							'</div>' +
+							'</div>'
+
+						//各种基于事件的操作，下面会有进一步介绍
+
+					});
+					layui.use('laydate', function() {
+						var laydate = layui.laydate;
+
+						//执行一个laydate实例
+						laydate.render({
+							elem: '#startTime' //指定元素
+						});
+						laydate.render({
+							elem: '#endTime' //指定元素
+						});
+					});
+					var form = layui.form;
+					form.render();
+				});
+			};
+
+			function ShowaddStudent() {
+				layui.use('form', function() {
+					var form = layui.form;
+
+					layer.open({
+						type: 1,
+						area: ['700px', '600px'],
+						shadeClose: true, //点击遮罩关闭
+						content: '﻿<div class="add-student-container" style="padding: 15px;width: 600px;height: 450px;margin-left:30px;">' +
+							'<div class="add-one-student">' +
+							'<div class="add-one-student-title" style="padding:7px;background-color: #5FB878;border-radius: 5px;">' +
+							'<span style="font-size: 18px;color: #FFF;">单个录入</span>' +
+							'</div>' +
+							'<div class="add-one-student-input-name" style="margin-top: 25px;">' +
+							'<label class="layui-form-label" style="color: #333333;font-size: 15px;">考生姓名</label>' +
+							'<div class="layui-input-block">' +
+							'<input type="text" name="title" required lay-verify="required" placeholder="请输入考生姓名（必填）" autocomplete="off" class="layui-input student-name-input" style="width: 92%;">' +
+							'</div>' +
+							'</div>' +
+							'<div class="add-one-student-input-email" style="margin-top: 15px;">' +
+							'<label class="layui-form-label" style="color: #333333;font-size: 15px;">联系方式</label>' +
+							'<div class="layui-input-block">' +
+							'<input type="text" name="title" required lay-verify="required" placeholder="请输入考生邮箱或手机号（必填）" autocomplete="off" class="layui-input student-info-input" style="width: 92%;">' +
+							'</div>' +
+							'</div>' +
+							'<div class="add-one-student-btn" style="margin-left:110px;width: 14%;margin-top:15px">' +
+							'<button onclick="return false;" type = "button" class="layui-btn layui-btn-fluid layui-btn-sm layui-btn-normal">录入</button>' +
+							'</div>' +
+							'</div>' +
+							'<div class="add-many-students">' +
+							'<div class="add-many-student-title" style="margin-top:25px;padding:7px;background-color: #5FB878;border-radius: 5px;">' +
+							'<span style="font-size: 18px;color: #FFF;">批量录入</span>' +
+							'</div>' +
+							'<div class="add-many-student-help" style="margin-left: 35px;margin-top: 15px;margin-bottom: 15px;">' +
+							'<span class="layui-badge-dot layui-bg-orange"></span>' +
+							'<span style="font-size: 16px;color: #FF5722;">&nbsp;&nbsp;请下载模板后按模板提示输入导入</span>' +
+							'</div>' +
+							'<div class="add-many-student-download" style="margin-left:35px;width: 40%;display: inline-block;">' +
+							'<button onclick="return false;" type = "button" class="layui-btn layui-btn-fluid layui-bg-red layui-btn-sm">下载模板</button>' +
+							'</div>' +
+							'<div class="add-many-student-upload" style="margin-left:35px;width: 40%;display: inline-block;">' +
+							'<button onclick="return false;" type = "button" class="layui-btn layui-btn-fluid layui-btn-sm layui-btn-normal">导入文件</button>' +
+							'</div>' +
+							'</div>' +
+							'<div class="inform-student" style="margin-top: 25px;">' +
+							'<div class="inform-student-title" style="margin-top:25px;padding:7px;background-color: #5FB878;border-radius: 5px;">' +
+							'<span style="font-size: 18px;color: #FFF;">通知考生</span>' +
+							'</div>' +
+							'<div class="inform-student-btn-container" style="margin-top: 15px;margin-left: 35px;">' +
+							'<div class="inform-student-email" style="display: inline;">' +
+							'<div class="layui-form" style="display: inline;margin-right: 0px;margin-top: 0px;">' +
+							'<input type="checkbox" name="inform-student-email" lay-skin="switch" checked>' +
+							'</div>' +
+							'<span style="color: #333333;font-size: 17px;">&nbsp;&nbsp;&nbsp;邮件通知考生&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' +
+							'</div>' +
+							'<div class="inform-student-phone" style="display: inline;">' +
+							'<div class="layui-form" style="display: inline;margin-right: 0px;margin-top: 0px;">' +
+							'<input type="checkbox" name="inform-student-phone" lay-skin="switch">' +
+							'</div>' +
+							'<span style="color: #333333;font-size: 17px;">&nbsp;&nbsp;&nbsp;短信通知考生</span>' +
+							'</div>' +
+							'</div>' +
+							'</div>' +
+							'</div>'
+
+						//各种基于事件的操作，下面会有进一步介绍
+
+					});
+					var form = layui.form;
+					form.render();
+				});
+			};
+
 			$(document).ready(function() {
 
+				layui.use('form', function() {
+					var form = layui.form;
+					form.render();
+					//各种基于事件的操作，下面会有进一步介绍
+				});
+
+				layui.use('element', function() {
+					var element = layui.element;
+
+				});
+
+				SearchExam();
+				checkIfCanAddStudent();
+
+				layui.element.init();
 				$("body").on("hover", ".NavBar-item", function() {
 
 					$(this).css("background-color", "#BCDDBC");
-
+					layui.element.init();
 				});
 
 				$("body").on("mouseout", ".NavBar-item", function() {
@@ -81,7 +341,7 @@
 					$(this).css("background-color", "#FFFFFF");
 
 				});
-				
+
 				$("body").on("hover", ".hand-movement", function() {
 
 					$(this).css("background-color", "#BCDDBC");
@@ -93,7 +353,7 @@
 					$(this).css("background-color", "#FFFFFF");
 
 				});
-				
+
 				$("body").on("hover", ".voluntarily", function() {
 
 					$(this).css("background-color", "#BCDDBC");
@@ -105,113 +365,317 @@
 					$(this).css("background-color", "#FFFFFF");
 
 				});
-				
-				
-				
+
 				$("body").on("click", ".hand-movement", function() {
 
-					window.location.href="HandMovement";
+					window.location.href = "HandMovement";
 
 				});
-				
+
 				$("body").on("click", ".create-exam", function() {
 
 					CreateExam();
 
 				});
 
+				$("body").on("mouseover", ".question-num", function() {
+					layer.tips('该考试共' + $(this).children("span").text() + '题', this, {
+						tips: [1, '#5FB878'],
+						time: 1000
+					});
+				});
+
+				$("body").on("mouseover", ".points-sum", function() {
+					layer.tips('该考试共' + $(this).children("span").text() + '分', this, {
+						tips: [1, '#5FB878'],
+						time: 1000
+					});
+				});
+
+				$("body").on("mouseover", ".student-num", function() {
+					layer.tips('该考试共' + $(this).children("span").text() + '考生', this, {
+						tips: [1, '#5FB878'],
+						time: 1000
+					});
+				});
+
+				//弹出录入考生
+				$("body").on("click", ".add-student-btn", function() {
+					nowManageExam = $(this).parent().parent().parent().parent().parent().parent().parent().attr("data-examid");
+					var CanAdd = $("[data-examid='" + nowManageExam + "'").attr("data-intime");
+					if(CanAdd == "0") {
+						layer.msg("请先发布考试或确认是否已过考试时间");
+						return;
+					}
+					ShowaddStudent();
+				});
+
+				//录入单个考生
+				$("body").on("click", ".add-one-student-btn", function() {
+
+					addOneStudent();
+
+				});
+
+				//弹出发布考试
+				$("body").on("click", ".publish-exam-btn", function() {
+					nowManageExam = $(this).parent().parent().parent().parent().parent().parent().parent().attr("data-examid");
+
+					ShowPublishExam();
+
+				});
+
+				//发布考试
+				$("body").on("click", ".add-publish-exam-btn", function() {
+
+					var startTime = $("#startTime").val();
+					var endTime = $("#endTime").val();
+					var MaxWindowsTime = $(".publish-exam-windows-time-input").val();
+
+					if(startTime == "" || endTime == "" || MaxWindowsTime == "") {
+						layer.msg("输入不能为空！")
+						return;
+					}
+
+					var parnt = /^([1-9]\d*(\.\d*[1-9])?)|(0\.\d*[1-9])$/;
+					if(parnt.test(MaxWindowsTime)) {
+
+					} else {
+						layer.msg('请输入正整数');
+						return;
+					}
+
+					var startTimestamp = Date.parse(new Date(startTime));
+					var endTimestamp = Date.parse(new Date(endTime));
+
+					if(parseInt(endTimestamp) <= Date.parse(new Date())) {
+						layer.msg("结束时间不得早于当前时间！")
+						return;
+					}
+					if(parseInt(startTimestamp) <= Date.parse(new Date())) {
+						layer.msg("开始时间不得早于当前时间！")
+						return;
+					}
+					if(parseInt(startTimestamp) >= parseInt(endTimestamp)) {
+						layer.msg("开始时间必须大于结束时间！")
+						return;
+					}
+					var a = {
+						'examid': parseInt(nowManageExam),
+						'startTime': parseInt(startTimestamp) / 1000,
+						'endTime': parseInt(endTimestamp) / 1000,
+						'maxtimes': parseInt(MaxWindowsTime)
+					};
+
+					$.ajax({
+						async: false,
+						url: 'PublishExam',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+
+							if(e.split(" ")[0] == "1") {
+								layer.msg("发布成功！");
+								sleep(1000);
+								layer.close(index);
+								window.location.href = "Exam";
+							}
+							if(e.split(" ")[0] == "0") {
+								layer.msg(e.split(" ")[1]);
+							}
+
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+
+				});
+
+				//编辑考试
+				$("body").on("click", ".edit-exam-btn", function() {
+					nowManageExam = $(this).parent().parent().parent().parent().parent().parent().parent().attr("data-examid");
+
+					window.location.href = "toEditExam?examId=" + nowManageExam;
+
+				});
+
 			});
+		</script>
+
+		<script type="text/html" id="loadExam">
+
+			{{each ExamList as exam}}
+
+			<div class="one-exam" data-examid="{{exam.examid}}" data-InTime="{{exam.starttime}}" data-InTimea="{{exam.endtime}}" style="width: 300px!important;height: 140px!important;border: 1px solid #CCC;border-top:3px solid #5FB878;display: inline-block;margin: 20px;">
+
+				<div class="one-exam-header">
+
+					<div class="one-exam-title" style="margin-top: 22px;margin-left: 12px;display: inline-block;">
+						<span style="font-size: 16px;color: #333;">{{exam.examtitle}}</span>
+					</div>
+					<div class="one-exam-manage" style="float:right;color:#01AAED;background-color:#FFFFFF;display: inline-block;">
+
+						<ul class="layui-nav" style="color:#01AAED;background-color:#FFFFFF;">
+							<li class="layui-nav-item" style="color:#01AAED;background-color:#FFFFFF;">
+								<a href="javascript:;" class="header-font-color" style="color:#01AAED;">
+									考试管理
+								</a>
+								<dl class="layui-nav-child">
+									<dd>
+										<a class="header-font-color add-student-btn" href="javascript:;">录入考生</a>
+									</dd>
+									<dd>
+										<a class="header-font-color publish-exam-btn" href="javascript:;">发布考试</a>
+									</dd>
+									<dd>
+										<a class="header-font-color edit-exam-btn" href="javascript:;">编辑考试</a>
+									</dd>
+									<dd>
+										<a class="header-font-color" href="javascript:;">归档考试</a>
+									</dd>
+									<dd>
+										<a class="header-font-color" href="javascript:;">删除考试</a>
+									</dd>
+									<dd>
+										<a class="header-font-color" href="javascript:;">出售考试</a>
+									</dd>
+									<dd>
+										<a class="header-font-color" href="javascript:;">分享考试</a>
+									</dd>
+								</dl>
+							</li>
+
+						</ul>
+
+					</div>
+
+					<div class="one-exam-time" style="margin-left:12px;margin-top:20px;margin-bottom: 7px;display: inline-block;">
+						<span style="color: #888;">{{exam.edittime}}</span>
+					</div>
+
+				</div>
+
+				<div class="exam-info" style="padding-top:7px;border-top: 1px solid #DDD;">
+					<div class="layui-row">
+						<div class="layui-col-md4" align="center">
+							<div class="question-num">
+								<i class="layui-icon layui-icon-file-b" style="font-size: 18px; color: #5FB878;"></i>
+								<span style="font-size: 16px;color: #444;">{{exam.questionnum}}</span>
+							</div>
+						</div>
+						<div class="layui-col-md4" align="center">
+							<div class="points-sum">
+								<i class="layui-icon layui-icon-flag" style="font-size: 18px; color: #5FB878;"></i>
+								<span style="font-size: 16px;color: #444;">{{exam.pointssum}}</span>
+							</div>
+						</div>
+						<div class="layui-col-md4" align="center">
+							<div class="student-num">
+								<i class="layui-icon layui-icon-friends" style="font-size: 18px; color: #5FB878;"></i>
+								<span style="font-size: 16px;color: #444;">{{exam.spare1}}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			{{/each}}
+
 		</script>
 
 	</head>
 
-	<body>
+	<body class="layui-layout-body">
+		<div class="layui-layout layui-layout-admin header-border">
+			<div class="layui-header " style="background-color:#FFFFFF;">
+				<div class="layui-logo">
+					<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+				</div>
+				<!-- 头部区域（可配合layui已有的水平导航） -->
+				<div class="layui-nav layui-layout-left">
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">考试</a>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">题库</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">商店</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="">购买考试</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="">购买题库</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">群组</a>
+					</li>
+				</div>
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">
+							<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="">基本资料</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="">交易中心</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item header-font-color">
+						<a class="header-font-color" href="">退出登录</a>
+					</li>
+				</ul>
+			</div>
 
-		<body class="layui-layout-body">
-			<div class="layui-layout layui-layout-admin header-border">
-				<div class="layui-header " style="background-color:#FFFFFF;">
-					<div class="layui-logo">
-						<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
-					</div>
-					<!-- 头部区域（可配合layui已有的水平导航） -->
-					<div class="layui-nav layui-layout-left">
-						<li class="layui-nav-item">
-							<a class="header-font-color" href="">考试</a>
+			<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
+				<div class="layui-side-scroll">
+					<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+					<ul class="layui-nav-tree" lay-filter="test">
+
+						<li class="NavBar-item">
+
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
 						</li>
-						<li class="layui-nav-item">
-							<a class="header-font-color" href="">题库</a>
+						<hr style="height:1px;">
+						<li class="NavBar-item create-exam">
+							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>创建考试</a>
 						</li>
-						<li class="layui-nav-item">
-							<a href="javascript:;" class="header-font-color">商店</a>
-							<dl class="layui-nav-child">
-								<dd>
-									<a class="header-font-color" href="">购买考试</a>
-								</dd>
-								<dd>
-									<a class="header-font-color" href="">购买题库</a>
-								</dd>
-							</dl>
+						<hr style="height:1px;">
+						<li class="NavBar-item">
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
 						</li>
-						<li class="layui-nav-item">
-							<a class="header-font-color" href="">群组</a>
-						</li>
-					</div>
-					<ul class="layui-nav layui-layout-right">
-						<li class="layui-nav-item">
-							<a href="javascript:;" class="header-font-color">
-								<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
-							</a>
-							<dl class="layui-nav-child">
-								<dd>
-									<a class="header-font-color" href="">基本资料</a>
-								</dd>
-								<dd>
-									<a class="header-font-color" href="">交易中心</a>
-								</dd>
-							</dl>
-						</li>
-						<li class="layui-nav-item header-font-color">
-							<a class="header-font-color" href="">退出登录</a>
+						<hr style="height:1px;">
+						<li class="NavBar-item">
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
 						</li>
 					</ul>
 				</div>
+			</div>
 
-				<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
-					<div class="layui-side-scroll">
-						<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-						<ul class="layui-nav-tree" lay-filter="test">
+			<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;">
+				<!-- 内容主体区域 -->
 
-							<li class="NavBar-item">
+				<div id="Exam-container" style="margin: 20px 20px 20px 20px;">
 
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
-							</li>
-							<hr style="height:1px;">
-							<li class="NavBar-item create-exam">
-								<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>创建考试</a>
-							</li>
-							<hr style="height:1px;">
-							<li class="NavBar-item">
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
-							</li>
-							<hr style="height:1px;">
-							<li class="NavBar-item">
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
-							</li>
-						</ul>
-					</div>
-				</div>
-				
-				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;">
-					<!-- 内容主体区域 -->
-					4324
-				</div>
-
-				<div class="layui-footer" style="margin-left: 20px;border-left: 1px solid darkseagreen;background-color: #FFF;">
-					<!-- 底部固定区域 -->
-					? layui.com - 底部固定区域
 				</div>
 			</div>
 
-		</body>
+			<div class="layui-footer" style="margin-left: 20px;border-left: 1px solid darkseagreen;background-color: #FFF;">
+				<!-- 底部固定区域 -->
+				? layui.com - 底部固定区域
+			</div>
+		</div>
+
+	</body>
 
 </html>

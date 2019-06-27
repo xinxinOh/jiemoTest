@@ -3,6 +3,7 @@
 <mapper namespace="com.neuedu.JiemoTest.dao.QuestionMapper" >
   <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Question" >
     <id column="questionId" property="questionid" jdbcType="INTEGER" />
+    <result column="questionSkill" property="questionskill" jdbcType="VARCHAR" />
     <result column="title" property="title" jdbcType="VARCHAR" />
     <result column="options" property="options" jdbcType="VARCHAR" />
     <result column="answer" property="answer" jdbcType="VARCHAR" />
