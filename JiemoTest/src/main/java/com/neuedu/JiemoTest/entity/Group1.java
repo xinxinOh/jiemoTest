@@ -1,6 +1,6 @@
 package com.neuedu.JiemoTest.entity;
 
-public class Group {
+public class Group1 {
     private Integer groupid;
 
     private Integer createuserid;

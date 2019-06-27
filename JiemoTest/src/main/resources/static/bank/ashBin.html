@@ -27,9 +27,6 @@
 					$(this).css("background-color", "#FFFFFF");
 				});
 				
-				$("body").on("mouseout", ".sigle-bank", function() {
-					$(this" > bank-top").css("color", "#F6BB49");
-				});
 				
 			});
 			
@@ -137,7 +134,7 @@
     				<div class="list-hover"><a  class="layui-icon layui-icon-triangle-d" style="font-size: 15px; color: darkseagreen;"></a>
     				<span>
     					<ul class="listcontext"> <!-- 二级菜单 -->
-      					<li><a href="" class = "layui-icon layui-icon-edit">永久删除</a></li>
+      					<li><a th:href="@{'/realDeletBank?id='+${bank.bankid}}" class = "layui-icon layui-icon-edit">永久删除</a></li>
       					<li><a th:href="@{'/recoverBank?id='+${bank.bankid}}" class = "layui-icon layui-icon-read" >恢复</a></li>
     					</ul>
     				</span>

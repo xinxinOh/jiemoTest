@@ -23,4 +23,6 @@ public interface QuestionBankService {
 
 	Bank selectByPrimaryKey(int bankId);
 
+	void realDeletBank(int bankId);
+
 }
