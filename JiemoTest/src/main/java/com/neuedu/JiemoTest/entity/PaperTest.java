@@ -140,4 +140,15 @@ public class PaperTest {
     public void setSpare4(String spare4) {
         this.spare4 = spare4 == null ? null : spare4.trim();
     }
+
+	@Override
+	public String toString() {
+		return "PaperTest [paperid=" + paperid + ", examid=" + examid + ", userid=" + userid + ", examtitle="
+				+ examtitle + ", paperstate=" + paperstate + ", participatetime=" + participatetime + ", submittime="
+				+ submittime + ", changewindowsnum=" + changewindowsnum + ", ifteacherdelete=" + ifteacherdelete
+				+ ", studentgrade=" + studentgrade + ", spare1=" + spare1 + ", spare2=" + spare2 + ", spare3=" + spare3
+				+ ", spare4=" + spare4 + "]";
+	}
+
+	
 }

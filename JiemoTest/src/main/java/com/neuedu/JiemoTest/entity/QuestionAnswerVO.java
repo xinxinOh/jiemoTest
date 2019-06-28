@@ -26,11 +26,13 @@ public class QuestionAnswerVO {
 
 	    private String answercontent;
 
-	    private Integer score;
+	    private Integer score;//考生得分
 
 	    private Integer correctstate;
-
-	    private Integer spare1;
+	    
+	    private Integer sumscore;//该题的总分
+	    
+		private Integer spare1;
 
 	    private Integer spare2;
 
@@ -38,7 +40,15 @@ public class QuestionAnswerVO {
 
 	    private String spare4;
 	   
-	    public Integer getPaperid() {
+	    public Integer getSumscore() {
+			return sumscore;
+		}
+
+		public void setSumscore(Integer sumscore) {
+			this.sumscore = sumscore;
+		}
+
+		public Integer getPaperid() {
 		return paperid;
 	}
 
@@ -180,6 +190,55 @@ public class QuestionAnswerVO {
 
 		public void setCorrectstate(Integer correctstate) {
 			this.correctstate = correctstate;
+		}
+
+		@Override
+		public String toString() {
+			return "QuestionAnswerVO [paperid=" + paperid + ", questionid=" + questionid + ", questionskill="
+					+ questionskill + ", title=" + title + ", options=" + options + ", answer=" + answer
+					+ ", questiontype=" + questiontype + ", analysis=" + analysis + ", difficultdegree="
+					+ difficultdegree + ", edittime=" + edittime + ", questionserialnum=" + questionserialnum
+					+ ", answercontent=" + answercontent + ", score=" + score + ", correctstate=" + correctstate
+					+ ", sumscore=" + sumscore + ", spare1=" + spare1 + ", spare2=" + spare2 + ", spare3=" + spare3
+					+ ", spare4=" + spare4 + "]";
+		}
+
+		public QuestionAnswerVO(Integer paperid, Integer questionid, String questionskill, String title, String options,
+				String answer, Integer questiontype, String analysis, Integer difficultdegree, Integer edittime,
+				Integer questionserialnum, String answercontent, Integer score, Integer correctstate, Integer sumscore,
+				Integer spare1, Integer spare2, String spare3, String spare4) {
+			super();
+			this.paperid = paperid;
+			this.questionid = questionid;
+			this.questionskill = questionskill;
+			this.title = title;
+			this.options = options;
+			this.answer = answer;
+			this.questiontype = questiontype;
+			this.analysis = analysis;
+			this.difficultdegree = difficultdegree;
+			this.edittime = edittime;
+			this.questionserialnum = questionserialnum;
+			this.answercontent = answercontent;
+			this.score = score;
+			this.correctstate = correctstate;
+			this.sumscore = sumscore;
+			this.spare1 = spare1;
+			this.spare2 = spare2;
+			this.spare3 = spare3;
+			this.spare4 = spare4;
+		}
+
+		public QuestionAnswerVO() {
+			super();
+		}
+
+		public QuestionAnswerVO(Integer paperid, Integer questionid, Integer score, Integer sumscore) {
+			super();
+			this.paperid = paperid;
+			this.questionid = questionid;
+			this.score = score;
+			this.sumscore = sumscore;
 		}
 
 

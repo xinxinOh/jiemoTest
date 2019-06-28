@@ -19,15 +19,18 @@
     <id column="questionId" property="questionid" jdbcType="INTEGER" />
     <result column="questionskill" property="questionskill" jdbcType="INTEGER" />
     <result column="title" property="title" jdbcType="VARCHAR" />
-    <result column="answer" property="answer" jdbcType="INTEGER" />
+    <result column="answer" property="answer" jdbcType="VARCHAR" />
     <result column="questiontype" property="questiontype" jdbcType="INTEGER" />
-    <result column="analysis" property="analysis" jdbcType="INTEGER" />
+    <result column="analysis" property="analysis" jdbcType="VARCHAR" />
     <result column="difficultdegree" property="difficultdegree" jdbcType="VARCHAR" />
     <result column="questionserialnum" property="questionserialnum" jdbcType="INTEGER" />
-    <result column="answercontent" property="answercontent" jdbcType="INTEGER" />
+    <result column="answercontent" property="answercontent" jdbcType="VARCHAR" />
     <result column="score" property="score" jdbcType="INTEGER" />
     <result column="correctstate" property="correctstate" jdbcType="INTEGER" />
+    <result column="options" property="options" jdbcType="VARCHAR" />
+    <result column="sumscore" property="sumscore" jdbcType="INTEGER" />
   </resultMap>
+  
   
   <sql id="Example_Where_Clause" >
     <where >
@@ -109,11 +112,26 @@
    <select id="getQuestionAndAnswerByPaperId" resultMap="BaseResultMap2" parameterType="java.lang.Integer" >
     select answer_info.paperId as paperid,answer_info.questionId as questionid,question.questionskill as questionskill,question.title as title,
     question.answer as answer,question.questiontype as questiontype,question.analysis as analysis,question.difficultdegree as difficultdgree,
-    answer_info.questionserialnum as questionserialnum,answer_info.answercontent as answercontent,answer_info.score as score,answer_info.correctstate as correctstate       
+    answer_info.questionserialnum as questionserialnum,answer_info.answercontent as answercontent,answer_info.score as score,
+    answer_info.correctstate as correctstate,question.options as options     
     
     from question,answer_info
     where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
+    order by answer_info.questionSerialNum asc
   </select>
+  
+   <select id="getQuestionAndAnswerByPartId" resultMap="BaseResultMap2" parameterType="java.lang.Integer" >
+    select answer_info.paperId as paperid,answer_info.questionId as questionid,question.questionskill as questionskill,question.title as title,
+    question.answer as answer,question.questiontype as questiontype,question.analysis as analysis,question.difficultdegree as difficultdgree,
+    answer_info.questionserialnum as questionserialnum,answer_info.answercontent as answercontent,answer_info.score as score,question_in_part.grade as sumscore,
+    answer_info.correctstate as correctstate,question.options as options     
+    
+    from question inner join answer_info on question.questionid=answer_info.questionid 
+    		inner join question_in_part on question.questionid=question_in_part.questionid
+    where question_in_part.partid= #{partid,jdbcType=INTEGER} and  answer_info.paperId = #{paperid,jdbcType=INTEGER}
+    order by answer_info.questionSerialNum asc
+  </select>
+  
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.Answer_infoKey" >
     select 
     <include refid="Base_Column_List" />
@@ -215,6 +233,14 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  
+  <select id="studentSumScore" resultType="java.lang.Integer" >
+    select 
+       IFNULL (SUM(score), 0)
+    from answer_info
+    where paperid= #{0} and correctstate=1
+  </select>
+  
   <update id="updateByExampleSelective" parameterType="map" >
     update answer_info
     <set >

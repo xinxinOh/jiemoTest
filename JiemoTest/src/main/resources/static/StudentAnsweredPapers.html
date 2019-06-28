@@ -13,25 +13,29 @@
 		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
 
 		<script type="text/javascript">
-		var examid;
-		function getPaperInfo(paperID){
-			window.location.href="getPaperInfo?paperID="+paperID;
-					
+		var userid;
+		function getPaperInfo(paperID,paperstate){
+			if(paperstate==2||paperstate=="2"||paperstate=="未批改"){
+				layer.msg("试卷未批改 暂不能查看");
+			}
+			else{
+			window.location.href="StuGetPaperInfo?paperID="+paperID;
+			}	
 		}
 		
-		
-		function showCharts(){
+
+		function showCharts(paperid){
 			 var myChart = echarts.init(document.getElementById('main'));
 		        //数据加载完之前先显示一段简单的loading动画
 		        myChart.showLoading();
-		        examid=$(".examid").text();
+		        
 		        var names=[];    //横坐标数组（实际用来盛放X轴坐标值）
 		        var values=[];    //纵坐标数组（实际用来盛放Y坐标值）
 		        $.ajax({
 		            type : "post",
 		            async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
-		            url : "EchartsShow",    //请求发送到dataActiont处
-		            data : {"examid":examid},
+		            url : "StuEchartsShow",    //请求发送到dataActiont处
+		            data : {"paperid":paperid},
 		            dataType : "json",        //返回数据形式为json
 		            success : function(result) {
 		                //请求成功时执行该函数内容，result即为服务器返回的json对象
@@ -81,8 +85,7 @@
 
 			});
 			$(document).ready(function() {
-            showCharts();
-				
+                userid=$(".userid").text();
 				$("body").on("hover", ".NavBar-item", function() {
 
 					$(this).css("background-color", "#BCDDBC");
@@ -97,30 +100,7 @@
 
 			});
 			
-			function deletePaper(paperID){
-				var params={'paperid':paperID};
-				$.ajax({
-					async: false,
-					url: 'deletePaper',
-					type: 'get',
-					contentType: 'application/json;charset=utf-8', //请求的字符编码
-					data:params,
-					success: function(e) {
-						var a=JSON.parse(e);
-				    	if(a.flag){
-				    		//window.parent.location.reload();
-				    		layer.msg("删除成功");
-				    	}
-				    	else{
-				    		layer.msg("删除失败");
-				    	}
-					    				
-					},
-					error: function() {
-						layer.msg("deletePaperError");
-					}
-				});
-			}
+			
 			
 			function createTime(v){  
 			    return new Date(parseInt(v)).toLocaleString()
@@ -132,7 +112,7 @@
 
 	<body>
 <div style="display:none;">
-				<span  class="examid" style="font-size: 20px;color: #5FB878;" th:id="${examid}" th:text="${examid}"></span>
+				<span  class="userid" style="font-size: 20px;color: #5FB878;" th:id="${userid}" th:text="${userid}"></span>
 	</div>
 		<body class="layui-layout-body">
 			<div class="layui-layout layui-layout-admin header-border" >
@@ -190,20 +170,17 @@
 
 							<li class="NavBar-item">
 
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
+								<a class="NavBar-a" href="toStudentAnsweredPapers"><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 已答考试</a>
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>创建考试</a>
+								<a class="NavBar-a" href="toStudentUnAnsweredPapers"><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>未答考试</a>
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>我的题库</a>
 							</li>
-							<hr style="height:1px;">
-							<li class="NavBar-item">
-								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
-							</li>
+							
 						</ul>
 					</div>
 				</div>
@@ -223,9 +200,9 @@
 						<div id="main" style="width: 800px;height:450px;"></div>
 
 						<script type="text/html" id="barDemo">
-							<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看/阅卷</a>
-							
-							<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+							<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看试卷</a>
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">成绩分析</a>
+                           
 						</script>
 						<script>
 							layui.config({
@@ -263,14 +240,13 @@
 								table.render({
 									elem: '#demo',
 									height: 450,
-									url: 'showAnswered' //数据接口
+									url: 'showStuAnswered' //数据接口
 										,
-									title: '试卷表',
+									where: {'userid':userid} ,
+									title: '未答试卷表',
 									page: true //开启分页
 										,
-									where: {'examid':examid} ,
-									
-									toolbar:'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+									toolbar:true //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
 										,
 									
 									cols: [
@@ -281,20 +257,14 @@
 											}, {
 												field: 'paperid',
 												title: '试卷序号',
-												width: 100,
+												width: 95,
 												sort: true,
 												fixed: 'left',
 												totalRowText: '合计：'
 											}, {
-												field: 'spare3',
-												title: '考生姓名',
-												width: 120,
-												sort: true,
-												totalRow: true
-											}, {
 												field: 'examtitle',
 												title: '考试名称',
-												width: 160,
+												width: 150,
 												sort: true
 											}, {
 												field: 'paperstate',
@@ -303,12 +273,20 @@
 												sort: true,
 												totalRow: true,
 												templet:function(d){
-            return  d.paperstate == '0' ? "未作答":"<span class='layui-red'>已作答</span>";
+            return  d.paperstate == '2' ? "未批改":"已批改";
         }
+											},  {
+												field: 'endtime',
+												title: '考试结束时间',
+												sort: true,
+												width: 170,
+												templet:function(d){
+										            return  createTime(d.endtime);
+										        }
 											}, {
 												field: 'participatetime',
 												title: '参加考试时间',
-												width: 180,
+												width: 170,
 												sort: true,
 												templet:function(d){
 										            return  createTime(d.participatetime);
@@ -317,7 +295,7 @@
 												field: 'submittime',
 												title: '提交考试时间',
 												sort: true,
-												width: 180,
+												width: 170,
 												templet:function(d){
 										            return  createTime(d.participatetime);
 										        }
@@ -328,13 +306,13 @@
 												width: 130
 											}, {
 												field: 'studentgrade',
-												title: '学生成绩',
-												width: 100,
+												title: '成绩',
+												width: 75,
 												sort: true,
 												totalRow: true
-											}, {
+											},   {
 												fixed: 'right',
-												width: 145,
+												width: 170,
 												align: 'center',
 												toolbar: '#barDemo'
 											}
@@ -392,8 +370,8 @@
 										,
 										layEvent = obj.event; //获得 lay-event 对应的值
 									if(layEvent === 'detail') {
-										//layer.msg('查看操作paperid:'+data.paperid);
-										getPaperInfo(data.paperid);
+										//layer.msg('答卷——paperid:'+data.paperid);
+										getPaperInfo(data.paperid,data.paperstate);
 									} else if(layEvent === 'del') {
 										layer.confirm('真的删除行么', function(index) {
 											obj.del(); //删除对应行（tr）的DOM结构
@@ -402,7 +380,8 @@
 											deletePaper(data.paperid);
 										});
 									} else if(layEvent === 'edit') {
-										layer.msg('编辑操作');
+										//layer.msg('查看成绩分析');
+										showCharts(data.paperid);
 										
 									}
 								});
