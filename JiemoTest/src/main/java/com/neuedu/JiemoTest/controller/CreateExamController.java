@@ -118,7 +118,7 @@ public class CreateExamController {
 		map.put("ExamList", ExamList);
 		
 		String str = JSON.toJSONString(map); // 利用fastjson转换字符串
-		
+		System.out.println(str);
 		return str; //返回字符串
 		
 		

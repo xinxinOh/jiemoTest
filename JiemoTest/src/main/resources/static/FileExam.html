@@ -27,7 +27,7 @@
 					var startTime = examList.eq(i).attr("data-InTime");
 					var endTime = examList.eq(i).attr("data-InTimea");
 					var nowTime = Date.parse(new Date()) / 1000;
-					if(endTime != "" || endTime =="-1" || endTime==-1) {
+					if(endTime != "") {
 						examList.eq(i).attr("data-InTime", "1");
 					} else {
 						examList.eq(i).attr("data-InTime", "0");
@@ -102,6 +102,45 @@
 					num = '0' + num;
 				}
 				return num;
+			}
+			
+			function SearchFileExam(){
+				
+				$.ajax({
+					async: false,
+					url: 'getFileExamList',
+					type: 'get',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					success: function(e) {
+
+						if(e == "请先登录") {
+							layer.msg("请先登录");
+							return;
+						}
+
+						var obj = JSON.parse(e); //将字符串转换成json对象
+
+						var new_html = template("loadFileExam", obj); //将json对象绑定到artTemplate模板上
+
+						$('#Exam-container').html(new_html);
+
+						var allTime = $(".one-exam-time").children("span");
+						for(var i = 0; i < allTime.length; i++) {
+							var editTime = allTime.eq(i).text();
+							allTime.eq(i).text("编辑于 " + getMyDate(parseInt(editTime) * 1000));
+						}
+						
+						var timestamp = Date.parse(new Date())/1000;
+						var endTimeSpan = $(".end-time-span");
+						for(var i = 0; i < endTimeSpan.length; i++) {
+							var endTime = endTimeSpan.eq(i).text();
+							var de = parseInt((parseInt(endTime) - parseInt(timestamp))/3600);
+							endTimeSpan.eq(i).text(de+"h");
+						}
+					}
+
+				});
+				
 			}
 
 			function SearchExam() {
@@ -390,8 +429,7 @@
 
 				});
 
-				SearchExam();
-				checkIfCanAddStudent();
+				SearchFileExam();
 
 				layui.element.init();
 				$("body").on("hover", ".NavBar-item", function() {
@@ -536,19 +574,15 @@
 						'endTime': parseInt(endTimestamp) / 1000,
 						'maxtimes': parseInt(MaxWindowsTime)
 					};
-					alert(parseInt(nowManageExam));
-					layer.confirm('确定发布考试？考试发布后将无法更改考试内容，只可以修改考试时间', {
-					  btn: ['确定','取消'] //按钮
-					}, function(){
-					  
-					  $.ajax({
+
+					$.ajax({
 						async: false,
 						url: 'PublishExam',
 						type: 'get',
 						contentType: 'application/json;charset=utf-8', //请求的字符编码
 						data: a,
 						success: function(e) {
-							
+
 							if(e.split(" ")[0] == "1") {
 								layer.msg("发布成功！");
 								sleep(1000);
@@ -564,10 +598,6 @@
 							alert('请先登陆');
 						}
 					});
-					  
-					}, function(){
-					  alert(1);
-					  });
 
 				});
                 //更改已发布考试的设置
@@ -600,14 +630,7 @@
 						'startTime': parseInt(startTimestamp) / 1000,
 						'endTime': parseInt(endTimestamp) / 1000
 					};
-					
-										
-					layer.confirm('确定更改考试时间？', {
-					  btn: ['确定','取消'] //按钮
-					}, function(){
-						
-					  var a = {'examId': parseInt(nowManageExam)};
-					  
+
 					$.ajax({
 						async: false,
 						url: 'ChangePublishExam',
@@ -629,22 +652,11 @@
 							alert('请先登陆');
 						}
 					});
- 					  
-					}, function(){
-					  alert(1);
-					  });
-
-
                 });
 				//编辑考试
 				$("body").on("click", ".edit-exam-btn", function() {
 					nowManageExam = $(this).parent().parent().parent().parent().parent().parent().parent().attr("data-examid");
-					var CanAdd = $("[data-examid='" + nowManageExam + "'").attr("data-intime");
-					if(CanAdd == "1") {
-						layer.msg("考试已经发布，无法编辑内容");
-						return;
-					}
-					
+
 					window.location.href = "toEditExam?examId=" + nowManageExam;
 
 				});
@@ -727,104 +739,51 @@
 
 				});
 			    
-			    //跳转到归档考试页面
-			    
-			    $("body").on("click", ".file-exam", function(){
-			    	window.location.href="toFileExam";
+			    //恢复考试
+			    $("body").on("click", ".return-exam", function(){
+			    	nowManageExam = $(this).parent().parent().parent().parent().parent().parent().parent().attr("data-examid");
+					var nowExam = $(this).parent().parent().parent().parent().parent().parent().parent();
+					
+					layer.confirm('确定将该考试恢复？', {
+					  btn: ['确定','取消'] //按钮
+					}, function(){
+						
+					  var a = {'examId': parseInt(nowManageExam)};
+
+					$.ajax({
+						async: false,
+						url: 'RenewExam',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+							
+							if(e.split(" ")[0] == "1") {
+								layer.msg(e.split(" ")[1]);
+								nowExam.remove();
+							}
+							if(e.split(" ")[0] == "0") {
+								layer.msg(e.split(" ")[0]);
+							}
+							
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+					  
+					}, function(){
+					  alert(1);
+					  });
 			    });
 			    
-			    $("body").on("click", ".delete-exam", function(){
-			    	window.location.href="toRecycleBin";
-			    });
 			});
 		</script>
 
-		<script type="text/html" id="loadExam">
+		<script type="text/html" id="loadFileExam">
 
-			{{each ExamList as exam}}
-            {{if exam.examstate == "1"}}
-			<div class="one-exam" data-windowsTime = "{{exam.maxtimes}}" data-examid="{{exam.examid}}" data-InTime="{{exam.starttime}}" data-InTimea="{{exam.endtime}}" style="width: 300px!important;height: 140px!important;border: 1px solid #CCC;border-top:3px solid #5FB878;display: inline-block;margin: 20px;">
+			{{each FileExamList as exam}}
 
-				<div class="one-exam-header">
-
-					<div class="one-exam-title" style="margin-top: 22px;margin-left: 12px;display: inline-block;">
-						<span style="font-size: 16px;color: #333;">{{exam.examtitle}}</span>
-					</div>
-					<div class="one-exam-manage" style="float:right;color:#01AAED;background-color:#FFFFFF;display: inline-block;">
-
-						<ul class="layui-nav" style="color:#01AAED;background-color:#FFFFFF;">
-							<li class="layui-nav-item" style="color:#01AAED;background-color:#FFFFFF;">
-								<a href="javascript:;" class="header-font-color" style="color:#01AAED;">
-									考试管理
-								</a>
-								<dl class="layui-nav-child">
-									<dd>
-										<a class="header-font-color add-student-btn" href="javascript:;">录入考生</a>
-									</dd>
-									<dd>
-										<a class="header-font-color publish-exam-btn" href="javascript:;">发布考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color edit-exam-btn" href="javascript:;">编辑考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color place-exam-on-file-btn" href="javascript:;">归档考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color delete-exam-btn" href="javascript:;">删除考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color" href="javascript:;">出售考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color" href="javascript:;">分享考试</a>
-									</dd>
-								</dl>
-							</li>
-
-						</ul>
-
-					</div>
-
-					<div class="one-exam-time" style="width:270px;margin-left:12px;margin-top:20px;margin-bottom: 7px;display: inline-block;">
-						<span style="color: #888;">{{exam.edittime}}</span>
-						<div class="end-time" style="float:right">
-						<span class="end-time-span" style="color: #FF5722;font-size:19px;">{{exam.endtime}}</span>
-						<span style="color: #888;">后结束</span>
-					    </div>
-					</div>
-					
-					
-
-				</div>
-
-				<div class="exam-info" style="padding-top:7px;border-top: 1px solid #DDD;">
-					<div class="layui-row">
-						<div class="layui-col-md4" align="center">
-							<div class="question-num">
-								<i class="layui-icon layui-icon-file-b" style="font-size: 18px; color: #5FB878;"></i>
-								<span style="font-size: 16px;color: #444;">{{exam.questionnum}}</span>
-							</div>
-						</div>
-						<div class="layui-col-md4" align="center">
-							<div class="points-sum">
-								<i class="layui-icon layui-icon-flag" style="font-size: 18px; color: #5FB878;"></i>
-								<span style="font-size: 16px;color: #444;">{{exam.pointssum}}</span>
-							</div>
-						</div>
-						<div class="layui-col-md4" align="center">
-							<div class="student-num">
-								<i class="layui-icon layui-icon-friends" style="font-size: 18px; color: #5FB878;"></i>
-								<span style="font-size: 16px;color: #444;">{{exam.spare1}}</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-			{{/if}}
-			
-			{{if exam.examstate == "0"}}
 			<div class="one-exam" data-examid="{{exam.examid}}" data-InTime="{{exam.starttime}}" data-InTimea="{{exam.endtime}}" style="width: 300px!important;height: 140px!important;border: 1px solid #CCC;border-top:3px solid #FFB800;display: inline-block;margin: 20px;">
 
 				<div class="one-exam-header">
@@ -841,25 +800,10 @@
 								</a>
 								<dl class="layui-nav-child">
 									<dd>
-										<a class="header-font-color add-student-btn" href="javascript:;">录入考生</a>
-									</dd>
-									<dd>
-										<a class="header-font-color publish-exam-btn" href="javascript:;">发布考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color edit-exam-btn" href="javascript:;">编辑考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color place-exam-on-file-btn" href="javascript:;">归档考试</a>
+										<a class="header-font-color return-exam" href="javascript:;">还原</a>
 									</dd>
 									<dd>
 										<a class="header-font-color delete-exam-btn" href="javascript:;">删除考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color" href="javascript:;">出售考试</a>
-									</dd>
-									<dd>
-										<a class="header-font-color" href="javascript:;">分享考试</a>
 									</dd>
 								</dl>
 							</li>
@@ -897,9 +841,7 @@
 					</div>
 				</div>
 
-			</div>
-			{{/if}}
-			
+			</div>		
 			{{/each}}
 
 		</script>
@@ -970,11 +912,11 @@
 						</li>
 						<hr style="height:1px;">
 						<li class="NavBar-item file-exam">
-							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
 						</li>
 						<hr style="height:1px;">
-						<li class="NavBar-item delete-exam">
-							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
+						<li class="NavBar-item">
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
 						</li>
 					</ul>
 				</div>
