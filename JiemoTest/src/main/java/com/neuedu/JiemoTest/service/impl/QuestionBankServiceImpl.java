@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.neuedu.JiemoTest.dao.BankMapper;
 import com.neuedu.JiemoTest.dao.QuestionInBankMapper;
+import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.Bank;
 import com.neuedu.JiemoTest.entity.BankExample;
 import com.neuedu.JiemoTest.entity.BankExample.Criteria;
@@ -26,7 +27,8 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 	QuestionInBankMapper questionInBank;
 	@Autowired
 	Produce produce;
-	
+	@Autowired
+	UserInfoMapper userMapper;
 	//
 	@Override
 	public List<Bank> selectByUser(UserInfo user ,int state) {
@@ -106,6 +108,21 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 		bankMapper.deleteByPrimaryKey(bankId);
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void copyBank(int sourceId, int userId) {
+		// TODO Auto-generated method stub
+		Bank sourceBank = bankMapper.selectByPrimaryKey(sourceId);
+		Bank newBank = new Bank();
+		newBank.setBankintroduction(sourceBank.getBankintroduction());
+		newBank.setBankname(sourceBank.getBankname());
+		newBank.setSourcebankid(sourceId);
+		newBank.setCreatedate((int) (System.currentTimeMillis() / 1000));
+		newBank.setSpare1(1);
+		//插入新bank
+		bankMapper.insert(newBank);
+		//
 	}
 	
 }

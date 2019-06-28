@@ -43,10 +43,10 @@ public class QuestionBankController {
 	@Autowired
 	UserInfoMapper userInfoMapper;
 	
-	@Test
+	//@Test
 	@RequestMapping("/loginForTest")
 	public String LoginForTest(HttpServletRequest request) {
-		UserInfo user = userInfoMapper.selectByPrimaryKey(3);
+		UserInfo user = userInfoMapper.selectByPrimaryKey(1);
 		request.getSession().setAttribute("user", user);
 		return "Exam";
 	}
@@ -54,7 +54,7 @@ public class QuestionBankController {
 	@RequestMapping("/showQuestionBanks")
 	public String showQuestionBanks(HttpServletRequest request , Model model) {
 		UserInfo user = (UserInfo) request.getSession().getAttribute("user");
-		System.out.println("user!!!!!!!!!!!!!!!!!!!"+user.getUserid());
+		//System.out.println("user!!!!!!!!!!!!!!!!!!!"+user.getUserid());
 		//查找bank
 		List<Bank> banks= questionBankService.selectByUser(user,1);
 		//System.out.println(banks.size());
@@ -196,4 +196,5 @@ public class QuestionBankController {
 		questionService.delete(bankId,questionId);
 		return "bank/BankQuestion";
 	}
+	
 }

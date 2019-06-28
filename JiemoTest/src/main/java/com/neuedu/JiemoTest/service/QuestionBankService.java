@@ -25,4 +25,7 @@ public interface QuestionBankService {
 
 	void realDeletBank(int bankId);
 
+	@Transactional
+	void copyBank(int sourceId, int userId);
+
 }

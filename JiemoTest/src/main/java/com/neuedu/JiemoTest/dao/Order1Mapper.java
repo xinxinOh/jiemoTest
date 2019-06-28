@@ -3,8 +3,11 @@ package com.neuedu.JiemoTest.dao;
 import com.neuedu.JiemoTest.entity.Order1;
 import com.neuedu.JiemoTest.entity.Order1Example;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface Order1Mapper {
     int countByExample(Order1Example example);
 

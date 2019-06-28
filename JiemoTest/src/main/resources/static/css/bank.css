@@ -160,3 +160,16 @@
 .boxs {
     border: 1px solid #E6E6E6;
 }
+.one-share {
+    display: block;
+    color: black;
+    height: 50px;
+    font-size: 18px;
+    border: 1px solid #B9B9B9;
+    background: #F3F3F3;
+}
+.one-share p {
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 50px;
+}
