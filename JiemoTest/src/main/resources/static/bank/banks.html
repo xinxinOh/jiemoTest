@@ -121,7 +121,13 @@
 						var intro = document.getElementById("creat-bank-intro").value;
 						
 						if(name == ''){
-							layer.msg("请输入题库名！");
+							layer.msg('请输入题库名', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						      });
 							return;
 						}
 						$.ajax({
@@ -159,7 +165,7 @@
 					<!-- 头部区域（可配合layui已有的水平导航） -->
 					<div class="layui-nav layui-layout-left">
 						<li class="layui-nav-item">
-							<a class="header-font-color" href="">考试</a>
+							<a class="header-font-color" href="/static/Exam.html">考试</a>
 						</li>
 						<li class="layui-nav-item">
 							<a class="header-font-color" href="">题库</a>
@@ -234,15 +240,15 @@
     		</div>
     		<div class="bank-context">	
     			<div class="bank-left">
-    				<a th:text = "${bank.bankname}" class = "bank-name"></a>
-    				<a th:text = "${bank.bankintroduction}" class = "bank-intro"></a>
+    				<a th:text = "${bank.bankname}" th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "bank-name"></a>
+    				<a th:text = "${bank.bankintroduction}" th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "bank-intro"></a>
     			</div>
     			<div class="bank-right listbox">
     				<div class="list-hover"><a  class="layui-icon layui-icon-triangle-d" style="font-size: 15px; color: darkseagreen;"></a>
     				<span>
     					<ul class="listcontext"> <!-- 二级菜单 -->
       					<li><a th:onclick="editBank([[${bank.bankid}]],[[${bank.bankname}]],[[${bank.bankintroduction}]])" class = "layui-icon layui-icon-edit">编辑题库</a></li>
-      					<li><a th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=3'" class = "layui-icon layui-icon-read" >查看题目</a></li>
+      					<li><a th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "layui-icon layui-icon-read" >查看题目</a></li>
       					<li><a href="" class = "layui-icon layui-icon-release" >分享题库</a></li>
       					<li><a href="" class = "layui-icon layui-icon-cart" >出售题库</a></li>
       					<li><a th:href="@{'/deleteBank?id='+${bank.bankid}}"  class = "layui-icon layui-icon-delete">删除题库</a></li>

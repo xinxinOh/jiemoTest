@@ -31,4 +31,8 @@ public interface QuestionMapper {
     int updateByPrimaryKey(Question record);
     
     List<Question> getQuestionByPaperId(int paperID);
+
+	Integer selectLastInsert();
+    
+    //int selectLastInsert();
 }

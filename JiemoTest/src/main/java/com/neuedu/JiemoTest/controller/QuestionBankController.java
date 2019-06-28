@@ -46,7 +46,7 @@ public class QuestionBankController {
 	@Test
 	@RequestMapping("/loginForTest")
 	public String LoginForTest(HttpServletRequest request) {
-		UserInfo user = userInfoMapper.selectByPrimaryKey(2);
+		UserInfo user = userInfoMapper.selectByPrimaryKey(3);
 		request.getSession().setAttribute("user", user);
 		return "Exam";
 	}
@@ -85,6 +85,23 @@ public class QuestionBankController {
 		List<Bank> banks = questionBankService.selectByUser(user, 1);
 		model.addAttribute("banksList",banks);
 		return "bank/banks";
+	}
+	
+	//彻底删除题库
+	@RequestMapping("/realDeletBank")
+	public String realDeletBank(HttpServletRequest request ,Model model) {
+		//删除题库
+		int bankId = Integer.parseInt(request.getParameter("id"));
+		System.out.println("start real delet!");
+		questionBankService.realDeletBank(bankId);
+		System.out.println("real deleted!");
+		
+		//更新model
+		UserInfo user = (UserInfo) request.getSession().getAttribute("user");
+		List<Bank> banks = questionBankService.selectByUser(user, 0);
+		model.addAttribute("banksList",banks);
+		
+		return "bank/ashBin";
 	}
 	
 	//恢复题库
@@ -160,14 +177,23 @@ public class QuestionBankController {
 		List<Question> questions = questionService.selectByBank(bankId,start,count);
 		Bank bank = questionBankService.selectByPrimaryKey(bankId);
 		Integer totle = questionService.totleInBank(bankId);
+		//Integer begin = start*count+1;
 		
 		model.addAttribute("bankName",bank.getBankname());
-		//model.addAttribute("questions",JSON.toJSON(questions));
-		model.addAttribute("questions",JSON.toJSONString(questions));
-		System.out.println(JSON.toJSON(questions));
-		System.out.println(JSON.toJSONString(questions));
+		model.addAttribute("questions",questions);
 		model.addAttribute("totle",totle);
+		model.addAttribute("start_",start);
+		model.addAttribute("bankId",bankId);
+		model.addAttribute("curr",start/count+1);
 		
 		return "bank/Bankquestion";
+	}
+	
+	@RequestMapping("/deleteQestion")
+	public String deleteQustions(HttpServletRequest request) {
+		int bankId = Integer.parseInt(request.getParameter("bankId"));
+		int questionId = Integer.parseInt(request.getParameter("questionId"));
+		questionService.delete(bankId,questionId);
+		return "bank/BankQuestion";
 	}
 }

@@ -30,4 +30,5 @@ public interface BankMapper {
     int updateByPrimaryKeySelective(Bank record);
 
     int updateByPrimaryKey(Bank record);
+    
 }

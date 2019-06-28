@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.neuedu.JiemoTest.dao.OrderMapper" >
-  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Order" >
+<mapper namespace="com.neuedu.JiemoTest.dao.Order1Mapper" >
+  <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Order1" >
     <id column="orderId" property="orderid" jdbcType="INTEGER" />
     <result column="userId" property="userid" jdbcType="INTEGER" />
     <result column="goodsId" property="goodsid" jdbcType="INTEGER" />
@@ -76,13 +76,13 @@
     orderId, userId, goodsId, createTime, bonusPointsNum, payState, orderType, spare_1, 
     spare_2, spare_3, spare_4
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.OrderExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.Order1Example" >
     select
     <if test="distinct" >
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from order
+    from order1
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
@@ -93,21 +93,21 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    from order
+    from order1
     where orderId = #{orderid,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from order
+    delete from order1
     where orderId = #{orderid,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.OrderExample" >
-    delete from order
+  <delete id="deleteByExample" parameterType="com.neuedu.JiemoTest.entity.Order1Example" >
+    delete from order1
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Order" >
-    insert into order (orderId, userId, goodsId, 
+  <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Order1" >
+    insert into order1 (orderId, userId, goodsId, 
       createTime, bonusPointsNum, payState, 
       orderType, spare_1, spare_2, 
       spare_3, spare_4)
@@ -116,8 +116,8 @@
       #{ordertype,jdbcType=INTEGER}, #{spare1,jdbcType=INTEGER}, #{spare2,jdbcType=INTEGER}, 
       #{spare3,jdbcType=VARCHAR}, #{spare4,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.Order" >
-    insert into order
+  <insert id="insertSelective" parameterType="com.neuedu.JiemoTest.entity.Order1" >
+    insert into order1
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="orderid != null" >
         orderId,
@@ -189,14 +189,14 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.OrderExample" resultType="java.lang.Integer" >
-    select count(*) from order
+  <select id="countByExample" parameterType="com.neuedu.JiemoTest.entity.Order1Example" resultType="java.lang.Integer" >
+    select count(*) from order1
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map" >
-    update order
+    update order1
     <set >
       <if test="record.orderid != null" >
         orderId = #{record.orderid,jdbcType=INTEGER},
@@ -237,7 +237,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map" >
-    update order
+    update order1
     set orderId = #{record.orderid,jdbcType=INTEGER},
       userId = #{record.userid,jdbcType=INTEGER},
       goodsId = #{record.goodsid,jdbcType=INTEGER},
@@ -253,8 +253,8 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.Order" >
-    update order
+  <update id="updateByPrimaryKeySelective" parameterType="com.neuedu.JiemoTest.entity.Order1" >
+    update order1
     <set >
       <if test="userid != null" >
         userId = #{userid,jdbcType=INTEGER},
@@ -289,8 +289,8 @@
     </set>
     where orderId = #{orderid,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Order" >
-    update order
+  <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Order1" >
+    update order1
     set userId = #{userid,jdbcType=INTEGER},
       goodsId = #{goodsid,jdbcType=INTEGER},
       createTime = #{createtime,jdbcType=INTEGER},

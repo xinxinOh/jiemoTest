@@ -3,6 +3,7 @@
 <mapper namespace="com.neuedu.JiemoTest.dao.QuestionMapper" >
   <resultMap id="BaseResultMap" type="com.neuedu.JiemoTest.entity.Question" >
     <id column="questionId" property="questionid" jdbcType="INTEGER" />
+    <result column="questionSkill" property="questionskill" jdbcType="VARCHAR" />
     <result column="title" property="title" jdbcType="VARCHAR" />
     <result column="options" property="options" jdbcType="VARCHAR" />
     <result column="answer" property="answer" jdbcType="VARCHAR" />
@@ -260,6 +261,14 @@
     <include refid="Base_Column_List" />
     from question,answer_info
     where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
+  </select>
+  
+   <!-- ========================选择最新插入数据的id========================== -->
+  <resultMap id="id_int" type="java.lang.Integer" >
+    <id column="max(questionId)" property="questionid" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectLastInsert" resultType="java.lang.Integer">
+    select max(questionId) from question
   </select>
   
 </mapper>
