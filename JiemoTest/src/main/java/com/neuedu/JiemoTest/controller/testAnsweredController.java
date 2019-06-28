@@ -112,11 +112,7 @@ public class testAnsweredController{
 			return "json1";
 		}
 		
-		@RequestMapping("/Exam")
-		public String toExam(){
-			
-			return "Exam";
-		}
+	
 		
 		@RequestMapping("/toShowAnsweredList")
 		public ModelAndView toShowAnsweredList(HttpServletRequest request){	
