@@ -71,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    question.questionId, title, options, answer, questionType, analysis, difficultDegree, editTime
+    question.questionId,questionSkill, title, options, answer, questionType, analysis, difficultDegree, editTime
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.QuestionExample" >
     select

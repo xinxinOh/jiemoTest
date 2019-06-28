@@ -12,4 +12,11 @@ public interface ManageExamService {
 	Exam SearchExam(int examid);
 	List<Part> SearchExamPart(int examid);
 	List<Question> SearchPartExam(int partId);
+	String deleteExamInfo(int examId);
+	String PlaceExamOnFile(int examId);
+	String DeleteExam(int examId);
+	String ChangePublishExam(int examid, int startTime, int endTime);
+	List<Exam> SearchFileExam(int userId);
+	String RenewExam(int examId);
+	List<Exam> SearchDeleteExam(int userId);
 }
