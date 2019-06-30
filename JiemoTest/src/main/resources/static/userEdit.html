@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="renderer" content="webkit|ie-comp|ie-stand">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>个人信息编辑</title>
+		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+
+		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
+		<style type="text/css">
+		#pic {
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			cursor: pointer;
+		}
+	</style>
+	</head>
+
+	<body>
+
+		<body class="layui-layout-body">
+			<div class="layui-layout layui-layout-admin header-border">
+				<div class="layui-header " style="background-color:#FFFFFF;">
+					<div class="layui-logo">
+						<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+					</div>
+					<!-- 头部区域（可配合layui已有的水平导航） -->
+					<div class="layui-nav layui-layout-left">
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">考试</a>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">题库</a>
+						</li>
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">商店</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">购买考试</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">购买题库</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">群组</a>
+						</li>
+					</div>
+					<ul class="layui-nav layui-layout-right">
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">
+								<img src="/upload" id="g" class="layui-nav-img">  贤心
+							</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">基本资料</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">交易中心</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item header-font-color">
+							<a class="header-font-color" href="">退出登录</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
+					<div class="layui-side-scroll">
+						<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+						<ul class="layui-nav-tree" lay-filter="test">
+
+							<li class="NavBar-item">
+
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 个人信息</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>公司信息</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;">
+					<!-- 内容主体区域 -->
+					<div style="padding: 15px;">
+						<p>个人信息</p>
+						<p style="font-size: 20px;"></p>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<div class="fw_conent" style="color:black;">
+							<!--内容开始------------------------------>
+							
+							<table width="100%" border="0" cellspacing="0" cellpadding="0" class="zwfb_shop_table">
+								<form method="post" action="upload" enctype="multipart/form-data">
+									<div class="gmxz_tip">
+
+										<label class="layui-form-label">头像</label>
+										<img id="pic" src="" >
+										<!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
+										<input type="file" id="test1" name="file" value="上传头像" style="display: none;" ></input>
+								</form>
+								<br />
+								<br />
+
+								<form method="post" action="userEdit">
+									<div class="layui-form-item">
+										<div class="layui-inline">
+											<label class="layui-form-label">用户ID</label>
+											<div class="layui-input-inline">
+												<input type="text" id="userid" placeholder="用户ID-禁止填写" th:value="${session.user.userid}" name="userid" lay-verify="required|userid" disabled="true" class="layui-input" />
+												<!--<div th:text="${session.userid}"></div><!--</div><input type="hidden" name="userid" id="userid" />-->
+											</div>
+
+										</div>
+										<div class="layui-form-item">
+											<div class="layui-inline">
+												<label class="layui-form-label">昵称</label>
+												<div class="layui-input-inline">
+													<input type="text" id="nickname" placeholder="用户名昵称" name="nickname" lay-verify="required|nickname" autocomplete="off" class="layui-input" />
+												</div>
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<div class="layui-inline">
+												<label class="layui-form-label">邮箱</label>
+												<div class="layui-input-inline">
+													<input type="email" id="email" placeholder="邮箱" name="email" lay-verify="required|email" autocomplete="off" class="layui-input" />
+												</div>
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<div class="layui-inline">
+												<label class="layui-form-label">手机</label>
+												<div class="layui-input-inline">
+													<input type="tel" id="phonenumber" placeholder="手机号" name="phonenumber" lay-verify="required|phonenumber" autocomplete="off" class="layui-input" />
+												</div>
+											</div>
+										</div>
+										<div class="layui-form-item">
+											<div class="layui-inline">
+												<label class="layui-form-label">新密码</label>
+												<div class="layui-input-inline">
+													<input type="tel" id="password" placeholder="密码" name="password" lay-verify="required|password" autocomplete="off" class="layui-input" />
+												</div>
+											</div>
+										</div>
+										<br />
+										
+
+										<div class="layui-form-item layui-form-text">
+											<label class="layui-form-label">个人简介</label>
+											<div class="layui-input-block">
+												<textarea placeholder="个人简介" id="introduction" class="layui-textarea"></textarea>
+											</div>
+										</div>
+
+										<div class="layui-form-item">
+											<div class="layui-input-block">
+												<button class="layui-btn" type="button" id="tijiao" lay-filter="demo1">提交</button>
+												<button type="reset" id="chongzhi" class="layui-btn layui-btn-primary">重置</button>
+											</div>
+										</div>
+								</form>
+							</table>
+							</div>
+
+							<!--内容结束------------------------------>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="layui-footer" style="margin-left: 20px;border-left: 1px solid darkseagreen;background-color: #FFF;">
+					<!-- 底部固定区域 -->
+					© layui.com - 底部固定区域
+				</div>
+			</div>
+			<!--头像问题处理-->
+			<script type="text/javascript">
+				$(function () {
+					$("#pic").click(function () {
+						$("#test1").click(); //隐藏了input:file样式后，点击头像就可以本地上传
+						
+						$("#test1").on("change", function () {
+							var objUrl = getObjectURL(this.files[0]); //获取图片的路径，该路径不是图片在本地的路径
+							if (objUrl) {
+								$("#pic").attr("src", objUrl); //将图片路径存入src中，显示出图片
+								$("#g").attr("src", objUrl);
+							}
+						});
+					});
+				});
+				//建立一個可存取到該file的url
+				function getObjectURL(file) {
+					var url = "/upload";
+					if (window.createObjectURL != undefined) { //basic
+						url = window.createObjectURL(file);
+					} else if (window.URL != undefined) { //mozilla(firefox) 
+						url = window.URL.createObjectURL(file);
+					} else if (window.webkitURL != undefined) { //webkit or chrome
+						url = window.webkitURL.createObjectURL(file);
+					}
+					return url;
+				}
+
+
+			</script>
+			<script type="text/javascript">
+				//JavaScript代码区域
+				layui.use('element', function() {
+					var element = layui.element;
+
+				});
+				$(document).ready(function() {
+
+					//					$.ajax({
+					//						dataType: 'json',
+					//						url: 'userEdit',
+					//						type: 'post',
+					//						contentType: 'application/json;charset=utf-8',
+					//						
+					//						dataType: "text", //后台返回前台返回类型
+					//					 	success: function(data) {
+					//							alert(data);
+					//						}
+					//					 	
+					//					});
+
+					$("body").on("hover", ".NavBar-item", function() {
+
+						$(this).css("background-color", "#BCDDBC");
+
+					});
+
+					$("body").on("mouseout", ".NavBar-item", function() {
+
+						$(this).css("background-color", "#FFFFFF");
+
+					});
+
+				});
+			</script>
+
+			<script type="text/javascript">
+				$(function() {
+					$("#tijiao").click(function() {
+						var p1 = $('#nickname').val();
+						var p2 = $('#email').val();
+						var p3 = $('#phonenumber').val();
+						var p4 = $('#introduction').val();
+						var p5 = $('#userid').val();
+						var p6 = $('#password').val();
+						
+						var u = {
+							'nickname': p1,
+							'email': p2,
+							'phonenumber': p3,
+							'userid':p5,
+							'introduction': p4,
+							'password':p6
+						}; //包装成一个对象
+						$.ajax({
+							url: 'userEdit',
+							type: 'post',
+							contentType: 'application/json;charset=utf-8',
+							data: JSON.stringify(u), //转换成json格式的字符串，传到后台
+							dataType: "text", //返回类型
+							success: function(e) {
+								alert(e);
+							},
+							error: function() {
+								alert('编辑信息提交失败');
+							}
+						});
+
+					});
+
+				});
+
+				$(document).keydown(function(event) {
+					if(event.keyCode == "13") {
+						alert("确认要提交么？");
+
+					}
+				});
+			</script>
+
+		</body>
+
+</html>

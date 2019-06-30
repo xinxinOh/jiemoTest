@@ -20,9 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 public class UploadController {
 
-	// @RequestMapping 
+	// @RequestMapping   @GetMapping 
 	// @GetMapping  @PostMapping 这两个注解需要请求的方式必须是get /post  ,urlmapping一致, 才能进入该方法
-	@GetMapping("/toupload")
+	@RequestMapping ("/toupload")
     public String upload() {
         return "upload";
     }
@@ -33,15 +33,15 @@ public class UploadController {
      * @param request
      * @return
      */
-	@PostMapping("/upload")
+	@RequestMapping("/upload")
     @ResponseBody
     public String upload(@RequestParam("file") MultipartFile file,HttpServletRequest request) {
         if (file.isEmpty()) {
             return "上传失败，请选择文件";
         }
         //fileName可以用自己的生成方案，我这里只简单用的原始文件名称
-        String fileName = file.getOriginalFilename();
-        String filePath = request.getServletContext().getRealPath("/upload");
+        String fileName = file.getOriginalFilename();//获取文件的原来的名称
+        String filePath = request.getServletContext().getRealPath("/userEdit");//获取tomcat路径中upload的文件夹
 	    //如果没有该文件夹,创建文件夹,有,就跳过
         File fileFolder = new File(filePath);
 		if (!fileFolder.exists()) {
@@ -51,7 +51,7 @@ public class UploadController {
 		//目标文件的路径和文件名
         File dest=new File(filePath,fileName);
         try {
-            file.transferTo(dest);// transferTo() 将二进制流写入到某个目标文件上
+            file.transferTo(dest);// transferTo() 将二进制流写入（传入）到某个目标文件上
             return "上传成功";
         } catch (IOException e) {
         	e.printStackTrace();

@@ -12,6 +12,7 @@ import com.neuedu.JiemoTest.entity.UserInfoExample;
  */
 public interface RegisterService {
 
+	int checkRegister(UserInfo user);
 	int addRegister(UserInfo user);
 	/**
 	 * @param u

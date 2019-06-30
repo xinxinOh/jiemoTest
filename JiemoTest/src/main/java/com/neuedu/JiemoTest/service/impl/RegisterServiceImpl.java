@@ -54,6 +54,38 @@ public class RegisterServiceImpl implements RegisterService {
            return null;
         }
     }
+	
+	@Override
+	public int checkRegister(UserInfo u) {
+		UserInfoExample example = new UserInfoExample();
+		Criteria c = example.createCriteria();
+		c.andPhonenumberEqualTo(u.getUsername());
+		
+		Criteria c2 = example.createCriteria();
+		c2.andEmailEqualTo(u.getUsername());
+		
+		Criteria c3 = example.createCriteria();
+		c3.andUsernameEqualTo(u.getUsername());
+		
+		example.or(c2);
+		example.or(c3);
+		
+		List<UserInfo> list = userInfoMapper.selectByExample(example);
+		System.out.println(list.toString());//输出list字符串试试
+		System.out.println(list.size());//输出list的size试试
+		if (list.size() > 0) {//表示数据库中有重复的信息
+			list.get(0);
+			return 0;//返回false
+		} else {
+		//判断list.size（）是1 ， 取list.get(0) ,返回1个Userifno
+		return 1;//返回正确
+		}
+		
+		
+	}
+	
+	
+	
 	@Transactional
 	@Override
 	public int addRegister(UserInfo u) {

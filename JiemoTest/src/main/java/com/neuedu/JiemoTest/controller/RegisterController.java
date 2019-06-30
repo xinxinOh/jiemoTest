@@ -48,7 +48,7 @@ public class RegisterController {
 	}
 	
 	@RequestMapping("/register")
-	public @ResponseBody String Register(@RequestBody UserInfo u,HttpServletResponse response) throws Exception{
+	public @ResponseBody String Register(@RequestBody UserInfo u,HttpServletRequest request,HttpServletResponse response) throws Exception{
 //		UserInfo u = (UserInfo)request.getSession().getAttribute("user");
 
 		//PrintWriter out = response.getWriter();
@@ -61,12 +61,21 @@ public class RegisterController {
 		System.out.println("输出登录名试试"+u.getUsername());
 		System.out.println("输出已经加密的密码试试"+u.getPassword());
 		System.out.println("输出用户类型试试"+u.getUsertype());
-		int r1 = registerService.addRegister(u);
-		if(r1 == 1) {
-			return "注册成功";
-		}else {
-			return "注册失败";
-		}
+		int user = registerService.checkRegister(u);
+		if(user != 1) {	
+			return "登录名重复! 请重新输入!";
+		}else{
+	   		request.getSession().setAttribute("user",user);
+	   		int r1 = registerService.addRegister(u);
+			if(r1 == 1) {
+				return "注册成功";
+			}else {
+				return "注册失败";
+			}
+   		 
+   	 }
+		
+		
 		
 		}
 }
