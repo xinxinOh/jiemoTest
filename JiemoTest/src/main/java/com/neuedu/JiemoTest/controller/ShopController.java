@@ -2,6 +2,7 @@ package com.neuedu.JiemoTest.controller;
 
 import java.util.List;
 
+import javax.jms.Session;
 import javax.servlet.http.HttpServletRequest;
 
 import org.mockito.internal.matchers.InstanceOf.VarArgAware;
@@ -17,8 +18,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.Bank;
+import com.neuedu.JiemoTest.entity.BonusPointsRecord;
 import com.neuedu.JiemoTest.entity.Goods;
 import com.neuedu.JiemoTest.entity.Order1;
 import com.neuedu.JiemoTest.entity.UserInfo;
@@ -106,6 +109,7 @@ public class ShopController {
 		int userid = user.getUserid();
 		List<Order1> order1s = orderService.selectOrder(userid,type);
 		model.addAttribute("orders", order1s);
+		model.addAttribute("ordersJSON",JSON.toJSONString(order1s));
 		if (type == 0) {
 			return "bank/share";
 		}
@@ -128,6 +132,55 @@ public class ShopController {
 			}
 		}
 		bankService.copyBank(sourceId,userId);
+		return "success";
+	}
+	
+	@RequestMapping("/showPoints")
+	public String showPoints(HttpServletRequest request , Model model) {
+		UserInfo user = (UserInfo) request.getSession().getAttribute("user");
+		int userId = user.getUserid();
+		List<BonusPointsRecord> records = shopSerivce.showRecords(userId);
+		model.addAttribute("points",user.getBonuspoints());
+		model.addAttribute("record",records);
+		model.addAttribute("recordJSON",JSON.toJSONString(records));
+		return "trad/points";
+	}
+	
+	@RequestMapping("/creatRecord")
+	@ResponseBody
+	public String creatRecord(HttpServletRequest request , @RequestBody JSONObject data , Model model) {
+		UserInfo user = (UserInfo) request.getSession().getAttribute("user");
+		int userId = user.getUserid();
+		int userPoints =user.getBonuspoints();
+		int changePoints = data.getIntValue("points");
+		//var Jsdata = '{"points":'+points+'}';"notEnough"
+		if (userPoints-changePoints<0) {
+			return "notEnough";
+		}
+		//更新用户余额
+		user.setBonuspoints(userPoints-changePoints);
+		//新建账单
+		BonusPointsRecord record = new BonusPointsRecord();
+		record.setUserid(userId);
+		if (changePoints < 0) {
+			record.setOperatetype(1);
+			changePoints = - changePoints;
+		}else {
+			record.setOperatetype(0);
+		}
+		record.setBonuspointsnum(changePoints);
+		int seconds = (int) (System.currentTimeMillis() / 1000);
+		record.setOperatetime(seconds);
+		record.setAccount("success");
+		//积分操作
+		shopSerivce.chargeRecord(user , record);
+		
+		//更新session和model
+		request.getSession().setAttribute("user", user);
+		List<BonusPointsRecord> records = shopSerivce.showRecords(userId);
+		model.addAttribute("points",user.getBonuspoints());
+		model.addAttribute("record",records);
+		model.addAttribute("recordJSON",JSON.toJSONString(records));
 		return "success";
 	}
 }

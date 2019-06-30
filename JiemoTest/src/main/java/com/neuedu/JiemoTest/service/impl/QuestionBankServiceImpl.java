@@ -120,9 +120,28 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 		newBank.setSourcebankid(sourceId);
 		newBank.setCreatedate((int) (System.currentTimeMillis() / 1000));
 		newBank.setSpare1(1);
+		newBank.setUserid(userId);
+		newBank.setSpare1(sourceBank.getSpare1());
+		newBank.setSpare2(sourceBank.getSpare2());
+		newBank.setSpare3(sourceBank.getSpare3());
+		newBank.setSpare4(sourceBank.getSpare4());
+		
 		//插入新bank
 		bankMapper.insert(newBank);
-		//
+		int newbankId = bankMapper.selectLastInsert();
+		//复制题目
+		QuestionInBankExample example = new QuestionInBankExample();
+		com.neuedu.JiemoTest.entity.QuestionInBankExample.Criteria criteria = example.createCriteria();
+		criteria.andBankidEqualTo(sourceId);
+		List<QuestionInBankKey> keys = questionInBank.selectByExample(example);
+		
+		for (QuestionInBankKey questionInBankKey : keys) {
+			QuestionInBankKey key = new QuestionInBankKey();
+			key.setBankid(newbankId);
+			key.setQuestionid(questionInBankKey.getQuestionid());
+			questionInBank.insert(key);
+		}
+				
 	}
 	
 }

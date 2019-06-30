@@ -288,4 +288,10 @@
       spare_4 = #{spare4,jdbcType=VARCHAR}
     where bankId = #{bankid,jdbcType=INTEGER}
   </update>
+  
+  <!-- ========================选择最新插入数据的id========================== -->
+  <select id="selectLastInsert" resultType="java.lang.Integer">
+    select max(bankId) from bank
+  </select>
+  
 </mapper>

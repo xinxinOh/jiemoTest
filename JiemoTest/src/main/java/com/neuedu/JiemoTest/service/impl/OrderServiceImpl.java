@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.neuedu.JiemoTest.dao.BankMapper;
+import com.neuedu.JiemoTest.dao.GoodsMapper;
 import com.neuedu.JiemoTest.dao.Order1Mapper;
 import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.Order1;
@@ -28,6 +29,9 @@ public class OrderServiceImpl implements OrderService{
 	
 	@Autowired
 	BankMapper bankMapper;
+	
+	@Autowired
+	GoodsMapper goodsMapper;
 	
 	@Override
 	public void creatOrder(Order1 order1) {
@@ -52,6 +56,12 @@ public class OrderServiceImpl implements OrderService{
 				order1.setSpare3(userMapper.selectByPrimaryKey(order1.getSpare1()).getNickname());
 				//题库名
 				order1.setSpare4(bankMapper.selectByPrimaryKey(order1.getGoodsid()).getBankname());
+			}
+		}else {
+			//设置商品名
+			for (Order1 order1 : order1s) {
+				//商品名
+				order1.setSpare3(goodsMapper.selectByPrimaryKey(order1.getGoodsid()).getSpare3());
 			}
 		}
 		

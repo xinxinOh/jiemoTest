@@ -18,6 +18,9 @@
 				var element = layui.element;
 
 			});
+			layui.use('layer', function(){
+				  var layer = layui.layer;
+			});
 			$(document).ready(function() {
 				$("body").on("hover", ".NavBar-item", function() {
 					$(this).css("background-color", "#BCDDBC");
@@ -29,7 +32,8 @@
 			});
 			
 			function copyBank(bankid) {
-				var Jsdata = '{"bankid":'+bankid+'"}';
+				var Jsdata = '{"bankid":'+bankid+'}';
+				//alert(bankid);
 				$.ajax({
 					type:"POST"
 					,dataType:'text'
@@ -41,7 +45,7 @@
 						layer.closeAll();
 					}
 					,error: function (message){
-						layer.msg('获取失败，您已拥有该分享的题库', {
+						layer.msg('您已拥有该分享的题库', {
 					        time: 1000 //1s后自动关闭
 							,type:1
 							,end:function(index,layero){
