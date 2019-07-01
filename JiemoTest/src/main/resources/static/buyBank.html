@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/modules/layer/default/layer.css" th:href="@{static/layui/css/modules/layer/default/layer.css}" />
+
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script type="text/javascript" src="js/echarts.min.js" th:src="@{static/js/echarts.js}"></script>
+		<script type="text/javascript" src="js/buyBank.js" th:src="@{static/js/buyBank.js}"></script>
+		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
+		<script src="layui/lay/modules/layer.js" th:src="@{static/layui/lay/modules/layer.js}"></script>
+
+	</head>
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			$(".layui-body").scroll(function() {
+				var scroll = parseInt($(".layui-body").scrollTop());
+				//屏幕的高度
+				var client = parseInt($(".abc").height() + 55);
+				var h = parseInt($(document).height());
+
+				console.log(scroll);
+				console.log(client);
+				console.log(h);
+
+				console.log("------------------");
+				if(h + scroll >= client) { // 到达底部时,加载新内容
+					continueLoad();
+				}
+			});
+		});
+	</script>
+
+	<body>
+		<div style="display:none;">
+			<span class="examid" style="font-size: 20px;color: #5FB878;" th:id="${examid}" th:text="${examid}"></span>
+		</div>
+		<div>
+			<div class="layui-layout layui-layout-admin header-border">
+				<div class="layui-header " style="background-color:#FFFFFF;">
+					<div class="layui-logo">
+						<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+					</div>
+					<!-- 头部区域（可配合layui已有的水平导航） -->
+					<div class="layui-nav layui-layout-left">
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">考试</a>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">题库</a>
+						</li>
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">商店</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">购买考试</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">购买题库</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">群组</a>
+						</li>
+					</div>
+					<ul class="layui-nav layui-layout-right">
+						<li class="layui-nav-item header-font-color">
+							<div class="layui-row">
+
+								<div class="layui-col-md10 search-bank">
+									<input style="height: 35px;border: 1px solid #5FB878;" type="text" name="title" placeholder="搜搜看" class="layui-input search">
+								</div>
+
+								<div class="layui-col-md2 layui-anim layui-anim-fadein "  onclick="search1($('.search').val())"  style="border-radius:3px;cursor:pointer;line-height: 35px;text-align: center;background-color: #5FB878;color: #FFF;">
+									<span>搜索</span>
+								</div>
+							</div>
+						</li>
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">
+								<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+							</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">基本资料</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">交易中心</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item header-font-color">
+							<a class="header-font-color" href="">退出登录</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
+					<div class="layui-side-scroll">
+						<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+						<ul class="layui-nav-tree" lay-filter="test">
+
+							<li class="NavBar-item">
+
+								<a class="NavBar-a" onclick="findtag('IT技术')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i> IT技术</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" onclick="findtag('IQ&EQ')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i>IQ&EQ</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" onclick="findtag('招聘真题')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i>招聘真题</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" onclick="findtag('资格证书')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i>资格证书</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" onclick="findtag('学历教育')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i>学历教育</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" onclick="findtag('培训学习')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i>培训学习</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" onclick="findtag('综合测试')"><i class="layui-icon layui-icon-note" style="font-size: 26px; color: darkseagreen;"></i>综合测试</a>
+							</li>
+
+						</ul>
+					</div>
+				</div>
+
+				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;margin-top: 0px;padding-top: 0px;top:55px;">
+					<!-- 内容主体区域 -->
+					<div class="abc" style="margin-top: 0px;padding-top: 0px;">
+
+						<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;margin-left:5px;padding-top: 0px;">
+							<legend>题库</legend>
+						</fieldset>
+
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<div class="bank-info">
+							<div class="one-exam" style="width: 300px!important;height: 140px!important;border: 1px solid #CCC;border-top:3px solid #5FB878;display: inline-block;margin: 20px;">
+
+								<div class="one-exam-header">
+
+									<div class="one-exam-title" style="margin-top: 22px;margin-left: 12px;display: inline-block;">
+										<span style="font-size: 16px;color: #333;">标题</span>
+									</div>
+
+									<div class="one-exam-goodsid" style="margin-top: 22px;margin-left: 12px;display: none;">
+										<span style="font-size: 16px;color: #333;">goodsid</span>
+									</div>
+									<div class="one-exam-fromid" style="margin-top: 22px;margin-left: 12px;display: none;">
+										<span style="font-size: 16px;color: #333;">fromid</span>
+									</div>
+									<div class="one-exam-userid" style="margin-top: 22px;margin-left: 12px;display: none;">
+										<span style="font-size: 16px;color: #333;">userid</span>
+									</div>
+
+									<div class="one-exam-manage" style="float:right;color:#01AAED;background-color:#FFFFFF;display: inline-block;">
+										<span class="layui-badge" style="background-color:#5FB878;"> &nbsp;标签&nbsp;</span>
+									</div>
+
+									<div class="one-exam-time" style="width:270px;margin-left:12px;margin-top:20px;margin-bottom: 7px;display: inline-block;">
+										<span style="color: #888;">发布于</span>
+										<span style="color: #888;">发布时间</span>
+										<div class="end-time" style="float:right">
+											<span class="end-time-span" style="color: #FF5722;font-size:19px;">价格</span>
+											<span style="color: #888;">积分</span>
+										</div>
+									</div>
+
+								</div>
+
+								<div class="exam-info" style="padding-top:7px;border-top: 1px solid #DDD;">
+									<div class="layui-row">
+										<div class="layui-col-md6" align="center">
+											<div class="question-num">
+												<i class="layui-icon layui-icon-file-b" style="font-size: 18px; color: #5FB878;"></i>
+												<span style="font-size: 16px;color: #444;">预览</span>
+											</div>
+										</div>
+										<div class="layui-col-md6" align="center">
+											<div class="points-sum">
+												<i class="layui-icon layui-icon-flag" style="font-size: 18px; color: #5FB878;"></i>
+												<span style="font-size: 16px;color: #444;">人数</span>
+												<span style="font-size: 16px;color: #444;">购买</span>
+
+											</div>
+										</div>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script src="layui/layui.js" th:src="@{static/layui/layui.all.js}"></script>
+		<script src="layui/layer/layer.js" th:src="@{static/layui/layer/layer.js}"></script>
+		<script type="text/javascript" src="js/template.js" th:src="@{static/js/template.js}"></script>
+		<script type="text/javascript" src="js/answeredInfo.js" th:src="@{static/js/answeredInfo.js}"></script>
+
+	</head>
+
+	<body class="layui-layout-body" style="background-color: #F5F5F5;overflow-y:auto; overflow-x:auto;height:1500px;">
+	
+	<div style="display:none;">
+				<span  class="paperid" style="font-size: 20px;color: #5FB878;" th:id="${paperid}" th:text="${paperid}"></span>
+	</div>
+													
+		<div class="layui-layout layui-layout-admin">
+			<div class="layui-header header-border" style="background-color:#FFFFFF;">
+				<div class="layui-logo">
+					<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+				</div>
+				<!-- 头部区域（可配合layui已有的水平导航） -->
+				<div class="layui-nav layui-layout-left">
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">考试</a>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">题库</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">商店</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="">购买考试</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="">购买题库</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">群组</a>
+					</li>
+				</div>
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">
+							<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="">基本资料</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="">交易中心</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item header-font-color">
+						<a class="header-font-color" href="">退出登录</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="layui-row" style="margin-top: 50px;">
+				<div class="layui-col-md1">
+
+				</div>
+				<div class="layui-col-md3" >
+					<div class="layui-row">
+						<div class="layui-col-md2" >
+							&nbsp;
+						</div>
+						
+						<div class="layui-col-md9 all-btn" style="background-color: #FFFFFF;">
+						
+						
+							<div class="exam-info-container">
+							
+						
+								<div class="exam-btn-container">
+									<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 15px;">
+										<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878;"> 基本信息</button>
+									</div>
+
+									<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;" th:each="part:${parts}">
+										<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878"  th:text="${part.partname}"> 第一部分</button>
+									</div>
+								</div>
+                           
+
+								<div class="exam-question-info" style="width: 240px;margin-left: 18px;margin-top: 30px;">
+
+									<div class="exam-points-num" style="margin-top: 10px;">
+
+										<div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;">总分值：</span>
+										</div>
+
+										<div class="exam-question-num" style="display: inline;float:right;">
+											<span id="exam-sum-score" style="color: #007DDB;font-size: 20px;">0</span>
+											<span style="color: #666666;">&nbsp;分</span>
+										</div>
+
+									</div>
+
+									<div class="exam-points-num" style="margin-top: 10px;">
+
+										<div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;">考生得分:</span>
+										</div>
+
+										<div class="exam-question-num" style="display: inline;float:right;">
+											<span id="student-sum-score" style="color: #007DDB;font-size: 20px;">0&nbsp;</span>
+											<span style="color: #666666;">分</span>
+										</div>
+
+									</div>
+
+								</div>
+
+								<div class="exam-add-part-btn" style="width: 240px;margin-left: 18px;margin-top: 20px;margin-bottom: 15px;">
+									
+                                         <div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;font-size: 20px;">试卷状态:</span>
+										</div>
+
+										<div class="exam-question-num" style="display: inline;float:right;">
+											<span id="paper-state" style="color: #007DDB;font-size: 20px;">未判卷&nbsp;</span>
+											
+										</div>
+								</div>
+                            </div>
+						
+						</div>
+						<div class="layui-col-md1" >
+							&nbsp;
+						</div>
+					</div>
+
+					
+				</div>
+		
+		<div class="layui-col-md7">
+
+						<div class="exam-intro-controller" style="border: 1px solid #F5F5F5;background-color: #FFFFFF;">
+	                        
+							
+							
+							<div class="exam-title" style="margin-top: 25px;">
+							              <label class="layui-form-label" style="color: #333333;font-size: 17px;width:15%">考试标题</label>
+								<div class="layui-input-block">
+									<input type="text" name="title" required lay-verify="required" autocomplete="off" disabled="disabled"
+									      class="layui-input" style="width: 85%;" th:value="${test.examtitle}" >
+								</div>
+								
+							</div>
+							
+							<div class="exam-participate-time" style="margin-top: 25px;">
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;width:15%">开始答卷时间</label>
+								<div class="layui-input-block">
+									<input type="text" name="title" required lay-verify="required" autocomplete="off" disabled="disabled"
+									      class="layui-input" style="width: 85%;" th:value="${participatetime}" >
+								</div>
+							</div>
+							
+							<div class="exam-submit-time" style="margin-top: 25px;">
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;width:15%">提交试卷时间</label>
+								<div class="layui-input-block">
+									<input type="text" name="title" required lay-verify="required" autocomplete="off" disabled="disabled"
+									      class="layui-input" style="width: 85%;" th:value="${submittime}" >
+								</div>
+							</div>
+							
+							<div class="exam-change-window" style="margin-top: 25px;margin-bottom:25px;">
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;width:15%">切换窗口次数</label>
+								<div class="layui-input-block">
+									<input type="text" name="title" required lay-verify="required" autocomplete="off" disabled="disabled"
+									      class="layui-input" style="width: 85%;" th:value="${test.changewindowsnum}" >
+								</div>
+							</div>
+
+
+						</div>
+
+						<div class="part-controller" style="border: 1px solid #F5F5F5;margin-top: 25px;">
+
+							<div class="part" style="border: 1px solid #F5F5F5;background-color: #FFFFFF;">
+
+								<div class="part-question-statistic" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">
+
+									<fieldset style="border: 1px solid #D2D2D2;">
+										<legend style="font-size: 20px;">
+											<i class="layui-icon layui-icon-list tongji" style="font-size:16px;color:#5FB878;">总体答题情况</i>
+										</legend>
+
+										<div class="statistic-title">
+											<table class="layui-table" lay-size="sm">
+												<colgroup>
+													<col width="25%">
+													<col width="25%">
+													<col width="25%">
+													<col width="25%">
+												
+												</colgroup>
+												<thead>
+													<tr>
+														<th>部分序号</th>
+														<th>部分名称</th>
+														<th>部分得分</th>
+														<th>部分总分</th>
+														
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>贤心</td>
+														<td>2016-11-29</td>
+														<td>人生就像是一场修行</td>
+														<td>31231</td>
+														
+													</tr>
+													<tr>
+														<td>许闲心</td>
+														<td>2016-11-28</td>
+														<td>于千万人之中遇见里…</td>
+														<td>人生就像是一场修行</td>
+														
+													</tr>
+												</tbody>
+											</table>
+										</div>
+
+									</fieldset>
+
+								</div>
+
+								<div class="part-question-info" style="margin-right:20px;margin-left: 20px;margin-top: 25px;margin-bottom: 75px;">
+
+									<fieldset style="border: 1px solid #D2D2D2;margin-bottom:30px;" th:each="part:${parts}">
+										<legend>
+											<i class="layui-icon layui-icon-form xinxi" style="font-size:20px;color:#5FB878;font-weight: bold;" th:text="${part.partname}"></i>
+										</legend>
+
+										<div class="question-container" id="question-container">
+											
+											<div class="one-question" style="margin-left: 10px;margin-top: 15px;"  th:each="questionAnswerVO:${part__${part.partid}__}"  >
+												<div class="one-question-introduction">
+				
+													<div class="one-question-serial" style="display: inline;">
+														<span style="font-size: 20px;color: #5FB878;" th:text="${questionAnswerVO.questionserialnum}+'、'">&nbsp;&nbsp;</span>
+													</div>
+                                                   
+                                                   
+                                                   <!--题型 填空选择-->
+													<div class="one-question-type" style="display: inline;margin-right: 5px;" th:switch="${questionAnswerVO.questiontype}">
+
+															<span th:case="'0'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;单选题&nbsp;</span>
+															<span th:case="'1'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;多选题&nbsp;</span>
+															<span th:case="'2'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;判断题&nbsp;</span>
+															<span th:case="'3'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;填空题&nbsp;</span>
+															<span th:case="'4'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;问答题&nbsp;</span>	
+															<span th:case="'*'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;其他&nbsp;</span>						
+													</div>
+
+													<div class="one-question-skill" style="display: inline;margin-right: 5px;">
+													<!--问题技能-->
+														    <span  class="layui-badge" style="background-color:#5FB878;" th:text="${questionAnswerVO.questionskill}"></span>
+													</div>
+
+													<div class="one-question-degree" style="display: inline;margin-right: 5px;" th:switch="${questionAnswerVO.difficultdegree}">
+															<span th:case="'0'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;难度：简单&nbsp;</span>
+															<span th:case="'1'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;难度：一般&nbsp;</span>
+															<span th:case="'2'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;难度：困难&nbsp;</span>
+													</div>
+
+													<div class="one-question-points" style="margin-top: 10px;float:right;">
+                                                        
+                                                        
+														<div class="exam-question-title" style="display: inline;" th:switch="${questionAnswerVO.correctstate}">
+														    <span th:case="'0'" th:id="'qid'+${questionAnswerVO.questionid}"  style="color:red;"> &nbsp;未打分&nbsp;</span>
+															<span th:case="'1'" th:id="'qid'+${questionAnswerVO.questionid}"  style="color:darkseagreen;" th:text="'得分'+${questionAnswerVO.score}"> </span>
+														</div>
+
+														<div class="exam-question-title" style="display: inline;">
+			       											<span style="color: #666666;" >&nbsp;&nbsp;&nbsp;满分</span>
+															<span style="color: #333333;" th:text="${questionAnswerVO.sumscore}"></span>
+														</div>
+														
+														<i th:attr="data-paperid=${questionAnswerVO.paperid},data-questionid=${questionAnswerVO.questionid},data-sumscore=${questionAnswerVO.sumscore}" 
+														    class="layui-icon layui-icon-edit" style="font-size: 20px; color:darkseagreen;display: inline;"
+															onclick="grade($(this))"></i>
+													</div>
+
+												</div>
+
+												<div class="one-question-title" style="margin-top: 30px;margin-left: 20px;">
+													<span style="color:black;font-size: 17px;" th:text="${questionAnswerVO.title}"></span>
+												</div>
+
+
+												<div class="one-question-detial" style="margin-top: 30px;margin-left: 20px;">
+													
+													<div class="choice" style="border-left: 4px solid #5FB878;">
+														
+														<div class="layui-form" style="margin-left: 3px;">
+
+														<div class="layui-form-item" style="margin-bottom:0px;" th:each="option:${#strings.arraySplit(questionAnswerVO.options, '#^#')}">
+  															    <div th:switch = "${ #strings.contains(questionAnswerVO.answercontent, #strings.substring(option,0,1)  ) }" >
+                                                                      <div th:case="true">
+                                                                      <i class="layui-icon layui-icon-radio" style="font-size: 15px; color:#4E5465;"  th:text="'&nbsp;&nbsp;'+${option}" th:id="${option}"></i>
+                                                                      </div>
+														         	 <div th:case="false">
+                                                                      <i class="layui-icon layui-icon-circle" style="font-size: 15px; color:#4E5465;"  th:text="${'&nbsp;&nbsp;'+option}" th:id="${option}"></i>
+                                                                      </div>
+																</div>	
+			                                            	<br>
+														</div>
+	
+														</div>
+
+													</div>
+													<div class="right-answer" style="border-left: 4px solid #1E9FFF;margin-top: 15px;">	
+														<div class ="student-answer-title" style="margin-left: 5px;">
+															<span style="color:black;font-size: 16px;"> 考生答案 </span>
+														</div>
+														<br>
+														<div class ="right-answer-info" style="margin-left: 5px;" th:each="Sanswer: ${#strings.arraySplit(questionAnswerVO.answercontent, '#^#')}">
+                                                               <a th:text="${Sanswer}"></a>        
+														</div>
+													</div>
+													<div class="right-answer" style="border-left: 4px solid #FF5722;margin-top: 15px;">
+														
+														<div class ="right-answer-title" style="margin-left: 5px;">
+															<span style="color:black;font-size: 16px;"> 正确答案 </span>
+														</div>
+														<br>
+														<div class ="right-answer-info" style="margin-left: 5px;" th:each="answer: ${#strings.arraySplit(questionAnswerVO.answer, '#^#')}">
+                                                               <a th:text="${answer}"></a>     
+														</div>
+
+													</div>
+													
+													<div class="answer-jiexi" style="border-left: 4px solid #FFB800;margin-top: 15px;">
+														
+														<div class ="right-answer-title" style="margin-left: 5px;">
+															<span style="color:black;font-size: 16px;" > 试题解析 </span>
+														</div>
+														<br>
+														<div class ="right-answer-info" style="margin-left: 5px;">
+															<span th:text="${questionAnswerVO.analysis}">  </span>
+														</div>
+
+													</div>
+														
+														
+													</div>
+												
+											    <hr>
+											</div>
+											
+										</div>
+
+									</fieldset>
+
+								</div>
+								<div style="color: #4E5465;text-align: center;">
+									<span>——— 已到底 ———</span>
+								</div >
+								
+								<br>
+								<br>
+								<br><br>
+
+							</div>
+
+						</div>
+
+					</div>
+		
+		<div class="layui-col-md1">
+						&nbsp;
+					</div>
+
+		</div>
+		
+		
+</div>
+	</body>
+
+</html>
