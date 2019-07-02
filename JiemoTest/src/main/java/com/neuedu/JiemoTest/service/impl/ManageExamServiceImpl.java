@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.neuedu.JiemoTest.dao.Answer_infoMapper;
 import com.neuedu.JiemoTest.dao.ExamMapper;
 import com.neuedu.JiemoTest.dao.PaperTestMapper;
 import com.neuedu.JiemoTest.dao.PartMapper;
 import com.neuedu.JiemoTest.dao.QuestionInPartMapper;
 import com.neuedu.JiemoTest.dao.QuestionMapper;
+import com.neuedu.JiemoTest.entity.Answer_infoExample;
 import com.neuedu.JiemoTest.entity.Exam;
 import com.neuedu.JiemoTest.entity.ExamExample;
+import com.neuedu.JiemoTest.entity.PaperTest;
 import com.neuedu.JiemoTest.entity.PaperTestExample;
 import com.neuedu.JiemoTest.entity.Part;
 import com.neuedu.JiemoTest.entity.PartExample;
@@ -41,6 +44,9 @@ public class ManageExamServiceImpl implements ManageExamService{
 	
 	@Autowired
 	PaperTestMapper paperTestMapper;
+	
+	@Autowired 
+	Answer_infoMapper answer_infoMapper;
 	
 	@Override
 	public String PublishExam(int examid,int startTime,int endTime,int maxTimes) {
@@ -135,6 +141,7 @@ public class ManageExamServiceImpl implements ManageExamService{
 		for(Part p : PartList) {
 			PartId.add(p.getPartid());
 		}
+		
         if(PartId.size() != 0) {
 		QuestionInPartExample questionInPartExample = new QuestionInPartExample();
 		Criteria questionInPartcriteria = questionInPartExample.createCriteria();
@@ -146,6 +153,22 @@ public class ManageExamServiceImpl implements ManageExamService{
 		partDeleteCriteria.andPartidIn(PartId);
 		ret = partMapper.deleteByExample(partDeleteExample);
         }
+        
+        PaperTestExample paperTestExample2 = new PaperTestExample();
+		com.neuedu.JiemoTest.entity.PaperTestExample.Criteria paperTestDeleteCriteria2 = paperTestExample2.createCriteria();
+		paperTestDeleteCriteria2.andExamidEqualTo(examId);
+		List<PaperTest> PaperTestList = new ArrayList<PaperTest>();
+		PaperTestList = paperTestMapper.selectByExample(paperTestExample2);
+        List<Integer> PaperId = new ArrayList<Integer>();
+		
+		for(PaperTest p : PaperTestList) {
+			PaperId.add(p.getPaperid());
+		}
+		
+		Answer_infoExample answer_InfoExample = new Answer_infoExample();
+		com.neuedu.JiemoTest.entity.Answer_infoExample.Criteria answer_InfoCriteria = answer_InfoExample.createCriteria();
+		answer_InfoCriteria.andPaperidIn(PaperId);
+		ret = answer_infoMapper.deleteByExample(answer_InfoExample);
 		
 		PaperTestExample paperTestExample = new PaperTestExample();
 		com.neuedu.JiemoTest.entity.PaperTestExample.Criteria paperTestDeleteCriteria = paperTestExample.createCriteria();
@@ -168,6 +191,18 @@ public class ManageExamServiceImpl implements ManageExamService{
 		Exam exam = new Exam();
 		exam.setExamid(examId);
 		exam.setExamstate(2);
+		
+		PaperTestExample example = new PaperTestExample();
+		com.neuedu.JiemoTest.entity.PaperTestExample.Criteria criteria = example.createCriteria();
+		criteria.andExamidEqualTo(examId);
+		List<PaperTest> PaperTestList = paperTestMapper.selectByExample(example);
+		
+		for (PaperTest p : PaperTestList) {
+			if(p.getPaperstate() != 2 ) {
+				return "0 有未答完题或者未批改的试卷，无法归档";
+			}
+		}
+		
 		int ret = examMapper.updateByPrimaryKeySelective(exam);
 		if(ret == 1) {
 			return "1 归档成功";
@@ -224,6 +259,18 @@ public class ManageExamServiceImpl implements ManageExamService{
 		}else {
 		return "0 还原失败";
 		}
+	}
+	
+	@Override
+	public String CheckExamUser(int userId,int examId) {
+		
+		Exam exam = examMapper.selectByPrimaryKey(examId);
+		if(exam == null || userId != exam.getUserid()) {
+			return "0 没有访问权限";
+		}else {
+			return "1 可以编辑";
+		}
+		
 	}
 
 

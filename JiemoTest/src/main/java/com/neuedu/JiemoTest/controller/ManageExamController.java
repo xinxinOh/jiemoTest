@@ -3,7 +3,9 @@ package com.neuedu.JiemoTest.controller;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +27,14 @@ public class ManageExamController {
 	@Autowired
 	ManageExamService manageExamService;
 	
-	@RequestMapping("/toFileExam")
+	@RequestMapping("/FileExam")
 	public String toExam(){
 		
 		return "FileExam";
 		
 	}
 	
-	@RequestMapping("/toRecycleBin")
+	@RequestMapping("/RecycleBin")
 	public String toRecycleBin(){
 		
 		return "RecycleBin";
@@ -68,12 +70,45 @@ public class ManageExamController {
 	}
 	
 	@RequestMapping("/toEditExam")
-	public String EditExam(HttpServletRequest request){
+	public String EditExam(HttpServletResponse response,HttpServletRequest request){
+		
 		int examid = Integer.parseInt(request.getParameter("examId"));
 		HttpSession session = request.getSession();
 		session.setAttribute("EditExamId", examid);
 
 		return "EditExam"; //返回字符串
+		
+		
+	}
+	
+	@RequestMapping("/CheckExamUser")
+	public @ResponseBody String CheckExamUser(@RequestParam("examId") int examId,HttpServletResponse response,HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		String userinfo = (String) session.getAttribute("UserInfo"); 
+		JSONObject userJson = JSONObject.parseObject(userinfo);
+		UserInfo userInfo=JSON.toJavaObject(userJson, UserInfo.class);
+		
+		if(userInfo == null) {
+			return "0 请先登录";
+		}
+		
+		Cookie[] cookies = request.getCookies();	
+	    for(Cookie cookie : cookies){
+	        if(cookie.getName().equals("Operation")){
+	            return "0 请再等15秒后操作";
+	        }
+	    }
+	    
+	    
+	    Cookie cookie = new Cookie("Operation","1");
+		cookie.setMaxAge(15);
+		response.addCookie(cookie);
+		
+		int userId = userInfo.getUserid();
+		String ret = manageExamService.CheckExamUser(userId, examId);
+
+		return ret; //返回字符串
 		
 		
 	}
