@@ -27,12 +27,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neuedu.JiemoTest.dao.Answer_infoMapper;
 import com.neuedu.JiemoTest.entity.Answer_info;
 import com.neuedu.JiemoTest.entity.Echarts;
+import com.neuedu.JiemoTest.entity.Goods;
 import com.neuedu.JiemoTest.entity.PaperTest;
 import com.neuedu.JiemoTest.entity.Part;
 import com.neuedu.JiemoTest.entity.PartDetail;
 import com.neuedu.JiemoTest.entity.Question;
 import com.neuedu.JiemoTest.entity.QuestionAnswerVO;
 import com.neuedu.JiemoTest.service.AnsweredPapersService;
+import com.neuedu.JiemoTest.service.LoadGoodsService;
 
 
 
@@ -41,6 +43,9 @@ public class testAnsweredController{
 
 	@Autowired
 	AnsweredPapersService answeredPapersService;
+	@Autowired
+	LoadGoodsService loadGoodsService;
+
 	/*
 	 * @RequestMapping 相当于servlet的映射名
 	 * 当访问http://localhost:8081/hello1时 进入该方法 不需要项目名
@@ -112,7 +117,6 @@ public class testAnsweredController{
 			return "json1";
 		}
 		
-	
 		
 		@RequestMapping("/toShowAnsweredList")
 		public ModelAndView toShowAnsweredList(HttpServletRequest request){	
@@ -170,6 +174,7 @@ public class testAnsweredController{
 	        long lt2 = new Long(paperTest.getSubmittime());
 	        Date date = new Date(lt);
 	        Date date2 = new Date(lt2);
+	        
 	        res = simpleDateFormat.format(date);
 	        res2 = simpleDateFormat.format(date2);
 			

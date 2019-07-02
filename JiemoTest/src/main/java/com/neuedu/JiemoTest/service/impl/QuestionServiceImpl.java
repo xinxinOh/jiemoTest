@@ -86,13 +86,11 @@ public class QuestionServiceImpl implements QuestionService {
 		question.setSpare4(null);
 		int seconds = (int) (System.currentTimeMillis() / 1000);
 		question.setEdittime(seconds);
+		System.out.println("skill-----------------------------------"+question.getQuestionskill());
 		
 		if (bank.getSourcebankid()==-1) {
 			//是源题库则编辑原题目
 			questionMapper.updateByPrimaryKey(question);
-			
-			System.out.println(question.getQuestionskill());
-		
 		}else {
 			//不是源题库则新建题目，并修改题库和题目关系
 			int sourceId = question.getQuestionid();
@@ -100,7 +98,7 @@ public class QuestionServiceImpl implements QuestionService {
 			question.setQuestionid(null);
 			//复制源题库信息
 			Question sourceQuestion = questionMapper.selectByPrimaryKey(sourceId);
-			//新题库
+			//新题
 			int a = questionMapper.insert(question);
 			int newid = questionMapper.selectLastInsert();
 			//删除旧信息
@@ -121,6 +119,7 @@ public class QuestionServiceImpl implements QuestionService {
 	public void create(int bankid, Question question) {
 		// TODO Auto-generated method stub
 		questionMapper.insert(question);
+		System.out.println("skill-----------------------------------"+question.getQuestionskill());
 		int questionid = questionMapper.selectLastInsert();
 		
 		//System.out.println(questionid);

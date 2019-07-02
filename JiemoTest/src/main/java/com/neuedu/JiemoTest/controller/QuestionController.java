@@ -59,7 +59,7 @@ public class QuestionController {
 		int seconds = (int) (System.currentTimeMillis() / 1000);
 		question.setEdittime(seconds);
 		
-		//System.out.println(skill);
+		System.out.println(data.getString("skill"));
 		questionService.create(bankid,question);
 		
 		return "bank/Bankquestion";

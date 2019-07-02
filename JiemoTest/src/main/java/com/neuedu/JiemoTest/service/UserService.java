@@ -6,10 +6,5 @@ import com.neuedu.JiemoTest.entity.Answer_info;
 import com.neuedu.JiemoTest.entity.UserInfo;
 
 public interface UserService {
-	List<Answer_info> queryAll();
-	
-	int tianjiaYonghu(UserInfo u);
-	
-	
-	int tianjiaTwoYonghu(UserInfo u);
+	int getIdByName(String name);
 }

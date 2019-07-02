@@ -160,3 +160,73 @@
 .boxs {
     border: 1px solid #E6E6E6;
 }
+.one-share {
+    display: block;
+    color: black;
+    height: 50px;
+    font-size: 18px;
+    border: 1px solid #B9B9B9;
+    background: #F3F3F3;
+}
+.one-share p {
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 50px;
+}
+.unPay {
+    display: inline-block;
+    color: #0078d7;
+    text-align: center;
+}
+.unPay:hover{
+    color: #E98835;
+}
+.one-order {
+    display: block;
+    color: black;
+    height: 50px;
+    font-size: 18px;
+    border: 1px solid #B9B9B9;
+    background: #F3F3F3;
+}
+.one-order div {
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 50px;
+    width: 18%;
+}
+.order_search {
+    margin-top: 20px;
+    color: black;
+}
+.order_search .layui-form.layui-form-pane {
+    margin-left: 30%;
+}
+.center-title {
+    color: #8FBC8F;
+    font-size: 40px;
+    font-family: cursive;
+    margin-top: 40px;
+}
+p.last-point {
+    font-size: 50px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    margin-left: 30px;
+    color: #E98835;
+    font-family: auto;
+}
+
+.point-info .point-text {
+    margin-left: -200px;
+    font-family: cursive;
+    font-size: 25px;
+    margin-top: 30px;
+}
+.point-btn button.layui-btn {
+    margin-right: 30px;
+    margin-top: 15px;
+}
+.show-btn-box {
+    margin-left: 70%;
+}

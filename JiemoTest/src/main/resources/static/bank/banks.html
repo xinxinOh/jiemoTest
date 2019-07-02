@@ -92,8 +92,16 @@
 					}); 
 				
 			}
+			layui.use('form', function() {
+				var form = layui.form;
+				form.render('select');
+				form.render('checkbox');
+				form.render('radio');
+				//各种基于事件的操作，下面会有进一步介绍
+			});
 			
 			function createBank(){
+				
 				layer.open({
 					title: '新建题库'
 					,btn:['确定','返回']
@@ -148,7 +156,202 @@
 					}); 
 				
 			}
-
+	
+			function sealBank(bankid,name,source) {
+				var form = layui.form;
+				layer.open({
+					title: '出售题库'
+					,btn:['确定','返回']
+					,anim:0
+					,area: ['400px', '300px']
+					,offset: 'auto'
+					,content:
+							'<div class="layui-form layui-form-pane">'
+							
+				  		    +'	<label class="layui-form-label" style="color: black;" >标签</label>'
+							+'<div class="layui-input-inline goods-Tag">'
+				  		    +'  <select id="skill">'
+				  		    +'    <option value="">请选择题库标签</option>'
+				  		    +'    <option value="IT技术">IT技术</option>'
+				  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+				  		    +'    <option value="招聘真题">招聘真题</option>'
+				  		    +'    <option value="资格证书">资格证书</option>'
+				  		    +'    <option value="学历教育">学历教育</option>'
+				  		    +'    <option value="培训学习">培训学习</option>'
+				  		    +'    <option value="综合测试">综合测试</option>'
+				  		    +'  </select>'
+				  		    +'</div>'
+				  		    
+				  		  	+'<div class="layui-form-item">'
+				    		+'	<label class="layui-form-label" style="color: black;" >商品价格</label>'
+				    		+'	<div class="layui-input-inline">'
+				      		+'		<input id="creat-good-price" class="layui-input" type="text" autocomplete="off" lay-verify="required">'
+				    		+'	</div>'
+				    		+'<span style="font-size: 20px;color: #5FB878;">积分</span>'
+				  			+'</div>'
+				  		    
+				    		+'</div>'
+				  		    
+					,btn1:function(index,layero){
+						
+			            var skill = $("#skill option:selected").val();
+			            var price = $("#creat-good-price").val();
+						//alert(source);
+			            if(source != -1){
+			            	layer.msg('您只能出售自己的题库！', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+				        	return;
+			            }
+			            
+			            if(skill == ''){
+				        	layer.msg('标签不能为空', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+				        	return;
+				        }
+						
+						if(price == ''){
+				        	layer.msg('请输入价格', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+				        	return;
+				        }
+						
+						price = parseInt(price);//如果变量val是字符类型的数则转换为int类型 如果不是则ival为NaN
+						   // alert(typeof(ival));
+						    if(!isNaN(price)&&price>0){
+						    } else{
+						        layer.msg('价格必须为大于0的整数', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+						    }
+						
+						var Jsdata = '{"bankid":'+bankid+',"price":"'+price+'","skill":"'+skill+'","type":0,"sp3":"'+name+'"}';
+						//alert(Jsdata);
+						$.ajax({
+							type:"POST"
+							,dataType:'text'
+							,contentType: "application/json;charset=UTF-8"
+							,data:Jsdata
+							,url:"/creatGoods"
+							,success:function(message){
+								location.reload(true);
+								layer.closeAll();
+							}
+							,error: function (message){
+								layer.msg("发布商品失败，请重试");
+								location.reload(true);
+							}
+						});
+					}
+					,btn2:function(index,layero){
+							  
+					}
+				});
+				form.render('select');
+				form.render('checkbox');
+				form.render('radio');
+			}
+			
+			function shareBank(bankid,source){
+				//分享
+				//var form = layui.form;
+				layer.open({
+					title: '出售题库'
+					,btn:['确定','返回']
+					,anim:0
+					,area: ['400px', '180px']
+					,offset: 'auto'
+					,content:
+							'<div class="layui-form layui-form-pane">'
+							
+				  		  	+'<div class="layui-form-item">'
+				    		+'	<label class="layui-form-label" style="color: black;" >用户名</label>'
+				    		+'	<div class="layui-input-inline">'
+				      		+'		<input id="creat-good-price" class="layui-input" type="text" autocomplete="off" lay-verify="required"  placeholder="请输入要分享的用户名">'
+				    		+'	</div>'
+				  			+'</div>'
+				  		    
+				    		+'</div>'
+				  		    
+					,btn1:function(index,layero){
+						
+			            var name = $("#creat-good-price").val();
+						//alert(source);
+			            if(source != -1){
+			            	layer.msg('您只能分享自己的题库！', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+				        	return;
+			            }
+			            
+			            if(name == ''){
+				        	layer.msg('分享对象不能为空', {
+						        time: 1000 //1s后自动关闭
+								,type:1
+								,end:function(index,layero){
+									layer.close(index);
+								}
+						     });
+				        	return;
+				        }
+			            
+						var Jsdata = '{"bankid":'+bankid+',"name":"'+name+'"}';
+						//alert(Jsdata);
+						$.ajax({
+							type:"POST"
+							,dataType:'text'
+							,contentType: "application/json;charset=UTF-8"
+							,data:Jsdata
+							,url:"/shareBanks"
+							,success:function(message){
+								layer.msg("分享成功！");
+								layer.closeAll();
+							}
+							,error: function (message){
+								layer.msg('分享失败，请检查用户名', {
+							        time: 1000 //1s后自动关闭
+									,type:1
+									,end:function(index,layero){
+										layer.close(index);
+									}
+							     });
+					        	return;
+								//location.reload(true);
+							}
+						});
+					}
+					,btn2:function(index,layero){
+							  
+					}
+				});
+				/* form.render('select');
+				form.render('checkbox');
+				form.render('radio'); */
+			}
+			
 		</script>
 		
 
@@ -195,7 +398,7 @@
 									<a class="header-font-color" href="">基本资料</a>
 								</dd>
 								<dd>
-									<a class="header-font-color" href="">交易中心</a>
+									<a class="header-font-color" href="/showOrder?type=1">交易中心</a>
 								</dd>
 							</dl>
 						</li>
@@ -217,7 +420,7 @@
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
-								<a class="NavBar-a" href="" ><i class="layui-icon layui-icon-release" style="font-size: 26px; color: darkseagreen;"></i>我的分享</a>
+								<a class="NavBar-a" href="/showOrder?type=0" ><i class="layui-icon layui-icon-release" style="font-size: 26px; color: darkseagreen;"></i>分享</a>
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
@@ -249,8 +452,8 @@
     					<ul class="listcontext"> <!-- 二级菜单 -->
       					<li><a th:onclick="editBank([[${bank.bankid}]],[[${bank.bankname}]],[[${bank.bankintroduction}]])" class = "layui-icon layui-icon-edit">编辑题库</a></li>
       					<li><a th:href="@{'/showQuestions?id='+${bank.bankid}}+'&&start=0&&count=5'" class = "layui-icon layui-icon-read" >查看题目</a></li>
-      					<li><a href="" class = "layui-icon layui-icon-release" >分享题库</a></li>
-      					<li><a href="" class = "layui-icon layui-icon-cart" >出售题库</a></li>
+      					<li><a th:onclick="shareBank([[${bank.bankid}]],[[${bank.sourcebankid}]])" class = "layui-icon layui-icon-release" >分享题库</a></li>
+      					<li><a th:onclick="sealBank([[${bank.bankid}]],[[${bank.bankname}]],[[${bank.sourcebankid}]])" class = "layui-icon layui-icon-cart" >出售题库</a></li>
       					<li><a th:href="@{'/deleteBank?id='+${bank.bankid}}"  class = "layui-icon layui-icon-delete">删除题库</a></li>
     					</ul>
     				</span>
