@@ -31,4 +31,6 @@ public interface BankMapper {
 
     int updateByPrimaryKey(Bank record);
     
+    Integer selectLastInsert();
+    
 }

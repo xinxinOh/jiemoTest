@@ -1,5 +1,6 @@
 package com.neuedu.JiemoTest.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +43,12 @@ public class CreateExamServiceImpl implements CreateExamService {
 	
 	@Override
 	public List<Question> SearchBankQuestion(int bankId,int start,int num){
-		
 		List<Question> QuestionList = questionInBankMapper.selectQuestionByQuestionBank(bankId, start, num);
-		
 		return QuestionList;
 	}
 	
 	@Override
 	public List<Bank> SearchBank(int userId){
-		
 		BankExample example = new BankExample();
 		Criteria criteria = example.createCriteria();
 		criteria.andUseridEqualTo(userId);
@@ -65,6 +63,10 @@ public class CreateExamServiceImpl implements CreateExamService {
 		ExamExample example = new ExamExample();
 		com.neuedu.JiemoTest.entity.ExamExample.Criteria criteria = example.createCriteria();
 		criteria.andUseridEqualTo(userId);
+		List<Integer> State = new ArrayList<Integer>();
+		State.add(0);
+		State.add(1);
+		criteria.andExamstateIn(State);
 		List<Exam> ExamList = examMapper.selectByExample(example);
 		return ExamList;
 	}
@@ -75,16 +77,18 @@ public class CreateExamServiceImpl implements CreateExamService {
 
 		int nowtime = (int) (System.currentTimeMillis()/1000);
 		exam.setEdittime(nowtime);
-		
 		exam.setSourceexamid(-1);
-		
+		exam.setSpare1(0);
 		int ret = examMapper.insert(exam);
 		int examId = exam.getExamid();
+		
+		
 		if(ret==1) {
 			return "1"+" "+examId;
 		}else {
 			return "0 添加失败";
 		}
+		
 	}
 	
 	@Override

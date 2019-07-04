@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script src="layui/layui.js" th:src="@{static/layui/layui.all.js}"></script>
+		<script src="layui/layer/layer.js" th:src="@{static/layui/layer/layer.js}"></script>
+		<script type="text/javascript" src="js/template.js" th:src="@{static/js/template.js}"></script>
+		<script type="text/javascript">
+			//JavaScript代码区域
+
+			var nowManageExam = -1;
+			var index = -1;
+			var nowMaxWindowsTime = -1;
+			//检查是否已过考试时间
+
+			$(document).ready(function() {
+
+				layui.use('form', function() {
+					var form = layui.form;
+					form.render();
+					//各种基于事件的操作，下面会有进一步介绍
+				});
+
+				layui.use('element', function() {
+					var element = layui.element;
+
+				});
+
+				
+
+				layui.element.init();
+				$("body").on("hover", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+					layui.element.init();
+				});
+
+				$("body").on("mouseout", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+
+				$("body").on("hover", ".hand-movement", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".hand-movement", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+
+				$("body").on("hover", ".voluntarily", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".voluntarily", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+				
+				
+				$("body").on("click", ".answer-one-paper", function() {
+
+					window.location.href="toAnswerPaper?PaperId=6";
+
+				});
+			});
+		</script>
+
+	</head>
+
+	<body class="layui-layout-body">
+		<div class="layui-layout layui-layout-admin header-border">
+			<div class="layui-header " style="background-color:#FFFFFF;">
+				<div class="layui-logo">
+					<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+				</div>
+				<!-- 头部区域（可配合layui已有的水平导航） -->
+				<div class="layui-nav layui-layout-left">
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">考试</a>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">题库</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">商店</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="">购买考试</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="">购买题库</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="">群组</a>
+					</li>
+				</div>
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">
+							<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="">基本资料</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="">交易中心</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item header-font-color">
+						<a class="header-font-color" href="">退出登录</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
+				<div class="layui-side-scroll">
+					<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+					<ul class="layui-nav-tree" lay-filter="test">
+
+						<li class="NavBar-item">
+
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i>我的考试</a>
+						</li>
+						<hr style="height:1px;">
+						<li class="NavBar-item create-exam">
+							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>已答考试</a>
+						</li>
+						<hr style="height:1px;">
+						<li class="NavBar-item file-exam">
+							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>未答考试</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;">
+				<!-- 内容主体区域 -->
+				<a class="answer-one-paper" href="javascript:;">答卷</a>
+				<div id="Exam-container" style="margin: 20px 20px 20px 20px;">
+
+				</div>
+			</div>
+
+			<div class="layui-footer" style="margin-left: 20px;border-left: 1px solid darkseagreen;background-color: #FFF;">
+				<!-- 底部固定区域 -->
+				? layui.com - 底部固定区域
+			</div>
+		</div>
+
+	</body>
+
+</html>

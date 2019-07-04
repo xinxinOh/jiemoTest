@@ -8,7 +8,6 @@ import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ModelAndViewMethodR
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
-import com.jayway.jsonpath.spi.json.JettisonProvider;
 import com.neuedu.JiemoTest.dao.UserInfoMapper;
 import com.neuedu.JiemoTest.entity.Bank;
 import com.neuedu.JiemoTest.entity.Question;
@@ -43,10 +41,10 @@ public class QuestionBankController {
 	@Autowired
 	UserInfoMapper userInfoMapper;
 	
-	@Test
+	//@Test
 	@RequestMapping("/loginForTest")
 	public String LoginForTest(HttpServletRequest request) {
-		UserInfo user = userInfoMapper.selectByPrimaryKey(3);
+		UserInfo user = userInfoMapper.selectByPrimaryKey(1);
 		request.getSession().setAttribute("user", user);
 		return "Exam";
 	}
@@ -54,7 +52,7 @@ public class QuestionBankController {
 	@RequestMapping("/showQuestionBanks")
 	public String showQuestionBanks(HttpServletRequest request , Model model) {
 		UserInfo user = (UserInfo) request.getSession().getAttribute("user");
-		System.out.println("user!!!!!!!!!!!!!!!!!!!"+user.getUserid());
+		//System.out.println("user!!!!!!!!!!!!!!!!!!!"+user.getUserid());
 		//查找bank
 		List<Bank> banks= questionBankService.selectByUser(user,1);
 		//System.out.println(banks.size());
@@ -177,12 +175,12 @@ public class QuestionBankController {
 		List<Question> questions = questionService.selectByBank(bankId,start,count);
 		Bank bank = questionBankService.selectByPrimaryKey(bankId);
 		Integer totle = questionService.totleInBank(bankId);
-		Integer begin = start*count+1;
+		//Integer begin = start*count+1;
 		
 		model.addAttribute("bankName",bank.getBankname());
 		model.addAttribute("questions",questions);
 		model.addAttribute("totle",totle);
-		model.addAttribute("begin",begin);
+		model.addAttribute("start_",start);
 		model.addAttribute("bankId",bankId);
 		model.addAttribute("curr",start/count+1);
 		
@@ -196,4 +194,5 @@ public class QuestionBankController {
 		questionService.delete(bankId,questionId);
 		return "bank/BankQuestion";
 	}
+	
 }

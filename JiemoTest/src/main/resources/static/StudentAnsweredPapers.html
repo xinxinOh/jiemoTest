@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<link type="text/css" rel="styleSheet" href="css/style1.css" th:href="@{static/css/style1.css}" />
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script type="text/javascript" src="js/echarts.min.js" th:src="@{static/js/echarts.js}"></script>
+
+		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
+
+		<script type="text/javascript">
+		var userid;
+		function getPaperInfo(paperID,paperstate){
+			if(paperstate==2||paperstate=="2"||paperstate=="未批改"){
+				layer.msg("试卷未批改 暂不能查看");
+			}
+			else{
+			window.location.href="StuGetPaperInfo?paperID="+paperID;
+			}	
+		}
+		
+
+		function showCharts(paperid){
+			 var myChart = echarts.init(document.getElementById('main'));
+		        //数据加载完之前先显示一段简单的loading动画
+		        myChart.showLoading();
+		        
+		        var names=[];    //横坐标数组（实际用来盛放X轴坐标值）
+		        var values=[];    //纵坐标数组（实际用来盛放Y坐标值）
+		        $.ajax({
+		            type : "post",
+		            async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+		            url : "StuEchartsShow",    //请求发送到dataActiont处
+		            data : {"paperid":paperid},
+		            dataType : "json",        //返回数据形式为json
+		            success : function(result) {
+		                //请求成功时执行该函数内容，result即为服务器返回的json对象
+		                if (result) {
+		                    for(var i=0;i<result.length;i++){
+		                        names.push(result[i].name);
+		                        values.push(result[i].num);
+		                    }
+		                    myChart.hideLoading();    //隐藏加载动画
+		                    myChart.setOption({        //加载数据图表
+		                        tooltip: {},
+		                        legend: {
+		                            data:['人数'],
+		                             x: 'right', // 'center' | 'left' | {number},
+		                             y: 'center', // 'center' | 'bottom' | {number}
+		                        },
+		                        xAxis: {
+		                            data: names
+		                        },
+		                        yAxis: {
+		                            type: 'value'
+		                        },
+		                      
+		                        series: [{
+		                            // 根据名字对应到相应的系列
+		                            name: '人数',//薪资 series not exists. Legend data should be same with series name or data name.
+		                            type: 'bar',
+		                            itemStyle: {normal: {color:'rgb(143,188,143)', label:{show:true}}},
+		                            data: values
+		                        }]
+		                    });
+		                }
+		            },
+		            error : function(errorMsg) {
+		                //请求失败时执行该函数
+		                alert("图表请求数据失败!");
+		                myChart.hideLoading();
+		            }
+		        });//end ajax
+			
+		}
+		
+		
+			//JavaScript代码区域
+			layui.use('element', function() {
+				var element = layui.element;
+
+			});
+			$(document).ready(function() {
+                userid=$(".userid").text();
+				$("body").on("hover", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#BCDDBC");
+
+				});
+
+				$("body").on("mouseout", ".NavBar-item", function() {
+
+					$(this).css("background-color", "#FFFFFF");
+
+				});
+
+			});
+			
+			
+			
+			function createTime(v){  
+			    return new Date(parseInt(v)).toLocaleString()
+			}
+			
+		</script>
+
+	</head>
+
+	<body>
+<div style="display:none;">
+				<span  class="userid" style="font-size: 20px;color: #5FB878;" th:id="${userid}" th:text="${userid}"></span>
+	</div>
+		<body class="layui-layout-body">
+			<div class="layui-layout layui-layout-admin header-border" >
+				<div class="layui-header " style="background-color:#FFFFFF;">
+					<div class="layui-logo">
+						<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+					</div>
+					<!-- 头部区域（可配合layui已有的水平导航） -->
+					<div class="layui-nav layui-layout-left">
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">考试</a>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">题库</a>
+						</li>
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">商店</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">购买考试</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">购买题库</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item">
+							<a class="header-font-color" href="">群组</a>
+						</li>
+					</div>
+					<ul class="layui-nav layui-layout-right">
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="header-font-color">
+								<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+							</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a class="header-font-color" href="">基本资料</a>
+								</dd>
+								<dd>
+									<a class="header-font-color" href="">交易中心</a>
+								</dd>
+							</dl>
+						</li>
+						<li class="layui-nav-item header-font-color">
+							<a class="header-font-color" href="">退出登录</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="layui-side" style="margin-top: 10px;margin-left: 10px;">
+					<div class="layui-side-scroll">
+						<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+						<ul class="layui-nav-tree" lay-filter="test">
+
+							<li class="NavBar-item">
+
+								<a class="NavBar-a" href="toStudentAnsweredPapers"><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 已答考试</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" href="toStudentUnAnsweredPapers"><i class="layui-icon layui-icon-add-circle-fine" style="font-size: 26px; color: darkseagreen;"></i>未答考试</a>
+							</li>
+							<hr style="height:1px;">
+							<li class="NavBar-item">
+								<a class="NavBar-a" href=""><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>我的题库</a>
+							</li>
+							
+						</ul>
+					</div>
+				</div>
+
+				<div class="layui-body" style="margin-left: 20px;border-left: 1px solid darkseagreen;margin-top: 0px;padding-top: 0px;top:55px;">
+					<!-- 内容主体区域 -->
+					<div style="margin-top: 0px;padding-top: 0px;">
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+
+						<table class="layui-hide" id="demo" lay-filter="test"></table>
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->						
+						<div id="main" style="width: 800px;height:450px;"></div>
+
+						<script type="text/html" id="barDemo">
+							<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看试卷</a>
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">成绩分析</a>
+                           
+						</script>
+						<script>
+							layui.config({
+								version: '1560414887305' //为了更新 js 缓存，可忽略
+							});
+
+							layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function() {
+								var laydate = layui.laydate //日期
+									,
+									laypage = layui.laypage //分页
+									,
+									layer = layui.layer //弹层
+									,
+									table = layui.table //表格
+									,
+									carousel = layui.carousel //轮播
+									,
+									upload = layui.upload //上传
+									,
+									element = layui.element //元素操作
+									,
+									slider = layui.slider //滑块
+
+								//向世界问个好
+								//layer.msg('Hello World');
+
+								//监听Tab切换
+								element.on('tab(demo)', function(data) {
+									layer.tips('切换了 ' + data.index + '：' + this.innerHTML, this, {
+										tips: 1
+									});
+								});
+
+								//执行一个 table 实例
+								table.render({
+									elem: '#demo',
+									height: 450,
+									url: 'showStuAnswered' //数据接口
+										,
+									where: {'userid':userid} ,
+									title: '未答试卷表',
+									page: true //开启分页
+										,
+									toolbar:true //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+										,
+									
+									cols: [
+										[ //表头
+											{
+												type: 'checkbox',
+												fixed: 'left'
+											}, {
+												field: 'paperid',
+												title: '试卷序号',
+												width: 95,
+												sort: true,
+												fixed: 'left',
+												totalRowText: '合计：'
+											}, {
+												field: 'examtitle',
+												title: '考试名称',
+												width: 150,
+												sort: true
+											}, {
+												field: 'paperstate',
+												title: '状态',
+												width: 80,
+												sort: true,
+												totalRow: true,
+												templet:function(d){
+            return  d.paperstate == '2' ? "未批改":"已批改";
+        }
+											},  {
+												field: 'endtime',
+												title: '考试结束时间',
+												sort: true,
+												width: 170,
+												templet:function(d){
+										            return  createTime(d.endtime);
+										        }
+											}, {
+												field: 'participatetime',
+												title: '参加考试时间',
+												width: 170,
+												sort: true,
+												templet:function(d){
+										            return  createTime(d.participatetime);
+										        }
+											}, {
+												field: 'submittime',
+												title: '提交考试时间',
+												sort: true,
+												width: 170,
+												templet:function(d){
+										            return  createTime(d.participatetime);
+										        }
+											}, {
+												field: 'changewindowsnum',
+												title: '切换窗口次数',
+												sort: true,
+												width: 130
+											}, {
+												field: 'studentgrade',
+												title: '成绩',
+												width: 75,
+												sort: true,
+												totalRow: true
+											},   {
+												fixed: 'right',
+												width: 170,
+												align: 'center',
+												toolbar: '#barDemo'
+											}
+										]
+									]
+								});
+
+								//监听头工具栏事件
+								table.on('toolbar(test)', function(obj) {
+									var checkStatus = table.checkStatus(obj.config.id),
+										data = checkStatus.data; //获取选中的数据
+										
+										//alert(JSON.stringify(obj));
+										//alert(JSON.stringify(checkStatus));
+										//alert(JSON.stringify(data));
+									switch(obj.event) {
+										case 'add':
+											//layer.msg('添加');
+											break;
+										case 'update':
+											//if(data.length === 0) {
+											//	layer.msg('请选择一行');
+											//} else if(data.length > 1) {
+											//	layer.msg('只能同时编辑一个');
+											//} else {
+											//	layer.alert('编辑 [id]：' + checkStatus.data[0].paperid);
+											//}
+											break;
+										case 'delete':
+											if(data.length === 0) {
+												layer.msg('请选择一行');
+											} else {
+												layer.msg(data[0].paperid);
+												for(var i=0;i<data.length;i++){	    		
+													//data[i].del(); //删除对应行（tr）的DOM结构
+													//$("p").parent(".selected")
+													deletePaper(data[i].paperid);
+													var allpaperidTd = $("[data-field=paperid]");
+													for(var j = 0 ; j < allpaperidTd.length ; j++){
+														if(allpaperidTd.eq(j).children("div").text() == data[i].paperid){
+															allpaperidTd.eq(j).children("div").parent().parent().remove();
+														}
+													}
+												}
+											    
+											}
+											break;
+									};
+								});
+
+								//监听行工具事件
+								table.on('tool(test)', function(obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+									//alert(JSON.stringify(obj));
+									var data = obj.data //获得当前行数据
+										,
+										layEvent = obj.event; //获得 lay-event 对应的值
+									if(layEvent === 'detail') {
+										//layer.msg('答卷——paperid:'+data.paperid);
+										getPaperInfo(data.paperid,data.paperstate);
+									} else if(layEvent === 'del') {
+										layer.confirm('真的删除行么', function(index) {
+											obj.del(); //删除对应行（tr）的DOM结构
+											layer.close(index);
+											//向服务端发送删除指令
+											deletePaper(data.paperid);
+										});
+									} else if(layEvent === 'edit') {
+										//layer.msg('查看成绩分析');
+										showCharts(data.paperid);
+										
+									}
+								});
+
+								//执行一个轮播实例
+								carousel.render({
+									elem: '#test1',
+									width: '100%' //设置容器宽度
+										,
+									height: 200,
+									arrow: 'none' //不显示箭头
+										,
+									anim: 'fade' //切换动画方式
+								});
+
+								//分页
+								laypage.render({
+									elem: 'pageDemo' //分页容器的id
+										,
+									count: 100 //总页数
+										,
+									skin: '#1E9FFF' //自定义选中色值
+										//,skip: true //开启跳页
+										,
+									jump: function(obj, first) {
+										if(!first) {
+											layer.msg('第' + obj.curr + '页', {
+												offset: 'b'
+											});
+										}
+									}
+								});
+
+
+								slider.render({
+									elem: '#sliderDemo',
+									input: true //输入框
+								});
+
+								
+							});
+							
+						</script>
+
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+						<!-- !!!!!!!!!!!!!!!!!!!!!!!!!内容主体区域!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+					</div>
+				</div>
+
+				
+			</div>
+
+		</body>
+
+</html>

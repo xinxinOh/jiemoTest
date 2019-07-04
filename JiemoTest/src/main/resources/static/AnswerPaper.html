@@ -1,0 +1,2806 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Insert title here</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link type="text/css" rel="styleSheet" href="css/ExamStyle.css" th:href="@{static/css/ExamStyle.css}" />
+		<link type="text/css" rel="styleSheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" />
+
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script type="text/javascript" src="js/template.js" th:src="@{static/js/template.js}"></script>
+		<script src="layui/layui.js" th:src="@{static/layui/layui.all.js}"></script>
+		<script src="layui/layer/layer.js" th:src="@{static/layui/layer/layer.js}"></script>
+		<script type="text/javascript" src="js/jquery.countdown.js" th:src="@{static/js/jquery.countdown.js}"></script>
+		
+		<script type="text/javascript">	
+			layui.use('element', function() {
+				var element = layui.element;
+			});
+			
+			var paperStartTime = Date.parse(new Date()) / 1000;
+			var windowsTime = 0;
+			var maxWindowsTime = -1;
+			var partserial = 1;
+			var chnNumChar = ["零","一","二","三","四","五","六","七","八","九"];
+			var chnUnitSection = ["","万","亿","万亿","亿亿"];
+			var chnUnitChar = ["","十","百","千"];
+			var paperEndTime = -1;
+			var element = layui.element;
+				element.init();
+			
+			function getMyDate(str) {
+				var oDate = new Date(str),
+					oYear = oDate.getFullYear(),
+					oMonth = oDate.getMonth() + 1,
+					oDay = oDate.getDate(),
+					oHour = oDate.getHours(),
+					oMin = oDate.getMinutes(),
+					oSen = oDate.getSeconds(),
+					oTime = oYear + '/' + getzf(oMonth) + '/' + getzf(oDay) + ' ' + getzf(oHour) + ':' + getzf(oMin) + ':' + getzf(oSen); //最后拼接时间  
+				return oTime;
+			};
+			//补0操作
+			function getzf(num) {
+				if(parseInt(num) < 10) {
+					num = '0' + num;
+				}
+				return num;
+			}
+			
+			function loadPaperInfo(){
+				
+				$.ajax({
+					async: false,
+					url: 'searchPaperExam',
+					type: 'post',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					success: function(e) {
+						var obj = JSON.parse(e); //将字符串转换成json对象
+						var nowTime = Date.parse(new Date()) / 1000;
+						paperEndTime = getMyDate((nowTime + parseInt(obj.duration)*60)*1000);
+
+						$(".exam-question-num-span").text(obj.questionnum);
+						$(".exam-points-num-span").text(obj.pointssum);
+						$(".exam-title-input").val(obj.examtitle);
+						$(".exam-intro-input").val(obj.examintroduction);
+						$(".exam-time").text(obj.duration);
+						maxWindowsTime= obj.maxtimes;
+						alert("考试中最大切换窗口"+maxWindowsTime+"次，超过该次数后会强制交卷。");
+						loadExamPartInfo();
+					},
+					error: function() {
+						alert('请先登陆');
+					}
+				});
+				
+			}
+			
+			function loadExamPartInfo(){
+				
+				$.ajax({
+					async: false,
+					url: 'searchPaperExamPart',
+					type: 'get',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					success: function(e) {
+						var obj = JSON.parse(e); //将字符串转换成json对象
+								
+						var new_html = template("Part", obj); //将json对象绑定到artTemplate模板上
+						$('#part-list').html(new_html);								
+						resetPartNameInfo();
+						loadPartQuestionInfo();
+						addBlockToQuestion();//添加填空。
+						
+						AddQuestionIfAnswer();//添加做没做的提示
+						
+						AddStartAnswerInfo();//向后台添加初始的answer_info.
+
+//						resetPartQuestionNum();
+//						resetPartPointsNum();
+//						resetAllPartTable();
+					},
+					error: function() {
+						alert('请先登陆');
+					}
+				});
+				
+			}
+			
+			function AddStartAnswerInfo(){
+				
+				var questionList = $(".one-question");
+				
+				for(var i = 0 ; i < questionList.length ; i++){
+					var a = {
+						'questionId': parseInt(questionList.eq(i).attr("data-questionid")),
+						'questionSerial': parseInt(questionList.eq(i).attr("data-questionserial")),
+						};
+
+					$.ajax({
+						async: false,
+						url: 'AddStartAnswerInfo',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+						
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+				}
+				
+			}
+			
+			function addBlockToQuestion(){
+				
+				var fillQuestion = $("[data-questiontype=3]");
+				
+				for(var i = 0 ; i < fillQuestion.length ; i++){
+					
+					var fillNum = fillQuestion.eq(i).attr("data-answer").split("#^#").length;
+					var questionSerail = fillQuestion.eq(i).attr("data-questionserial");
+					for(var j = 0 ; j < fillNum ; j++){
+						var content = '<div class="layui-input-block" style="margin-left:25px;margin-bottom:15px;">'+
+								'<input style="width:80%" type="text" name="'+questionSerail+'" required lay-verify="required" placeholder="请按顺序填写答案" autocomplete="off" class="layui-input fill-question-input">'+
+							'</div>';
+						fillQuestion.eq(i).children(".one-question-detial").children(".choice").children(".options-container").append(content);
+					}
+				    fillQuestion.eq(i).removeAttr("data-answer");	
+				}
+				
+				fillQuestion = $("[data-questiontype=4]");
+				
+				for(var i = 0 ; i < fillQuestion.length ; i++){
+					
+					var fillNum = fillQuestion.eq(i).attr("data-answer").split("#^#").length;
+					var questionSerail = fillQuestion.eq(i).attr("data-questionserial");
+					for(var j = 0 ; j < fillNum ; j++){
+						var content = '<div class="layui-input-block" style="margin-left:25px;margin-bottom:15px;">'+
+								'<textarea style="width:80%;height:150px" type="text" name="'+questionSerail+'" required lay-verify="required" placeholder="请填写答案" autocomplete="off" class="layui-input fill-question-textarea"></textarea>'+
+							'</div>';
+						fillQuestion.eq(i).children(".one-question-detial").children(".choice").css("height","150px");
+						fillQuestion.eq(i).children(".one-question-detial").children(".choice").children(".options-container").append(content);
+					}
+				    fillQuestion.eq(i).removeAttr("data-answer");	
+				}
+				
+				
+			}
+			
+			//初始添加问题是否已回答的统计
+			function AddQuestionIfAnswer(){
+				var nowNum = 1;
+				var statisticList = $(".question-statistic-container");
+				var questionContainerList = $(".question-container");
+				for(var i = 0 ; i < statisticList.length ; i++){
+					
+					var questionNum = questionContainerList.eq(i).children(".one-question").length;
+					for(var j = 0 ; j < questionNum ; j++){
+						var content = '<div class="If-answer" data-ifSerial = "'+nowNum+'" style="margin-top:10px;margin-left:26px;display: inline-block;">'+
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+nowNum+'</span>'+
+									    '</div>'+
+									'</div>';
+						statisticList.eq(i).append(content);
+						nowNum++;
+					}
+					
+				}
+				
+			}
+			
+			//初始加载的时候初始化部分的序号和部分中问题的序号
+			function refreshStartSerial(){
+				
+				var nowNum = 1;
+				var target_part_list = $(".part");
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					target_part_list.eq(i).attr("data-partserial",(i+1));
+					var part_question_list = target_part_list.eq(i).children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+					for(var j = 0 ; j < part_question_list.length ; j++){
+						part_question_list.eq(j).attr("data-questionSerial",nowNum);
+						part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((nowNum)+"、  ");
+						nowNum++;
+				   }
+				}
+				
+			}
+			
+			//加载部分中的问题
+			function loadPartQuestionInfo(){
+				var partList = $(".part");
+				var partQuestionContainer = $(".question-container");
+				var partId = -1;
+				for(var i = 0 ; i < partList.length ; i++){
+					partId = partList.eq(i).attr("data-partid");
+					var a = {'partId': partId};
+					$.ajax({
+						async: false,
+						url: 'searchPartQuestion',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+							var obj = JSON.parse(e); //将字符串转换成json对象
+
+							var new_html = template("PartQuestion", obj); //将json对象绑定到artTemplate模板上
+
+							partQuestionContainer.eq(i).html(new_html);
+							
+							
+							},
+						error: function() {
+						    alert('请先登陆');
+						}
+					});
+				}
+				refreshStartSerial();
+				resetPartQuestionOptions();
+				
+			}
+			
+			//重置导航中的部分名称
+			function resetPartNameInfo(){
+				
+				var partList = $(".part-name-input");
+				var btnNum = $(".exam-btn-container").children().length;
+				for(var i = 0 ; i < partList.length - btnNum + 1 ; i++){
+					var part_btn = '<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">'+
+					'<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#FF5722">第1部分</button>'+
+					'</div>';
+					$(".exam-btn-container").append(part_btn);
+				}
+				var partBtnContainer = $(".exam-basic-info");
+				for(var i = 0 ; i < partList.length ; i++){
+					partBtnContainer.eq(i+1).children("button").text(partList.eq(i).val());
+				}
+				
+			}
+			
+			//将部分中的选项标为已选和不可选
+			function resetPartQuestionOptions(){
+				var question = $(".question-container").children(".one-question");
+				
+				var i= 0 ;
+				var container_optionsContainer = $(".question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
+				while(i < question.length) {	
+					var serialNum = question.eq(i).attr("data-questionserial");
+					first_question = container_optionsContainer.eq(i).children("input");
+					var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
+
+					if(question_type == 0 ){
+
+						var options_info = first_question.attr("title");
+						var split_info = options_info.split('#^#');
+						question.eq(i).removeAttr("data-answer");
+						container_optionsContainer.eq(i).empty();
+						console.log(question_type);
+						for(var j = 0; j < split_info.length; j++) {
+							console.log(split_info[j]);
+							container_optionsContainer.eq(i).append('<input lay-filter="radioChoose" type="radio"  name="'+ serialNum+'"  title="' + split_info[j] + '">' + '<br>');
+						}
+						i++;
+						continue;
+					}
+					
+					if(question_type == 1 ){
+
+						var options_info = first_question.attr("title");
+						var split_info = options_info.split('#^#');
+						question.eq(i).removeAttr("data-answer");
+						container_optionsContainer.eq(i).empty();
+						console.log(question_type);
+						for(var j = 0; j < split_info.length; j++) {
+							console.log(split_info[j]);
+							container_optionsContainer.eq(i).append('<input lay-filter="checkboxChoose" style="color: #333;" type="checkbox" lay-skin="primary"  name="'+ serialNum+'"  title="' + split_info[j] + '">' + '<br>'+ '<br>');
+						}
+						i++;
+						continue;
+					}
+					else{
+						container_optionsContainer.eq(i).empty();
+						i++
+						continue;
+					}
+				}
+		
+			}
+			
+			function checkChoosedQuestion(){
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				var allQuestionId = new Array();
+				var allQuestionContainer = $(".question-container");
+				var nowId = new Array();
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					
+				target_part = target_part_list.eq(i);
+
+				var part_question = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				var IfRemove=0;
+	
+                for(var j = 0 ; j < part_question.length ; j++){
+					if($.inArray(part_question.eq(j).attr("data-questionid"),nowId) >=0 ){
+							part_question.eq(j).remove();
+							IfRemove = IfRemove+1;
+					}else{
+						nowId.push(part_question.eq(j).attr("data-questionid"));
+					}
+				}
+                if(IfRemove > 0){
+                	layer.msg('已自动过滤重复题目'+IfRemove+'道');
+                }
+                var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				for(var j = 0 ; j < part_question_list.length ; j++){
+					part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((j+1)+"、  ");
+				}
+				
+				}
+				
+			}
+			
+			function resetPartSerial(){
+				
+				var part_num = $(".exam-btn-container").children().length - 1;
+				
+				for(var i = 1 ; i < part_num + 1 ; i++){
+					$(".exam-btn-container").children().eq(i).children("button").text("第"+SectionToChinese(i)+"部分");
+				}
+				
+				for(var i = 0 ; i < part_num ; i++){
+					$(".part-controller").children().eq(i).attr("data-partserial",i+1);
+				}
+				
+				for(var i = 0 ; i < $("[lay-filter*=part-question-num]").length ; i++){
+					$("[lay-filter*=part-question-num]").eq(i).attr("lay-filter","part-question-num-"+(i+1));
+					$("[lay-filter*=part-points-num]").eq(i).attr("lay-filter","part-points-num-"+(i+1));
+					console.log(i);
+				}
+				
+			}
+			
+			//更新问题数量
+			function resetPartQuestionNum(){
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				
+				var all_question_num = 0;
+				for(var i = 0 ; i < target_part_list.length ; i++){
+//					if(target_part_list.eq(i).data("partserial") == partserial){
+					target_part = target_part_list.eq(i);
+					var part_question_num = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question").length;
+					
+					all_question_num = all_question_num + part_question_num;					
+			    }
+
+				for(var i = 0 ; i < target_part_list.length ; i++){
+//					if(target_part_list.eq(i).data("partserial") == partserial){
+					target_part = target_part_list.eq(i);
+					var part_question_num = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question").length;
+					target_part.children(".part-question-statistic").children("fieldset").children(".part-statistic-info").children(".exam-question-num").children().eq(0).text(part_question_num);
+               	    
+               	    $(".exam-question-num-span").text(all_question_num.toString());
+                	var baifenbi = (part_question_num / all_question_num).toFixed(2);
+                	console.log('part-question-num-'+target_part_list.eq(i).attr("data-partserial"));
+                	element.progress('part-question-num-'+target_part_list.eq(i).attr("data-partserial"), (baifenbi*100).toString()+'%');
+					
+			    }
+
+
+			}
+			
+			function resetPartPointsNum(){
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				
+				var all_points_num = 0;
+				var part_points_num = 0;
+				for(var i = 0 ; i < $(".set-points").length ; i++){
+//					if(target_part_list.eq(i).data("partserial") == partserial){
+					all_points_num = all_points_num + parseInt($(".set-points").eq(i).text());					
+			    }
+				$(".exam-points-num-span").text(all_points_num.toString());
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					part_points_num = 0;
+					var target_question = target_part_list.eq(i).children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+					for(var j = 0 ; j < target_question.length ; j++){
+						part_points_num = part_points_num + parseInt(target_question.eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text());
+					}
+					target_part_list.eq(i).children(".part-question-statistic").children("fieldset").children(".part-statistic-info").children(".exam-points-num").children().eq(0).text(part_points_num.toString());
+                	var baifenbi = (part_points_num / all_points_num).toFixed(2);
+
+                	element.progress('part-points-num-'+target_part_list.eq(i).attr("data-partserial"), (baifenbi*100).toString()+'%');
+					
+			    }
+
+
+			}
+			//用于初次加载更新表格
+			function resetAllPartTable(){
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				for(var i = 0 ; i < target_part_list.length ; i++){
+				target_part = target_part_list.eq(i);
+				
+				
+				target_part.children(".part-question-statistic").children("fieldset").children(".statistic-title").children("table").children("tbody").empty();
+				
+				var part_question_info_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				var question_serial = 1;
+				var question_type = 1;
+				var question_skill = 1;
+				var question_degree = 1;
+				var question_points = 1;
+				for(var j = 0 ; j < part_question_info_list.length ; j++){
+					
+					question_serial = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text();
+					question_type = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-type").children("span").text();
+					question_skill = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-skill").children("span").text();
+					question_degree = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-degree").children("span").text();
+					question_points = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text();
+				    var content = '<tr>'+
+													'<td>'+question_serial.replace("、","")+'</td>'+
+													'<td>'+question_type.replace(" ","")+'</td>'+
+													'<td>'+question_skill.split('：')[1]+'</td>'+
+													'<td>'+question_degree.split('：')[1]+'</td>'+
+													'<td>'+question_points+'</td>'+
+												'</tr>';
+				    target_part.children(".part-question-statistic").children("fieldset").children(".statistic-title").children("table").children("tbody").append(content);
+				}
+				}
+			}
+            //用于添加题目后加载更新表格
+			function resetPartTable(){
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					if(target_part_list.eq(i).attr("data-partserial") == partserial){
+						target_part = target_part_list.eq(i);
+					}
+				}
+				
+				target_part.children(".part-question-statistic").children("fieldset").children(".statistic-title").children("table").children("tbody").empty();
+				
+				var part_question_info_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				var question_serial = 1;
+				var question_type = 1;
+				var question_skill = 1;
+				var question_degree = 1;
+				var question_points = 1;
+				for(var i = 0 ; i < part_question_info_list.length ; i++){
+					
+					question_serial = part_question_info_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text();
+					question_type = part_question_info_list.eq(i).children(".one-question-introduction").children(".one-question-type").children("span").text();
+					question_skill = part_question_info_list.eq(i).children(".one-question-introduction").children(".one-question-skill").children("span").text();
+					question_degree = part_question_info_list.eq(i).children(".one-question-introduction").children(".one-question-degree").children("span").text();
+					question_points = part_question_info_list.eq(i).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text();
+				    var content = '<tr>'+
+													'<td>'+question_serial.replace("、","")+'</td>'+
+													'<td>'+question_type.replace(" ","")+'</td>'+
+													'<td>'+question_skill.split('：')[1]+'</td>'+
+													'<td>'+question_degree.split('：')[1]+'</td>'+
+													'<td>'+question_points+'</td>'+
+												'</tr>';
+				    target_part.children(".part-question-statistic").children("fieldset").children(".statistic-title").children("table").children("tbody").append(content);
+				}
+			}
+			    
+			function addPoints(){
+				var content='<div class="one-question-points" style="margin-top: 10px;float:right;">'+
+
+										'<div class="exam-question-title" style="display: inline;">'+
+											'<span style="color: #333333;">分值：</span>'+
+										'</div>'+
+
+										'<div class="exam-question-num" style="display: inline;">'+
+											'<span class="set-points" style="color: #007DDB;font-size: 20px;">0</span>'+
+											'<span style="color: #666666;">&nbsp;分</span>'+
+										'</div>'+
+									'</div>';
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					if(target_part_list.eq(i).attr("data-partserial")== partserial){
+						target_part = target_part_list.eq(i);
+					}
+				}
+				
+				var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				
+				for(var i = 0 ; i < part_question_list.length ; i++){
+					if(part_question_list.eq(i).children(".one-question-introduction").children(".one-question-points").length == 1){
+						continue;
+					}
+					part_question_list.eq(i).children(".one-question-introduction").append(content);
+				}
+				
+			}
+			
+			function NumberToChinese(num){
+			  var unitPos = 0;
+			  var strIns = '', chnStr = '';
+			  var needZero = false;
+ 
+			  if(num === 0){
+			    return chnNumChar[0];
+			  }
+ 
+			  while(num > 0){
+			    var section = num % 10000;
+			    if(needZero){
+			      chnStr = chnNumChar[0] + chnStr;
+			    }
+			    strIns = SectionToChinese(section);
+			    strIns += (section !== 0) ? chnUnitSection[unitPos] : chnUnitSection[0];
+			    chnStr = strIns + chnStr;
+			    needZero = (section < 1000) && (section > 0);
+			    num = Math.floor(num / 10000);
+			    unitPos++;
+			  }
+ 
+			  return chnStr;
+			}
+			
+			//交卷
+			function submitPaper(){
+				
+				//判断是否都答完题
+				layer.msg('1');
+				var allPart = $(".exam-basic-info");
+				for(var i = 0 ; i < allPart.length ; i++){
+					if(allPart.eq(i).children("button").css("background-color") == "rgb(255, 87, 34)"){
+											
+						layer.confirm('您有题目没有作答，是否选择交卷', {
+					 	 btn: ['确定','取消'] //按钮
+						}, function(){
+						
+					    EditAnswerInfo();
+					  
+						}, function(){
+					 	 alert(1);
+					 	});
+					 	return;
+					}
+				}
+				layer.confirm('确定交卷？', {
+					 	 btn: ['确定','取消'] //按钮
+						}, function(){
+						
+					    EditAnswerInfo();
+					  
+						}, function(){
+					 	 alert(1);
+				});
+			
+			}
+			
+			function EditAnswerInfo(){
+				
+				var questionList = $(".one-question");
+				
+				for(var i = 0 ; i < questionList.length ; i++){
+					var a = {
+						'questionId': parseInt(questionList.eq(i).attr("data-questionid")),
+						'questionSerial': parseInt(questionList.eq(i).attr("data-questionserial")),
+						'questionAnswer':getQuestionAnswer(questionList.eq(i),questionList.eq(i).attr("data-questiontype"))
+						};
+
+					$.ajax({
+						async: false,
+						url: 'ChangeAnswerInfo',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+						
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+				}
+				    var endTime = Date.parse(new Date()) / 1000;
+				    var a = {
+						'startTime':paperStartTime,
+						'endTime': endTime,
+						'windowTime':windowsTime
+						};
+
+					$.ajax({
+						async: false,
+						url: 'paperFinish',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+						window.location.href="Exam";
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+				
+			}
+			
+			function getQuestionAnswer(question,questiontype){
+				var questionSerial = question.attr("data-questionserial");
+				
+				
+				if(questiontype == 0 || questiontype == "0"){
+					var radioList = $("input[name='"+questionSerial+"']");
+					for(var i = 0 ; i < radioList.length ; i++){
+						if(radioList.eq(i).attr("checked") == "checked" || radioList.eq(i).attr("checked") == true){
+							console.log(radioList.eq(i).attr("title").charAt(0));
+							return radioList.eq(i).attr("title").charAt(0);
+						}
+					}
+					
+				}
+				
+				if(questiontype == 1 || questiontype == "1"){
+					var radioList = $("input[name='"+questionSerial+"']");
+					var answer = "";
+					for(var i = 0 ; i < radioList.length ; i++){
+						if(radioList.eq(i).attr("checked") == "checked" || radioList.eq(i).attr("checked") == true){
+							answer = answer + radioList.eq(i).attr("title").charAt(0) + "#^#";
+						}
+					}
+					console.log(answer.substring(0,answer.length-3));
+					return answer.substring(0,answer.length-3);
+				}
+				
+				if(questiontype == 2 || questiontype == "2"){
+					var radioList = $("input[name='"+questionSerial+"']");
+					for(var i = 0 ; i < radioList.length ; i++){
+						if(radioList.eq(i).attr("checked") == "checked" || radioList.eq(i).attr("checked") == true){
+							console.log(radioList.eq(i).attr("title").charAt(0));
+							return radioList.eq(i).attr("title").charAt(0);
+						}
+					}
+					
+				}
+				
+				if(questiontype == 3 || questiontype == "3"){
+					var inputList = $("input[name='"+questionSerial+"']");
+					var answer = "";
+					for(var i = 0 ; i < inputList.length ; i++){
+
+							answer = answer + inputList.eq(i).val() + "#^#";
+
+					}
+					console.log(answer.substring(0,answer.length-3));
+					return answer.substring(0,answer.length-3);
+				}
+				
+				if(questiontype == 4 || questiontype == "4"){
+					var textareaList = $("textarea[name='"+questionSerial+"']");
+					var answer = "";
+					for(var i = 0 ; i < textareaList.length ; i++){
+
+							answer = answer + textareaList.eq(i).val() + "#^#";
+
+					}
+					console.log(answer.substring(0,answer.length-3));
+					return answer.substring(0,answer.length-3);
+				}
+				
+			}
+			
+			//刷新部分中问题的序号
+			function refreshSerial(){
+				
+				var target_part_list = $(".part");
+				
+				var target_part = "";
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					if(target_part_list.eq(i).attr("data-partserial") == partserial){
+						target_part = target_part_list.eq(i);
+					}
+				}
+				
+				var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				
+				for(var i = 0 ; i < part_question_list.length ; i++){
+					part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+				}
+				
+			}
+			
+			function resetProgressBarSerial(){
+				
+				var numProportityBar = $(".num-proportity");
+				var PointsBar = $(".points-proportity");
+				
+				for(var i = 0 ; i < PointsBar.length ; i++){
+					numProportityBar.eq(i).attr("lay-filter","part-question-num-"+(i+1))
+					PointsBar.eq(i).attr("lay-filter","part-points-num-"+(i+1))
+				}
+				
+			}
+			
+			function SectionToChinese(section){
+			var strIns = '', chnStr = '';
+			var unitPos = 0;
+			  var zero = true;
+			  while(section > 0){
+			    var v = section % 10;
+			    if(v === 0){
+			      if(!zero){
+			        zero = true;
+			        chnStr = chnNumChar[v] + chnStr;
+			      }
+			    }else{
+			      zero = false;
+			      strIns = chnNumChar[v];
+			      strIns += chnUnitChar[unitPos];
+			      chnStr = strIns + chnStr;
+			    }
+			    unitPos++;
+			    section = Math.floor(section / 10);
+			  }
+			  return chnStr;
+			}
+			
+			function nextPage(){
+				
+				var form = layui.form;
+				var bankid = -1;
+				var all_bank = $("#bank-list").children();
+				var now_page = $(this).parent().children(".now-page").children("input").val();
+				var all_page = $(this).parent().children(".all-page").children("span").text().replace(/[^0-9]/ig,"");
+				
+				if(now_page >= all_page){
+					return;
+				}
+				
+				for(i=0;i<all_bank.length;i++){
+ 				   if(all_bank.css("color") == "#FFF"){
+ 				   	   bankid = all_bank.attr("data-bankid");
+ 				   	   break;
+ 				   }
+				}
+						
+						var a = {
+							'bankId': bankid,
+							'start': now_page-1,
+							'num': 5
+						};
+
+						$.ajax({
+							async: false,
+							url: 'getQuestionList',
+							type: 'get',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: a,
+							success: function(e) {
+								var obj = JSON.parse(e); //将字符串转换成json对象
+
+								var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+
+								$('#bank-question-container').html(new_html);
+
+								$('#bank-question-container').css('display', "");
+
+								var question_num = e.split('edittime').length - 1
+								for(var i = 0; i < question_num; i++) {
+									first_question = $(".options-container:eq('" + i + "')" + " input:eq(0)")
+									$(".options-container:eq('" + i + "')").parent().parent().parent().children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+									var question_type = $(".options-container:eq('" + i + "')").parent().parent().parent().attr("data-questiontype")
+									if(question_type == 0 || question_type == 1 ){
+								
+										var right_answer = $(".options-container:eq('" + i + "')").parent().next().children().children().eq(1).text();
+										right_answer = right_answer.replace("#^#","、");
+										$(".options-container:eq('" + i + "')").parent().next().children().children().eq(1).text(right_answer);
+								
+									}
+									else{
+										$(".options-container:eq('" + i + "')").empty();
+										continue;
+									}
+											
+									var options_info = first_question.attr("title");
+									var split_info = options_info.split('#^#');
+							
+									$(".options-container:eq('" + i + "')").empty();
+							
+									for(var j = 0; j < split_info.length; j++) {
+								
+										if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+											$(".options-container:eq('" + i + "')").append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+										}
+										else{
+											$(".options-container:eq('" + i + "')").append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+										}
+									}
+							
+						}
+
+							},
+							error: function() {
+								alert('请先登陆');
+							}
+						});
+
+						$(".one-bank").css("background-color", "");
+						$(".one-bank").css("border-radius", "");
+						$(".one-bank").css("color", "#000");
+						$(".one-bank").css("border-left", "4px solid #FFB800");
+
+						$(this).css("background-color", "#5FB878");
+						$(this).css("border-radius", "7px");
+						$(this).css("color", "#FFF");
+						$(this).css("border-left", "");
+
+						
+						form.render('select');
+						form.render('checkbox');
+						form.render('radio');
+				
+			}
+			
+			function SearchQuestion() {
+				var form = layui.form;
+				layui.use('form', function() {
+
+					layer.open({
+						type: 1,
+						area: ['95%', '95%'],
+						shadeClose: true, //点击遮罩关闭
+						content: '<div class="layui-row">' +
+							'<div class="layui-col-md2">' +
+							'<div class="layui-row">' +
+							'<div class="layui-col-md10">' +
+							'<div class="search-bank">' +
+							'<input style="height: 35px;border: 1px solid #5FB878;" type="text" name="title" placeholder="请输入标题" class="layui-input">' +
+							'</div>' +
+							'</div>' +
+							'<div class="layui-col-md2 ayui-anim layui-anim-fadein " style="border-radius:3px;cursor:pointer;line-height: 35px;text-align: center;background-color: #5FB878;color: #FFF;">' +
+							'<span>搜索</span>' +
+							'</div>' +
+							'</div>' +
+							'<div id="bank-list" th:fragment="bank-list" style="display:none;">' +
+
+							'</div>' +
+							'</div>' +
+							'<div class="layui-col-md10" style="padding-left: 10px;">' +
+							'<div class="layui-row">' +
+							'<div class="layui-col-md12" style="border-left: 1px solid #D0D0D0;border-right: 1px solid #D0D0D0;">' +
+							'<div class="bank-header" style="border-bottom: 1px solid #A0A0A0;">' +
+							'<div class="bank-name" style="padding:7px;display: inline;border-right: 1px solid #D0D0D0;text-align: center;line-height: 35px;">' +
+							'<span style="font-size: 16px;color: #333333;">JavaWeb考试题</span>' +
+							'</div>' +
+							'<div class="bank-intro" style="padding:7px;display: inline;border-right: 1px solid #D0D0D0;text-align: center;line-height: 35px;">' +
+							'<span style="font-size: 16px;color: #333333;">这是JavaWeb考试题，这是JavaWeb考试题，这是JavaWeb考试题。</span>' +
+							'</div>' +
+							'<div class="add-btn" style="display:inline;margin-right: 5px;margin-top: 4px;float: right;">' +
+							'<div class="cancel-btn" style="display: inline;">' +
+							'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>' +
+							'</div>' +
+							'<div class="queren-btn" style="display: inline;">' +
+							'<button type="button" class="layui-btn layui-btn-warm layui-btn-sm  layui-btn-danger">&nbsp;&nbsp;&nbsp;&nbsp;添加试题&nbsp;&nbsp;&nbsp;&nbsp;</button>' +
+							'</div>' +
+							'</div>' +
+							'</div>' +
+							'<div id="bank-question-container" style="margin: 10px;" th:fragment="question-list">' +
+
+							'<hr>' +
+							'</div>' +
+
+							'</div>' +
+							'</div>' +
+							
+							'<div class="fenye" style="margin-left:35%;margin-top:40px;padding-bottom:40px;">'+
+							
+							'<div class="last-page" style="display:inline;cursor:pointer;margin-right:20px;">'+
+							'<i class="layui-icon layui-icon-prev" style="font-size: 30px; color: #1E9FFF;"></i> '+
+							'</div>'+
+							
+							
+							
+							'<div class="now-page" style="display:inline;">'+
+							
+							'<span  style="display:inline;font-size:30px;color:#333;">第</span>'+
+							'<input style="display:inline;width:40px!important;height: 30px;border: 1px solid #5FB878;" type="text" name="title" class="page-input layui-input">'+
+							'<span  style="display:inline;font-size:30px;color:#333;">页</span>'+
+							
+							'</div>'+
+							
+							'<div class="all-page" style="display:inline">'+
+							'<span style="font-size:30px;color:#333;">共12页</span>'+
+							'</div>'+
+							
+							'<div class="next-page" style="display:inline;margin-left:20px;cursor:pointer;">'+
+							'<i class="layui-icon layui-icon-next" style="font-size: 30px; color: #1E9FFF;"></i> '+
+							'</div>'+
+							
+							'</div>'+
+							
+							'</div>' +
+							'</div>' +
+							'</div>'
+
+						//各种基于事件的操作，下面会有进一步介绍
+
+					});
+
+				});
+				
+				
+				$.ajax({
+					async: false,
+					url: 'getBankList',
+					type: 'post',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					dateType: "text", //返回类型
+					success: function(e) {
+						
+						var obj = JSON.parse(e); //将字符串转换成json对象
+						var new_html = template("bank", obj); //将json对象绑定到artTemplate模板上
+						$('#bank-list').html(new_html);
+						$('#bank-list').css('display', "");
+						var num = $("#bank-list").children().eq(0).children(".bank-img").children("span").text();
+						var page_num = 1;
+						if (num >=5){
+							page_num=Math.ceil(num/5);
+						}
+						$(".all-page").children("span").text("共"+page_num+"页");
+						
+					},
+					error: function() {
+						alert('请先登陆');
+					}
+				});
+				var a = {
+					'bankId': 1,
+					'start': 0,
+					'num': 5
+				};
+				$.ajax({
+					async: false,
+					url: 'getQuestionList',
+					type: 'get',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					data: a,
+					success: function(e) {
+						var obj = JSON.parse(e); //将字符串转换成json对象
+
+						var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+
+						$('#bank-question-container').html(new_html);
+
+						$('#bank-question-container').css('display', "");
+						
+						var question_num = e.split('edittime').length - 1
+						var container = $("#bank-question-container");
+						var container_optionsContainer = $("#bank-question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
+						for(var i = 0; i < question_num; i++) {
+							first_question = container_optionsContainer.eq(i).children("input");
+							var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
+							container_optionsContainer.eq(i).parent().parent().parent().children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+
+							if(question_type == 0 || question_type == 1 ){
+								
+								var right_answer = container_optionsContainer.eq(i).parent().next().children().children().eq(1).text();
+								right_answer = right_answer.replace("#^#","、");
+								container_optionsContainer.eq(i).parent().next().children().children().eq(1).text(right_answer);
+								
+							}
+							else{
+								container_optionsContainer.eq(i).empty();
+								continue;
+							}
+							
+							var options_info = first_question.attr("title");
+							var split_info = options_info.split('#^#');
+							
+							container_optionsContainer.eq(i).empty();
+							
+							for(var j = 0; j < split_info.length; j++) {
+								if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+									container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+								}
+								else{
+									container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+								}
+							}
+							
+						}
+
+					},
+					error: function() {
+						alert('请先登陆');
+					}
+				});
+				
+				$(".page-input").val("1");
+				
+				form.render();
+				
+				$(".one-bank:eq(0)").css("background-color", "#5FB878");
+				$(".one-bank:eq(0)").css("border-radius", "7px");
+				$(".one-bank:eq(0)").css("color", "#FFF");
+				$(".one-bank:eq(0)").css("border-left", "");
+
+			};
+			
+			function excWindowsChange(){
+				
+				windowsTime = windowsTime +1 ;
+				
+				if(windowsTime/2>=maxWindowsTime){
+					
+					EditAnswerInfo();
+					alert("超过最大窗口切换次数，已自动交卷！");
+				}
+				
+				layer.msg("您已切换窗口，剩余"+(maxWindowsTime-windowsTime/2)+"次");
+				
+			}
+			
+			$(document).ready(function() {
+				
+				
+				loadPaperInfo();
+				var form = layui.form;
+				layui.use('form', function() {
+					
+					form.render('select');
+					form.render('checkbox');
+					form.render('radio');
+					//各种基于事件的操作，下面会有进一步介绍
+				});
+				
+				document.addEventListener("visibilitychange", function(){
+                    excWindowsChange();
+                });
+				form.on('radio(radioChoose)', function(data){
+				    console.log(data.elem); //得到radio原始DOM对象
+				    var choose=$(data.elem);
+				    
+				    var questionSerial = parseInt(choose.parent().parent().parent().parent().attr("data-questionserial"));
+
+				    var content=
+									    '<div class="If-answer-img" style="padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				    IfAnswer.empty();
+				    IfAnswer.append(content);
+				    var part = choose.parent().parent().parent().parent().parent().parent().parent().parent();			
+				    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    var partSerial = part.attr("data-partserial");
+				    for(var i = 0 ; i < partStatistic.length ; i++){
+				    	console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    		$(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    		return;
+				    	}
+				    }
+				    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");
+				    
+				    
+				}); 
+				
+				$("body").on("input propertychange", ".fill-question-textarea", function() {
+                	
+                	var inputInfo = $(this).val();
+                	var question = $(this).parent().parent().parent().parent().parent();
+                	var questionSerial = question.attr("data-questionserial");
+                	
+                	var allFill = $("textarea[name='"+questionSerial+"']");
+                	for(var i = 0 ; i < allFill.length ; i++){
+                		
+                		if(allFill.eq(i).val() == ""){
+
+				    		var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    	    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				            
+				   		    IfAnswer.empty();
+				    	    IfAnswer.append(content);
+				    	    
+				    	    var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    		return;
+                	    }else{
+				    
+				    	    
+                     	}
+                		
+                	}
+                	
+                	var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   	IfAnswer.empty();
+				    IfAnswer.append(content);
+                	
+                	        var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    		return;
+				    
+				    
+                	
+                });
+				
+				$("body").on("input propertychange", ".fill-question-input", function() {
+                	
+                	var inputInfo = $(this).val();
+                	var question = $(this).parent().parent().parent().parent().parent();
+                	var questionSerial = question.attr("data-questionserial");
+                	
+                	var allFill = $("input[name='"+questionSerial+"']");
+                	for(var i = 0 ; i < allFill.length ; i++){
+                		
+                		if(allFill.eq(i).val() == ""){
+
+				    		var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    	    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				            
+				   		    IfAnswer.empty();
+				    	    IfAnswer.append(content);
+				    	    
+				    	    var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    	    
+				    		return;
+                	    }else{
+				    
+				    	    
+                     	}
+                		
+                	}
+                	
+                	var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   	IfAnswer.empty();
+				    IfAnswer.append(content);
+                	var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    		return;
+                	
+                });
+				
+				//点击跳转到指定题目
+				
+				$("body").on("click", ".If-answer-img", function(){
+					
+					var questionSerial = $(this).parent().attr("data-ifserial");
+					
+                	$('html,body').animate({scrollTop:parseInt($("div[data-questionserial='"+questionSerial+"']").offset().top)},300);	
+                	
+					
+				});
+				
+				form.on('checkbox(checkboxChoose)', function(data){
+				    console.log(data.elem); //得到radio原始DOM对象
+				    var choose=$(data.elem);
+				    var checkboxName = choose.attr("name");
+				    var allChoose = $("input[name='"+checkboxName+"']");
+				    
+				    for(var i = 0 ; i < allChoose.length ; i ++){
+				    	
+						if(allChoose.eq(i).attr("checked") == "checked"){
+							
+							var questionSerial = parseInt(choose.parent().parent().parent().parent().attr("data-questionserial"));
+				    
+				    		var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    		var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   		 	IfAnswer.empty();
+				    		IfAnswer.append(content);
+				    		
+						    var part = choose.parent().parent().parent().parent().parent().parent().parent().parent();			
+				    		var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    		
+				            var partSerial = part.attr("data-partserial");
+				    		for(var i = 0 ; i < partStatistic.length ; i++){
+				    		console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    			if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    				$(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    				break;
+				   		 		}
+				    		}
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");
+				    		return ;
+							
+						}
+						
+					}
+				    
+				    var questionSerial = parseInt(choose.parent().parent().parent().parent().attr("data-questionserial"));
+				    
+				    var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   	IfAnswer.empty();
+				    IfAnswer.append(content);
+				    
+					var part = choose.parent().parent().parent().parent().parent().parent().parent().parent();			
+				    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    var partSerial = part.attr("data-partserial");
+				    for(var i = 0 ; i < partStatistic.length ; i++){
+				        console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    		$(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    		return;
+				   		 }
+				    }
+				    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");				    
+				    
+				});
+
+				$(window).scroll(function(){
+				    
+				    $(".all-btn").offset({top:$(document).scrollTop()+115,left:119});
+				    
+				});
+			
+				$("body").on("click", ".exam-time", function() {
+
+					var td = $(this);
+					var txt = td.text();
+					var input1 = $("<input class='layui-input' style='width: 50px;height: 20px;' type='text' value='" + txt + "'/>");
+
+					td.html(input1);
+					input1.click(function() {
+						return false;
+					});
+					//获取焦点 
+					input1.trigger("focus");
+					//文本框失去焦点后提交内容，重新变为文本 
+					input1.blur(function() {
+						var newtxt = $(this).val();
+						//判断文本有没有修改 
+						if(newtxt != txt) {
+							td.html(newtxt);
+						}
+					});
+				});
+				
+				$("body").on("click", ".set-points", function() {
+
+					var td = $(this);
+					var txt = td.text();
+					var input1 = $("<input class='layui-input' style='width: 50px;height: 20px;' type='text' value='" + txt + "'/>");
+
+					td.html(input1);
+					input1.click(function() {
+						return false;
+					});
+					//获取焦点 
+					input1.trigger("focus");
+					//文本框失去焦点后提交内容，重新变为文本 
+					input1.blur(function() {
+						var newtxt = $(this).val();
+						//判断文本有没有修改 
+						if(newtxt != txt) {
+							
+							
+							var parnt = /^([1-9]\d*(\.\d*[1-9])?)|(0\.\d*[1-9])$/;
+							if(parnt.test(newtxt)){
+								
+							} else {
+							layer.msg('请输入正整数');
+							return;
+							}
+							td.html(newtxt);
+							resetPartPointsNum();
+							resetAllPartTable();
+						}
+					});
+				});
+				
+				$("body").on("mouseover", ".num-proportity", function() {
+					layer.tips('当前部分题目占考试所有题目' + (parseInt($(this).children("div").css("width").replace(/[^0-9]/ig,"")) / 1039).toFixed(2)*100+'%' , this, {
+						tips: [1, '#5FB878'],
+						time: 1000
+					});
+				});
+
+				$("body").on("mouseover", ".points-proportity", function() {
+					layer.tips('当前部分分值占考试总分' + (parseInt($(this).children("div").css("width").replace(/[^0-9]/ig,"")) / 1039).toFixed(2)*100+'%' , this, {
+						tips: [1, '#FF5722'],
+						time: 1000
+					});
+				});
+
+				$("body").on("mouseover", ".one-question-points", function() {
+
+					layer.tips('·填空题为每一个空的分数，多选题为总分（全部选对才可得分）', this, {
+						tips: [1, '#FF5722'],
+						time: 2000
+					});
+				});
+
+				$("body").on("click", ".add-exam-btn", function() {
+					partserial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					SearchQuestion();
+					
+				});
+				
+				$("body").on("keypress", ".page-input", function(event){
+ 
+            		if(event.keyCode == "13")    
+ 
+            		{
+ 
+            	   	 	var form = layui.form;
+				var bankid = -1;
+				var all_bank = $("#bank-list").children();
+				var now_page = $(".page-input").val();
+				var all_page = $(".all-page").children("span").text().replace(/[^0-9]/ig,"");
+
+				if(now_page > all_page){
+					return;
+				}
+				
+				for(i=0;i<all_bank.length;i++){
+
+ 				   if(all_bank.eq(i).css("border-radius") == "7px"){
+ 				   	   bankid = all_bank.eq(i).data("bankid");
+ 				   	   break;
+ 				   }
+				}
+						var a = {
+							'bankId': bankid,
+							'start': (now_page-1)*5,
+							'num': 5
+						};
+						$.ajax({
+							async: false,
+							url: 'getQuestionList',
+							type: 'get',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: a,
+							success: function(e) {
+								var obj = JSON.parse(e); //将字符串转换成json对象
+								
+								var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+
+								$('#bank-question-container').html(new_html);
+
+								$('#bank-question-container').css('display', "");
+
+								var question_num = e.split('edittime').length - 1
+								for(var i = 0; i < question_num; i++) {
+									first_question = $(".options-container:eq('" + i + "')" + " input:eq(0)")
+									$(".options-container:eq('" + i + "')").parent().parent().parent().children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1+(now_page-1)*5)+"、  ");
+									var question_type = $(".options-container:eq('" + i + "')").parent().parent().parent().attr("data-questiontype")
+									if(question_type == 0 || question_type == 1 ){
+								
+										var right_answer = $(".options-container:eq('" + i + "')").parent().next().children().children().eq(1).text();
+										right_answer = right_answer.replace("#^#","、");
+										$(".options-container:eq('" + i + "')").parent().next().children().children().eq(1).text(right_answer);
+								
+									}
+									else{
+										$(".options-container:eq('" + i + "')").empty();
+										continue;
+									}
+											
+									var options_info = first_question.attr("title");
+									var split_info = options_info.split('#^#');
+							
+									$(".options-container:eq('" + i + "')").empty();
+							
+									for(var j = 0; j < split_info.length; j++) {
+								
+										if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+											$(".options-container:eq('" + i + "')").append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+										}
+										else{
+											$(".options-container:eq('" + i + "')").append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+										}
+									}
+									
+							
+						}
+
+							},
+							error: function() {
+								alert('请先登陆');
+							}
+						});
+
+						form.render('select');
+						form.render('checkbox');
+						form.render('radio');
+						var nowp = parseInt(now_page)+1;						
+				        $(this).parent().children(".now-page").children("input").val(nowp.toString());
+ 
+            		}
+ 
+        	    });
+
+				$("body").on("click", ".next-page", function() {
+
+				var form = layui.form;
+				var bankid = -1;
+				var all_bank = $("#bank-list").children();
+				var now_page = $(".page-input").val();
+				var all_page = $(".all-page").children("span").text().replace(/[^0-9]/ig,"");
+				if(now_page >= all_page){
+					alert('123');
+					return;
+				}
+				
+				for(i=0;i<all_bank.length;i++){
+
+ 				   if(all_bank.eq(i).css("border-radius") == "7px"){
+ 				   	   bankid = all_bank.eq(i).attr("data-bankid");
+ 				   	   break;
+ 				   }
+				}
+						var a = {
+							'bankId': bankid,
+							'start': now_page*5,
+							'num': 5
+						};
+						$.ajax({
+							async: false,
+							url: 'getQuestionList',
+							type: 'get',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: a,
+							success: function(e) {
+								var obj = JSON.parse(e); //将字符串转换成json对象
+								
+								var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+
+								$('#bank-question-container').html(new_html);
+
+								$('#bank-question-container').css('display', "");
+
+								var question_num = e.split('edittime').length - 1
+								var container_optionsContainer = $("#bank-question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
+								for(var i = 0; i < question_num; i++) {
+								first_question = container_optionsContainer.eq(i).children("input");
+								var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
+								container_optionsContainer.eq(i).parent().parent().parent().children(".one-question-introduction").children(".one-question-serial").children("span").text((now_page*5+i+1)+"、  ");
+
+								if(question_type == 0 || question_type == 1 ){
+								
+									var right_answer = container_optionsContainer.eq(i).parent().next().children().children().eq(1).text();
+									right_answer = right_answer.replace("#^#","、");
+									container_optionsContainer.eq(i).parent().next().children().children().eq(1).text(right_answer);
+								
+								}
+								else{
+									container_optionsContainer.eq(i).empty();
+									continue;
+								}
+							
+								var options_info = first_question.attr("title");
+								var split_info = options_info.split('#^#');
+							
+								container_optionsContainer.eq(i).empty();
+							
+								for(var j = 0; j < split_info.length; j++) {
+									if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+										container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+									}
+									else{
+										container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+									}
+								}
+							
+								}
+
+							},
+							error: function() {
+								alert('请先登陆');
+							}
+						});
+
+						form.render('select');
+						form.render('checkbox');
+						form.render('radio');
+						var nowp = parseInt(now_page)+1;						
+				        $(this).parent().children(".now-page").children("input").val(nowp.toString());
+				});
+
+				$("body").on("click", ".last-page", function() {
+
+				var form = layui.form;
+				var bankid = -1;
+				var all_bank = $("#bank-list").children();
+				var now_page = $(this).parent().children(".now-page").children("input").val();
+				var all_page = $(this).parent().children(".all-page").children("span").text().replace(/[^0-9]/ig,"");
+
+				if(now_page <= 1){
+					return;
+				}
+				
+				for(i=0;i<all_bank.length;i++){
+
+ 				   if(all_bank.eq(i).css("border-radius") == "7px"){
+ 				   	   bankid = all_bank.eq(i).attr("data-bankid");
+ 				   	   break;
+ 				   }
+				}
+				
+						var a = {
+							'bankId': bankid,
+							'start': (now_page-2)*5,
+							'num': 5
+						};
+						$.ajax({
+							async: false,
+							url: 'getQuestionList',
+							type: 'get',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: a,
+							success: function(e) {
+								var obj = JSON.parse(e); //将字符串转换成json对象
+								
+								var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+
+								$('#bank-question-container').html(new_html);
+
+								$('#bank-question-container').css('display', "");
+
+								var question_num = e.split('edittime').length - 1
+								var container_optionsContainer = $("#bank-question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
+								for(var i = 0; i < question_num; i++) {
+								first_question = container_optionsContainer.eq(i).children("input");
+								var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
+								container_optionsContainer.eq(i).parent().parent().parent().children(".one-question-introduction").children(".one-question-serial").children("span").text(((now_page-2)*5+i+1)+"、  ");
+
+								if(question_type == 0 || question_type == 1 ){
+								
+									var right_answer = container_optionsContainer.eq(i).parent().next().children().children().eq(1).text();
+									right_answer = right_answer.replace("#^#","、");
+									container_optionsContainer.eq(i).parent().next().children().children().eq(1).text(right_answer);
+								
+								}
+								else{
+									container_optionsContainer.eq(i).empty();
+									continue;
+								}
+							
+								var options_info = first_question.attr("title");
+								var split_info = options_info.split('#^#');
+							
+								container_optionsContainer.eq(i).empty();
+							
+								for(var j = 0; j < split_info.length; j++) {
+									if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+										container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+									}
+									else{
+										container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+									}
+								}
+							
+								}
+
+							},
+							error: function() {
+								alert('请先登陆');
+							}
+						});
+
+						form.render('select');
+						form.render('checkbox');
+						form.render('radio');
+						var nowp = now_page-1;
+				        $(this).parent().children(".now-page").children("input").val(nowp.toString());
+				});
+
+				$("body").on("click", ".one-question-zhankai", function() {
+					if($(this).parent().next().next().css("display") == "none") {
+						$(this).parent().next().next().css("display", "block")
+					} else {
+						$(this).parent().next().next().css("display", "none")
+					}
+				});
+
+				$("body").on("click", ".one-bank", function() {
+					var form = layui.form;
+					if($(this).css("color") == "#FFF") {
+
+					} else {
+						
+						$(".page-input").val("1");
+						
+						var num = $(this).children(".bank-img").children("span").text();
+						var page_num = 1;
+						if (num >=5){
+							page_num=Math.ceil(num/5);
+						}
+						$(".all-page").children("span").text("共"+page_num+"页");
+						
+						var a = {
+							'bankId': $(this).attr("data-bankid"),
+							'start': 0,
+							'num': 5
+						};
+
+						$.ajax({
+							async: false,
+							url: 'getQuestionList',
+							type: 'get',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: a,
+							success: function(e) {
+								var obj = JSON.parse(e); //将字符串转换成json对象
+
+								var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+
+								$('#bank-question-container').html(new_html);
+
+								$('#bank-question-container').css('display', "");
+
+								var question_num = e.split('edittime').length - 1
+								var container_optionsContainer = $("#bank-question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
+								for(var i = 0; i < question_num; i++) {
+								first_question = container_optionsContainer.eq(i).children("input");
+								var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
+								container_optionsContainer.eq(i).parent().parent().parent().children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+
+								if(question_type == 0 || question_type == 1 ){
+								
+									var right_answer = container_optionsContainer.eq(i).parent().next().children().children().eq(1).text();
+									right_answer = right_answer.replace("#^#","、");
+									container_optionsContainer.eq(i).parent().next().children().children().eq(1).text(right_answer);
+								
+								}
+								else{
+									container_optionsContainer.eq(i).empty();
+									continue;
+								}
+							
+								var options_info = first_question.attr("title");
+								var split_info = options_info.split('#^#');
+							
+								container_optionsContainer.eq(i).empty();
+							
+								for(var j = 0; j < split_info.length; j++) {
+									if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+										container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+									}
+									else{
+										container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+									}
+								}
+							
+								}
+
+							},
+							error: function() {
+								alert('请先登陆');
+							}
+						});
+
+						$(".one-bank").css("background-color", "");
+						$(".one-bank").css("border-radius", "");
+						$(".one-bank").css("color", "#000");
+						$(".one-bank").css("border-left", "4px solid #FFB800");
+
+						$(this).css("background-color", "#5FB878");
+						$(this).css("border-radius", "7px");
+						$(this).css("color", "#FFF");
+						$(this).css("border-left", "");
+
+						
+						form.render('select');
+						form.render('checkbox');
+						form.render('radio');
+					}
+
+				});
+
+				$("body").on("click", ".exam-add-part-btn", function() {
+					
+					var part_count = $(".part").length + 1;
+					var part_name = SectionToChinese(part_count);
+					var content = 
+					'<div class="part" data-partserial = "'+part_count+'" style="padding-bottom:20px;margin-top:25px;border: 1px solid #F5F5F5;background-color: #FFFFFF;">'+
+					'<div class="part-name" style="margin-top: 25px;">'+
+					'<label class="layui-form-label" style="color: #333333;font-size: 17px;">部分名称</label>'+
+					'<div class="layui-input-block">'+
+					'<input type="text" name="title" required lay-verify="required" placeholder="请输入部分名称（必填）" autocomplete="off" class="layui-input part-name-input" style="width: 92%;">'+
+					'</div>'+
+					'</div>'+
+					'<div class="part-introduction" style="margin-top: 8px;">'+
+					'<label class="layui-form-label" style="color: #333333;font-size: 17px;">部分说明</label>'+
+					'<div class="layui-input-block">'+
+					'<input type="text" name="title" required lay-verify="required" placeholder="请输入部分说明（必填）" autocomplete="off" class="layui-input part-intro-input" style="width: 92%;">'+
+					'</div>'+
+					'</div>'+
+					'<div class="part-question-statistic" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">'+
+					'<fieldset style="border: 1px solid #D2D2D2;">'+
+					'<legend style="font-size: 20px;">'+
+					'<i class="layui-icon layui-icon-list tongji" style="font-size:16px;color:#5FB878;">部分统计</i>'+
+					'</legend>'+
+					'<div class="statistic-title">'+
+					'<table class="layui-table" lay-size="sm">'+
+					'<colgroup>'+
+					'<col width="20%">'+
+					'<col width="20%">'+
+					'<col width="20%">'+
+					'<col width="20%">'+
+					'<col width="20%">'+
+					'</colgroup>'+
+					'<thead>'+
+					'<tr>'+
+					'<th>题号</th>'+
+					'<th>题型</th>'+
+					'<th>知识点</th>'+
+					'<th>难易度</th>'+
+					'<th>分值</th>'+
+					'</tr>'+
+					'</thead>'+
+					'<tbody>'+
+					'</tbody>'+
+					'</table>'+
+					'</div>'+
+					'<div class="part-statistic-info">'+
+					'<div class="exam-question-title" style="display: inline;">'+
+					'<span style="color: #333333;">总题数：</span>'+
+					'</div>'+
+					'<div class="exam-question-num" style="display: inline;">'+
+					'<span style="color: #007DDB;font-size: 20px;">0</span>'+
+					'<span style="color: #333333;">&nbsp;道</span>'+
+					'</div>'+
+					'<div class="layui-progress num-proportity" lay-showPercent="yes"  lay-filter="part-question-num-'+ part_count + '" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<div class="layui-progress-bar" lay-percent="0%" style="color: #5FB878;"></div>'+
+					'</div>'+
+					'<div class="exam-points-title" style="display: inline;">'+
+					'<span style="color: #333333;">总分值：</span>'+
+					'</div>'+
+					'<div class="exam-points-num" style="display: inline;">'+
+					'<span style="color: #007DDB;font-size: 20px;">0</span>'+
+					'<span style="color: #333333;">&nbsp;分</span>'+
+					'</div>'+
+					'<div class="layui-progress points-proportity" lay-filter="part-points-num-'+ part_count + '"  lay-showPercent="yes" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<div class="layui-progress-bar layui-bg-red" lay-percent="0%"></div>'+
+					'</div>'+
+					'</div>'+
+					'</fieldset>'+
+					'</div>'+
+					'<div class="part-question-info" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">'+
+					'<fieldset style="border: 1px solid #D2D2D2;">'+
+					'<legend>'+
+					'<i class="layui-icon layui-icon-form xinxi" style="font-size:16px;color:#5FB878;">试题信息 </i>'+
+					'</legend>'+
+					'<div class="question-manage-info" style="background-color: #F5F5F5;">'+
+					'<div class="question-manage-btn" style="margin-left: 10px;margin-top: 10px;">'+
+					'<span style="color: #333333;font-size: 14px;">对选中试题的操作：</span>'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'&nbsp;&nbsp;&nbsp;&nbsp;↑上移&nbsp;&nbsp;&nbsp;&nbsp;'+
+					'</button>'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'&nbsp;&nbsp;&nbsp;&nbsp;↓下移&nbsp;&nbsp;&nbsp;&nbsp;'+
+					'</button>'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+					'</button>'+
+					'<button type="button" class="layui-btn layui-btn-sm layui-bg-red delete-part-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 350px;">'+
+					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除部分&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+					'</button>'+
+					'<button type="button" class="layui-btn layui-btn-normal layui-btn-sm add-exam-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 30px;">'+
+					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+添加试题&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
+					'</button>'+
+					'</div>'+
+					'</div>'+
+					'<div class="question-container">'+
+					'<hr>'+
+					'</div>'+
+					'</div>'+
+					'</div>'
+					
+					var part_btn = '<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">'+
+					'<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878">第'+ part_name +'部分</button>'+
+					'</div>';
+					$(".part-controller").append(content);
+					$(".exam-btn-container").append(part_btn);
+					$('html,body').animate({scrollTop:parseInt($(".part").eq(part_count-1).offset().top)},500);
+
+				});
+
+                $("body").on("click", ".exam-basic-info", function(){
+                	
+                	var index = $(".exam-btn-container .exam-basic-info").index(this);
+                	if(index ==0){
+                	    $('html,body').animate({scrollTop:parseInt($(".exam-intro-controller").offset().top)},300);	
+                	}else{
+                		$('html,body').animate({scrollTop:parseInt($(".part-controller").children().eq(index-1).offset().top)},300);	
+                	}
+
+                	
+                });
+
+				$("body").on("click", ".queren-btn", function() {
+
+					var target_part_list = $(".part");
+					var target_part = "";
+					for(var i = 0 ; i < target_part_list.length ; i++){
+						if(target_part_list.eq(i).attr("data-partserial") == partserial){
+							target_part = target_part_list.eq(i);
+						}
+					}
+					
+					var layer_checkbox = $(".layer-checkbox");
+					for(var i = 0 ; i < layer_checkbox.length ; i ++){
+						if(layer_checkbox.eq(i).attr("checked") == "checked"){
+							layer_checkbox.eq(i).removeClass("layer-checkbox");
+							layer_checkbox.eq(i).addClass("part-checkbox");
+							layer_checkbox.eq(i).attr("checked",false);
+							
+							layer_checkbox.eq(i).parent().parent().parent().children(".one-question-detial").children(".choice").children("div").removeClass("options-container");
+							layer_checkbox.eq(i).parent().parent().parent().children(".one-question-detial").children(".choice").children("div").addClass("part-options-container");
+							
+							target_part.children(".part-question-info").children("fieldset").children(".question-container").append(layer_checkbox.eq(i).parent().parent().parent().clone());
+
+						    layer_checkbox.eq(i).addClass("part-checkbox");
+							layer_checkbox.eq(i).removeClass("layer-checkbox");
+							
+							
+						}
+						
+					}
+					
+					var form = layui.form;
+					form.render('select');
+					form.render('checkbox');
+					form.render('radio');
+					
+					layer.closeAll();
+					
+					refreshSerial();
+					checkChoosedQuestion();
+					addPoints();
+					resetPartTable();
+					resetPartQuestionNum();
+					
+				});
+
+				$("body").on("click", ".create-exam-btn", function() {
+
+					var examTitle = $(".exam-title-input").val();
+					var examIntro = $(".exam-intro-input").val();
+					var examTime = $(".exam-time").text().replace(" ","");
+					var questionNum = $(".exam-question-num-span").text().replace(" ","");
+					var questionPoints = $(".exam-points-num-span").text().replace(" ","");
+					
+					var userid = -1;
+					if(examTime==0 || examTime=="0"){
+						layer.msg('请填写考试时长');
+						return;
+					}
+					
+					if(examTitle==null || examTitle==""){
+						layer.msg('请输入考试名称');
+						return;
+					}
+					
+					var partName = $(".part-name-input");
+					
+					var partNameArray=new Array();
+					for(var i = 0 ; i < partName.length ; i++){
+						partNameArray[i] = partName.eq(i).val();
+						if(partName.eq(i).val() == null || partName.eq(i).val() == ""){
+							layer.msg('请填写第'+SectionToChinese(i+1)+'部分名称');
+							return;
+						}
+					}
+					
+					var partIntro = $(".part-intro-input");
+					var partIntroArray=new Array();
+					for(var i = 0 ; i < partIntro.length ; i++){
+						partIntroArray[i] = partIntro.eq(i).val();
+					}
+					
+					var part = $(".question-container");
+					var questionIdArray = new Array();
+					var questionPointsArray = new Array();
+					for(var i = 0 ; i < part.length ; i++){
+						questionIdArray[i]="";
+						questionPointsArray[i]="";
+						for(var j = 0 ; j < part.eq(i).children().length ; j++){
+							questionIdArray[i] = questionIdArray[i] + part.eq(i).children().eq(j).attr("data-questionid") + " ";
+							questionPointsArray[i] = questionPointsArray[i] + part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() + " ";						
+						    if(part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() == "0"){
+						    	layer.msg('您有题目分数未设置，请重新检查！');
+						        return;
+						    }
+						}
+						if(questionPointsArray[i] == ""){
+							layer.msg('您有部分未添加题目，请重新检查！');
+						        return;
+						}
+					}
+					
+                    $.ajax({
+						async: false,
+						url: 'getUser',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: $.parseJSON(Exam),
+						success: function(e) {
+							 userid = e;
+						},
+						error: function() {
+							alert('请先登陆');
+							return;
+						}
+			     	});
+			     	
+			     	$.ajax({
+						async: false,
+						url: 'deleteAllExamInfo',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: $.parseJSON(Exam),
+						success: function(e) {
+							 if(e.split(' ')[1] == "0"){
+							 	layer.msg('发生未知错误');
+						        return;
+							 }
+						},
+						error: function() {
+							alert('请先登陆');
+							return;
+						}
+			     	});
+			     	
+				var Exam={'examtitle':examTitle,'examintroduction':examIntro,'duration':examTime,'questionnum':questionNum,'pointssum':questionPoints,'examstate':0,'maxTimes':1,'userid':userid,'maxtimes':1}
+	            console.log(JSON.stringify(Exam));
+	            
+	            var Examid = -1;
+				$.ajax({
+					async: false,
+					url: 'addExam',
+					type: 'post',
+					contentType: 'application/json;charset=utf-8', //请求的字符编码
+					data: JSON.stringify(Exam),
+					success: function(e){
+						
+						Examid = e.split(' ')[1];
+					},
+					error: function() {
+						alert('请先登陆');
+						return;
+					}
+				});
+				
+				
+				
+				//加入part
+				var partId = new Array();
+				for(var i = 0 ; i < partName.length ; i++){
+						var partInfo = {'examid':Examid,'partname':partNameArray[i],'spare3':partIntroArray[i]};
+						$.ajax({
+							async: false,
+							url: 'addPart',
+							type: 'post',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: JSON.stringify(partInfo),
+							success: function(e) {
+						
+								alert("partid"+e.split(' ')[1])
+							},
+							error: function() {
+								alert('请先登陆');
+								return;
+							}
+						});
+			    }
+				
+				//加入part中的题目		
+				for(var i = 0 ; i < partName.length ; i++){
+						var partQuestionInfo = {'partid':partId[i],'grade':questionPointsArray[i],'questionid':questionIdArray[i]};
+						$.ajax({
+							async: false,
+							url: 'addPartQuestion',
+							type: 'get',
+							contentType: 'application/json;charset=utf-8', //请求的字符编码
+							data: partQuestionInfo,
+							success: function(e) {
+
+							},
+							error: function() {
+								alert('请先登陆');
+								return;
+							}
+						});
+						
+			    }
+				
+				window.location.href="Exam";
+		
+					
+//					
+				});
+
+				$("body").on("click", ".delete-part-btn", function() {
+					
+					$(this).parent().parent().parent().parent().parent().remove();
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					$(".exam-btn-container").children().eq(parseInt(partSerial)).remove();
+					
+					resetPartSerial();
+					resetPartQuestionNum();
+					resetPartPointsNum();
+					resetPartNameInfo();
+				});
+
+				$("body").on("click", ".part-question-delete-btn", function() {
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					var target_part = $(this).parent().parent().parent().parent().parent();
+					var target_question_list = $(this).parent().parent().next().children(".one-question");
+					for(var i = 0 ; i < target_question_list.length ; i++){
+						if (target_question_list.eq(i).children(".one-question-introduction").children(".layui-form").children(".part-checkbox").attr("checked") == "checked"){
+							target_question_list.eq(i).remove();
+						}
+					}
+					
+					var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				
+					for(var i = 0 ; i < part_question_list.length ; i++){
+						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+					}
+					
+					resetPartQuestionNum();
+					resetPartPointsNum();
+					resetPartTable();
+				
+					
+				});
+				
+				$("body").on("click", ".part-question-up-btn", function() {
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					var target_part = $(this).parent().parent().parent().parent().parent();
+					var target_question_list = $(this).parent().parent().next().children(".one-question");
+					for(var i = 0 ; i < target_question_list.length ; i++){
+						if (i>0 && target_question_list.eq(i).children(".one-question-introduction").children(".layui-form").children(".part-checkbox").attr("checked") == "checked"){
+							var clone_temp = target_question_list.eq(i).clone();
+							target_question_list.eq(i-1).before(clone_temp);
+							target_question_list.eq(i).remove();
+							break;
+						}
+					}
+					
+					var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+					for(var i = 0 ; i < part_question_list.length ; i++){
+						
+						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+					}
+					resetPartTable();
+					
+					var form = layui.form;
+					form.render();
+				});
+				
+				$("body").on("click", ".part-question-down-btn", function() {
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					var target_part = $(this).parent().parent().parent().parent().parent();
+					var target_question_list = $(this).parent().parent().next().children(".one-question");
+					for(var i = 0 ; i < target_question_list.length ; i++){
+						if (i!=target_question_list.length-1 && target_question_list.eq(i).children(".one-question-introduction").children(".layui-form").children(".part-checkbox").attr("checked") == "checked"){
+							var clone_temp = target_question_list.eq(i).clone();
+							target_question_list.eq(i+1).after(clone_temp);
+							target_question_list.eq(i).remove();
+							break;
+						}
+					}
+					
+					var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+					for(var i = 0 ; i < part_question_list.length ; i++){
+						
+						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+					}
+					resetPartTable();
+					
+					var form = layui.form;
+					form.render();
+					
+					
+				});
+                
+                //监听输入框输入实时更改页面显示
+                
+                $("body").on("input propertychange", ".part-name-input", function() {
+                	resetPartNameInfo();
+                });
+                
+                $("body").on("onclick", ".exam-header", function(){
+                	window.location.href="Exam";
+                });
+			
+			    $('#clock').countdown(paperEndTime, function(event) {
+			      $(this).html(event.strftime('当前剩余时间 '+'%H:%M:%S'));
+			      
+			      if (event.type == 'finish'){
+			      	  EditAnswerInfo();
+			      	  alert("考试时间已过，已自动交卷。");
+			      }
+			      
+			    });
+			    
+			    //提交试卷
+			    $("body").on("click", ".submit-paper", function(){
+			    	submitPaper();
+			    });
+			    
+			});
+		</script>
+
+		<script type="text/html" id="bank">
+
+			{{each BankList as value}}
+
+			<div class="one-bank" data-bankId="{{value.bankid}}" style="cursor:pointer;color: #000; margin-top: 10px;padding-top: 10px;margin-left: 10px;padding-left: 5px;padding-bottom: 10px;border-left: 4px solid #FFB800;">
+				<div class="bank-name" style="display: inline;">
+					<span>{{value.bankname}}</span>
+				</div>
+				<div class="bank-img" style="display:inline;">
+					<span class="layui-badge layui-bg-blue">{{value.spare2}}</span>
+				</div>
+			</div>
+
+			<hr class="layui-bg-gray"> {{/each}}
+		</script>
+		
+		<script type="text/html" id="Part">
+
+			{{each PartList as part}}
+
+						<div class="part" data-partid = "{{part.partid}}" data-partserial="1" style="margin-top:25px;padding-bottom:20px;border: 1px solid #F5F5F5;background-color: #FFF;">
+
+							<div class="part-name" style="margin-top: 25px;">
+
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;">部分名称</label>
+								<div class="layui-input-block">
+									<input disabled="disabled" type="text" name="title" value="{{part.partname}}" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input part-name-input" style="width: 92%;">
+								</div>
+
+							</div>
+
+							<div class="part-introduction" style="margin-top: 8px;">
+
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;">部分说明</label>
+								<div class="layui-input-block">
+									<input disabled="disabled" type="text" name="title" value="{{part.spare3}}" required lay-verify="required" placeholder="" autocomplete="off" class="layui-input part-intro-input" style="width: 92%;">
+								</div>
+
+							</div>
+							
+							
+							<div class="part-question-statistic" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">
+
+								<fieldset style="border: 1px solid #D2D2D2;">
+									<legend style="font-size: 20px;">
+										<i class="layui-icon layui-icon-list tongji" style="font-size:16px;color:#5FB878;">答题情况</i>
+									</legend>
+									
+									<div class="question-statistic-container">
+
+									
+									
+									
+									
+									</div>
+
+
+								</fieldset>
+
+							</div>
+
+
+							<div class="part-question-info" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">
+
+								<fieldset style="border: 1px solid #D2D2D2;">
+									<legend>
+										<i class="layui-icon layui-icon-form xinxi" style="font-size:16px;color:#5FB878;">试题信息 </i>
+									</legend>
+									
+
+									<div class="question-container">
+
+
+										<hr>
+										
+										
+									</div>
+
+				        	</div>
+
+				        </div>
+
+
+				
+			{{/each}}
+		</script>
+
+		<script type="text/html" id="question">
+
+			{{each QuestionList as value}}
+
+			<div class="one-question" data-questionid = "{{value.questionid}}" data-questiontype = "{{value.questiontype}}" style="margin-left: 10px;margin-top: 15px;">
+				<div class="one-question-introduction">
+					<div class="layui-form" style="display: inline;margin-right: 0px;margin-top: 0px;">
+						<input type="checkbox" class="layer-checkbox" lay-skin="primary">
+					</div>
+
+					<div class="one-question-serial" style="display: inline;">
+						<span style="font-size: 20px;color: #5FB878;">1、&nbsp;&nbsp;</span>
+					</div>
+
+					<div class="one-question-type" style="display: inline;margin-right: 5px;">
+						{{if value.questiontype == "0"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;单选题&nbsp;</span> {{/if}} {{if value.questiontype == "1"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;多选题&nbsp;</span> {{/if}} {{if value.questiontype == "2"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;判断题&nbsp;</span> {{/if}} {{if value.questiontype == "3"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;填空题&nbsp;</span> {{/if}} {{if value.questiontype == "4"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;问答题&nbsp;</span> {{/if}}
+
+					</div>
+
+					<div class="one-question-skill" style="display: inline;margin-right: 5px;">
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;知识点：{{value.questionskill}}&nbsp;</span>
+					</div>
+
+					<div class="one-question-degree" style="display: inline;margin-right: 5px;">
+						{{if value.questiontype == "0"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：易&nbsp;</span> 
+						{{/if}}
+						
+						{{if value.questiontype == "1"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：中&nbsp;</span>
+						{{/if}}
+						
+						{{if value.questiontype == "2"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
+						{{/if}}
+						
+						{{if value.questiontype == "3"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
+						{{/if}}
+					</div>
+
+					<div class="one-question-zhankai" style="display: inline;margin-left: 10px;margin-right: 5px;">
+
+						<a class="zhankai" href="javascript:;">&nbsp;展开&nbsp;</a>
+					</div>
+					
+					
+
+				</div>
+
+				<div class="one-question-title" style="margin-top: 30px;margin-left: 20px;">
+					<span style="color: #333333;font-size: 17px;"> {{value.title}}
+				</div>
+
+
+				<div class="one-question-detial" style="margin-top: 30px;margin-left: 20px;">
+													
+					<div class="choice" style="border-left: 4px solid #5FB878;">
+														
+						<div class="layui-form options-container" style="margin-left: 3px;">
+
+							<input type="radio" name="sex" title="{{value.options}}">
+														
+						</div>
+
+					</div>
+													
+					<div class="right-answer" style="border-left: 4px solid #FF5722;margin-top: 15px;">
+														
+						<div class ="right-answer-title" style="margin-left: 5px;">
+							<span style="color: #333333;font-size: 16px;"> 正确答案 </span>
+						</div>
+					<br>
+						<div class="right-answer-info" style="margin-left: 5px;">
+							<span> {{value.answer}} </span>
+						</div>
+
+				</div>
+
+				<div class="answer-jiexi" style="border-left: 4px solid #FFB800;margin-top: 15px;">
+
+					<div class="right-answer-title" style="margin-left: 5px;">
+						<span style="color: #333333;font-size: 16px;"> 试题解析 </span>
+					</div>
+					<br>
+					<div class="right-answer-info" style="margin-left: 5px;">
+						<span> {{ value.analysis }}</span>
+					</div>
+
+				</div>
+
+			</div>
+
+			<hr>
+
+</div>
+
+			{{/each}}
+
+		</script>
+		
+		<script type="text/html" id="PartQuestion">
+
+			{{each PartQuestionList as value}}
+
+			<div class="one-question" data-questionSerial="-1" data-answer="{{value.answer}}" data-questionid = "{{value.questionid}}" data-questiontype = "{{value.questiontype}}" style="margin-left: 10px;margin-top: 15px;">
+				<div class="one-question-introduction">
+
+					<div class="one-question-serial" style="display: inline;">
+						<span style="font-size: 20px;color: #5FB878;">1、&nbsp;&nbsp;</span>
+					</div>
+
+					<div class="one-question-type" style="display: inline;margin-right: 5px;">
+						{{if value.questiontype == "0"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;单选题&nbsp;</span> {{/if}} {{if value.questiontype == "1"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;多选题&nbsp;</span> {{/if}} {{if value.questiontype == "2"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;判断题&nbsp;</span> {{/if}} {{if value.questiontype == "3"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;填空题&nbsp;</span> {{/if}} {{if value.questiontype == "4"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;问答题&nbsp;</span> {{/if}}
+
+					</div>
+
+					<div class="one-question-skill" style="display: inline;margin-right: 5px;">
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;知识点：{{value.questionskill}}&nbsp;</span>
+					</div>
+
+					<div class="one-question-degree" style="display: inline;margin-right: 5px;">
+						{{if value.difficultdegree == "0"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：易&nbsp;</span> 
+						{{/if}}
+						
+						{{if value.difficultdegree == "1"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：中&nbsp;</span>
+						{{/if}}
+						
+						{{if value.difficultdegree == "2"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
+						{{/if}}
+
+					</div>
+					
+					<div class="one-question-points" style="margin-top: 10px;float:right;">
+
+										<div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;">分值：</span>
+										</div>
+										
+										<div class="exam-question-num" style="display: inline;">
+											<span style="color: #007DDB;font-size: 20px;">{{value.spare2}}</span>
+											<span style="color: #666666;">&nbsp;分</span>
+										</div>
+									</div>
+
+				</div>
+
+				<div class="one-question-title" style="margin-top: 30px;margin-left: 20px;">
+					<span style="color: #333333;font-size: 17px;"> {{value.title}}
+				</div>
+
+
+				<div class="one-question-detial" style="margin-top: 30px;margin-left: 20px;">
+													
+					<div class="choice" style="border-left: 4px solid #FFB800;">
+														
+						<div class="layui-form options-container" style="margin-left: 3px;">
+
+							<input type="radio" name="sex" title="{{value.options}}">
+														
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+			<hr>
+
+</div>
+
+			{{/each}}
+
+		</script>
+	
+	
+	</head>
+
+	<body class="layui-layout-body" style="background-color: #F5F5F5;overflow-y:auto; overflow-x:auto;height:1500px;">
+		<div class="layui-layout layui-layout-admin">
+			<div class="layui-header header-border" style="background-color:#FFFFFF;">
+				<div class="layui-logo">
+					<img class="title-size" alt="" href="" src="img/title.png" th:src="@{static/img/title.png}">
+				</div>
+				<!-- 头部区域（可配合layui已有的水平导航） -->
+				<div data-bankid="1" class="layui-nav layui-layout-left">
+					<li class="layui-nav-item exam-header">
+						<a class="header-font-color" href="javascript:;">考试</a>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="javascript:;">题库</a>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">商店</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="javascript:;">购买考试</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="javascript:;">购买题库</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a class="header-font-color" href="javascript:;">群组</a>
+					</li>
+				</div>
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">
+						<a href="javascript:;" class="header-font-color">
+							<img src="http://t.cn/RCzsdCq" class="layui-nav-img"> 贤心
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a class="header-font-color" href="javascript:;">基本资料</a>
+							</dd>
+							<dd>
+								<a class="header-font-color" href="javascript:;">交易中心</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item header-font-color">
+						<a class="header-font-color" href="javascript:;">退出登录</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="layui-row" style="margin-top: 50px;">
+				<div class="layui-col-md1">
+
+				</div>
+				<div class="layui-col-md3">
+					<div class="layui-row">
+						<div class="layui-col-md3">
+							&nbsp;
+						</div>
+						<div class="layui-col-md7 all-btn"  style="background-color: #FFFFFF;">
+							<div class="exam-info-container">
+								<div class="exam-btn-container">
+									<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 15px;">
+										<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878;"> 基本信息</button>
+									</div>
+									
+									<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">
+										<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#FF5722"> 第一部分</button>
+									</div>
+								</div>
+							
+
+								<div class="exam-question-info" style="width: 240px;margin-left: 18px;margin-top: 30px;">
+
+									<div class="exam-question-num">
+
+										<div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;">总题数：</span>
+										</div>
+
+										<div class="exam-question-num" style="display: inline;float:right;">
+											<span class="exam-question-num-span" style="color: #007DDB;font-size: 20px;">0</span>
+											<span style="color: #666666;">&nbsp;道</span>
+										</div>
+
+									</div>
+
+									<div class="exam-points-num" style="margin-top: 10px;">
+
+										<div class="exam-points-title" style="display: inline;">
+											<span style="color: #333333;">总分值：</span>
+										</div>
+
+										<div class="exam-points-num" style="display: inline;float:right;">
+											<span class="exam-points-num-span" style="color: #007DDB;font-size: 20px;">0</span>
+											<span style="color: #666666;">&nbsp;分</span>
+										</div>
+
+									</div>
+
+									<div class="exam-time-info" style="margin-top: 10px;">
+
+										<div class="exam-time-title" style="display: inline;">
+											<span style="color: #333333;">考试时长：</span>
+										</div>
+
+										<div class="exam-time-num" style="display: inline;float:right;">
+											<span class="exam-time" style="color: #007DDB;font-size: 20px;">0</span>
+											<span style="color: #666666;">分钟</span>
+										</div>
+
+									</div>
+
+								</div>
+
+								<div class="submit-paper" style="width: 240px;margin-left: 18px;margin-top: 20px;margin-bottom: 15px;">
+									<button class="layui-btn layui-btn-fluid layui-btn-warm layui-btn-sm">提交试卷</button>
+								</div>
+								
+								
+
+							</div>
+							
+							<div class="time-clock" align="center" style="margin-bottom: 15px;margin-top: 10px;">
+								<span id="clock" style="font-size: 24px;color: #FF5722;"></span>
+							</div>
+							
+						</div>
+						<div class="layui-col-md2">
+							&nbsp;
+						</div>
+					</div>
+
+				</div>
+
+				<div class="layui-col-md7">
+
+					<div class="exam-intro-controller" style="border: 1px solid #F5F5F5;background-color: #FFFFFF;">
+
+						<div class="exam-title" style="margin-top: 25px;">
+							<label class="layui-form-label" style="color: #333333;font-size: 17px;">考试标题</label>
+							<div class="layui-input-block">
+								<input disabled="disabled" type="text" name="title" required lay-verify="required" placeholder="请输入考试标题（必填）" autocomplete="off" class="layui-input exam-title-input" style="width: 92%;">
+							</div>
+						</div>
+
+						<div class="exam-introduction" style="margin-top: 8px;margin-bottom: 25px;">
+							<label class="layui-form-label" style="color: #333333;font-size: 17px;">考试简介</label>
+							<div class="layui-input-block">
+								<textarea disabled="disabled" name="desc" placeholder="" class="layui-textarea exam-intro-input" style="width: 92%;"></textarea>
+							</div>
+						</div>
+
+					</div>
+
+					<div id="part-list" class="part-controller" style="border: 1px solid #F5F5F5;margin-top: 25px;">
+
+						<!--<div class="part" data-partserial="1" style="padding-bottom:20px;border: 1px solid #F5F5F5;background-color: #FFF;">
+
+							<div class="part-name" style="margin-top: 25px;">
+
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;">部分名称</label>
+								<div class="layui-input-block">
+									<input type="text" name="title" required lay-verify="required" placeholder="请输入部分名称（必填）" autocomplete="off" class="layui-input part-name-input" style="width: 92%;">
+								</div>
+
+							</div>
+
+							<div class="part-introduction" style="margin-top: 8px;">
+
+								<label class="layui-form-label" style="color: #333333;font-size: 17px;">部分说明</label>
+								<div class="layui-input-block">
+									<input type="text" name="title" required lay-verify="required" placeholder="请输入部分说明（选填）" autocomplete="off" class="layui-input part-intro-input" style="width: 92%;">
+								</div>
+
+							</div>
+
+							<div class="part-question-statistic" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">
+
+								<fieldset style="border: 1px solid #D2D2D2;">
+									<legend style="font-size: 20px;">
+										<i class="layui-icon layui-icon-list tongji" style="font-size:16px;color:#5FB878;">部分统计</i>
+									</legend>
+
+									<div class="statistic-title">
+										<table class="layui-table" lay-size="sm">
+											<colgroup>
+												<col width="20%">
+												<col width="20%">
+												<col width="20%">
+												<col width="20%">
+												<col width="20%">
+											</colgroup>
+											<thead>
+												<tr>
+													<th>题号</th>
+													<th>题型</th>
+													<th>知识点</th>
+													<th>难易度</th>
+													<th>分值</th>
+												</tr>
+											</thead>
+											<tbody>
+
+											</tbody>
+										</table>
+									</div>
+
+									<div class="part-statistic-info">
+
+										<div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;">总题数：</span>
+										</div>
+
+										<div class="exam-question-num" style="display: inline;">
+											<span style="color: #007DDB;font-size: 20px;">0</span>
+											<span style="color: #333333;">&nbsp;道</span>
+										</div>
+
+										<div class="layui-progress num-proportity" lay-filter="part-question-num-1" lay-showPercent="yes" style="margin-top: 10px;margin-bottom: 10px;">
+											<div class="layui-progress-bar" lay-percent="0%" style="color: #5FB878;"></div>
+										</div>
+
+										<div class="exam-points-title" style="display: inline;">
+											<span style="color: #333333;">总分值：</span>
+										</div>
+
+										<div class="exam-points-num" style="display: inline;">
+											<span style="color: #007DDB;font-size: 20px;">0</span>
+											<span style="color: #333333;">&nbsp;分</span>
+										</div>
+
+										<div class="layui-progress points-proportity" lay-filter="part-points-num-1" lay-showPercent="yes" style="margin-top: 10px;margin-bottom: 10px;">
+											<div class="layui-progress-bar layui-bg-red" lay-percent="0%"></div>
+										</div>
+										
+									</div>
+									
+								</fieldset>
+
+							</div>
+
+							<div class="part-question-info" style="margin-right:20px;margin-left: 20px;margin-top: 25px;">
+
+								<fieldset style="border: 1px solid #D2D2D2;">
+									<legend>
+										<i class="layui-icon layui-icon-form xinxi" style="font-size:16px;color:#5FB878;">试题信息 </i>
+									</legend>
+									<div class="question-manage-info" style="background-color: #F5F5F5;">
+										<div class="question-manage-btn" style="margin-left: 10px;margin-top: 10px;">
+											<span style="color: #333333;font-size: 14px;">对选中试题的操作：</span>
+
+											<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-up-btn" style="margin-top: 10px;margin-bottom: 10px;">
+													&nbsp;&nbsp;&nbsp;&nbsp;↑上移&nbsp;&nbsp;&nbsp;&nbsp;
+											</button>
+											<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-down-btn" style="margin-top: 10px;margin-bottom: 10px;">
+													&nbsp;&nbsp;&nbsp;&nbsp;↓下移&nbsp;&nbsp;&nbsp;&nbsp;
+											</button>
+											<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-delete-btn" style="margin-top: 10px;margin-bottom: 10px;">
+													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											</button>
+											<button type="button" class="layui-btn layui-btn-normal layui-btn-sm add-exam-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 475px;">
+													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+添加试题&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											</button>
+										</div>
+									</div>
+
+									<div class="question-container">
+
+
+										<hr>
+										
+										
+									</div>
+
+					</div>
+
+				</div>-->
+
+			</div>
+
+		</div>
+
+		</div>
+
+		</div>
+
+		<div class="layui-col-md1">
+			&nbsp;
+		</div>
+
+		</div>
+
+	</body>
+
+</html>

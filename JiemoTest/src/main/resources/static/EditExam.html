@@ -24,7 +24,9 @@
 				element.init();
 				
 			function loadExamInfo() {
-
+				
+				
+				
 				$.ajax({
 					async: false,
 					url: 'searchExam',
@@ -37,7 +39,7 @@
 						$(".exam-points-num-span").text(obj.pointssum);
 						$(".exam-title-input").val(obj.examtitle);
 						$(".exam-intro-input").val(obj.examintroduction);
-						
+						$(".exam-time").text(obj.duration);
 
 					},
 					error: function() {
@@ -58,15 +60,31 @@
 								
 						var new_html = template("Part", obj); //将json对象绑定到artTemplate模板上
 						$('#part-list').html(new_html);								
-						
 						resetPartNameInfo();
 						loadPartQuestionInfo();
-						refreshSerial();
+						refreshStartSerial();
+						resetProgressBarSerial();
+						resetPartQuestionNum();
+						resetPartPointsNum();
+						resetAllPartTable();
 					},
 					error: function() {
 						alert('请先登陆');
 					}
 				});
+				
+			}
+			//初始加载的时候初始化部分的序号和部分中问题的序号
+			function refreshStartSerial(){
+				
+				var target_part_list = $(".part");
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					target_part_list.eq(i).attr("data-partserial",(i+1));
+					var part_question_list = target_part_list.eq(i).children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+					for(var j = 0 ; j < part_question_list.length ; j++){
+						part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((j+1)+"、  ");
+				    }
+				}
 				
 			}
 			
@@ -85,12 +103,12 @@
 						contentType: 'application/json;charset=utf-8', //请求的字符编码
 						data: a,
 						success: function(e) {
-							alert(e);
 							var obj = JSON.parse(e); //将字符串转换成json对象
 
-							var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
+							var new_html = template("PartQuestion", obj); //将json对象绑定到artTemplate模板上
 
 							partQuestionContainer.eq(i).html(new_html);
+							resetPartQuestionOptions();
 							
 							},
 						error: function() {
@@ -103,41 +121,92 @@
 			
 			//重置导航中的部分名称
 			function resetPartNameInfo(){
-				var partBtnContainer = $(".exam-basic-info");
+				
 				var partList = $(".part-name-input");
+				var btnNum = $(".exam-btn-container").children().length;
+				for(var i = 0 ; i < partList.length - btnNum + 1 ; i++){
+					var part_btn = '<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">'+
+					'<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878">第1部分</button>'+
+					'</div>';
+					$(".exam-btn-container").append(part_btn);
+				}
+				var partBtnContainer = $(".exam-basic-info");
 				for(var i = 0 ; i < partList.length ; i++){
 					partBtnContainer.eq(i+1).children("button").text(partList.eq(i).val());
 				}
+				
+			}
+			
+			//将部分中的选项标为已选和不可选
+			function resetPartQuestionOptions(){
+
+				var question = $(".question-container").children(".one-question");
+				var container_optionsContainer = $(".question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
+				for(var i = 0; i < question.length; i++) {
+					first_question = container_optionsContainer.eq(i).children("input");
+					var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
+
+					if(question_type == 0 || question_type == 1 ){
+								
+						var right_answer = container_optionsContainer.eq(i).parent().next().children().children().eq(1).text();
+						right_answer = right_answer.replace("#^#","、");
+						container_optionsContainer.eq(i).parent().next().children().children().eq(1).text(right_answer);
+								
+					}
+					else{
+						container_optionsContainer.eq(i).empty();
+						continue;
+					}
+							
+					var options_info = first_question.attr("title");
+					var split_info = options_info.split('#^#');
+						
+					container_optionsContainer.eq(i).empty();
+							
+					for(var j = 0; j < split_info.length; j++) {
+						if(right_answer.indexOf(split_info[j].substr(0,1)) >=0 ){
+							container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j +'"  title="' + split_info[j] + '" checked>' + '<br>');
+						}
+						else{
+							container_optionsContainer.eq(i).append('<input type="radio"  name="'+ i +"b" + j  +'"  title="' + split_info[j] + '" disabled>' + '<br>');
+
+						}
+					}
+							
+				}
+				
 			}
 			
 			function checkChoosedQuestion(){
 				
 				var target_part_list = $(".part");
 				var target_part = "";
-				for(var i = 0 ; i < target_part_list.length ; i++){
-					if(target_part_list.eq(i).attr("data-partserial") == partserial){
-							target_part = target_part_list.eq(i);
-					}
-				}
-				
-				var part_question = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				var allQuestionId = new Array();
+				var allQuestionContainer = $(".question-container");
 				var nowId = new Array();
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					
+				target_part = target_part_list.eq(i);
+
+				var part_question = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
 				var IfRemove=0;
-                for(var i = 0 ; i < part_question.length ; i++){
-					if($.inArray(part_question.eq(i).attr("data-questionid"),nowId) >=0 ){
-							part_question.eq(i).remove();
+	
+                for(var j = 0 ; j < part_question.length ; j++){
+					if($.inArray(part_question.eq(j).attr("data-questionid"),nowId) >=0 ){
+							part_question.eq(j).remove();
 							IfRemove = IfRemove+1;
 					}else{
-						nowId.push(part_question.eq(i).attr("data-questionid"));
+						nowId.push(part_question.eq(j).attr("data-questionid"));
 					}
 				}
                 if(IfRemove > 0){
                 	layer.msg('已自动过滤重复题目'+IfRemove+'道');
                 }
                 var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
-				for(var i = 0 ; i < part_question_list.length ; i++){
-						
-					part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+				for(var j = 0 ; j < part_question_list.length ; j++){
+					part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((j+1)+"、  ");
+				}
+				
 				}
 				
 			}
@@ -162,6 +231,7 @@
 				
 			}
 			
+			//更新问题数量
 			function resetPartQuestionNum(){
 				
 				var target_part_list = $(".part");
@@ -219,7 +289,42 @@
 
 
 			}
-
+			//用于初次加载更新表格
+			function resetAllPartTable(){
+				
+				var target_part_list = $(".part");
+				var target_part = "";
+				for(var i = 0 ; i < target_part_list.length ; i++){
+				target_part = target_part_list.eq(i);
+				
+				
+				target_part.children(".part-question-statistic").children("fieldset").children(".statistic-title").children("table").children("tbody").empty();
+				
+				var part_question_info_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				var question_serial = 1;
+				var question_type = 1;
+				var question_skill = 1;
+				var question_degree = 1;
+				var question_points = 1;
+				for(var j = 0 ; j < part_question_info_list.length ; j++){
+					
+					question_serial = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text();
+					question_type = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-type").children("span").text();
+					question_skill = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-skill").children("span").text();
+					question_degree = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-degree").children("span").text();
+					question_points = part_question_info_list.eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text();
+				    var content = '<tr>'+
+													'<td>'+question_serial.replace("、","")+'</td>'+
+													'<td>'+question_type.replace(" ","")+'</td>'+
+													'<td>'+question_skill.split('：')[1]+'</td>'+
+													'<td>'+question_degree.split('：')[1]+'</td>'+
+													'<td>'+question_points+'</td>'+
+												'</tr>';
+				    target_part.children(".part-question-statistic").children("fieldset").children(".statistic-title").children("table").children("tbody").append(content);
+				}
+				}
+			}
+            //用于添加题目后加载更新表格
 			function resetPartTable(){
 				
 				var target_part_list = $(".part");
@@ -317,6 +422,7 @@
 			function refreshSerial(){
 				
 				var target_part_list = $(".part");
+				
 				var target_part = "";
 				for(var i = 0 ; i < target_part_list.length ; i++){
 					if(target_part_list.eq(i).attr("data-partserial") == partserial){
@@ -328,6 +434,18 @@
 				
 				for(var i = 0 ; i < part_question_list.length ; i++){
 					part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+				}
+				
+			}
+			
+			function resetProgressBarSerial(){
+				
+				var numProportityBar = $(".num-proportity");
+				var PointsBar = $(".points-proportity");
+				
+				for(var i = 0 ; i < PointsBar.length ; i++){
+					numProportityBar.eq(i).attr("lay-filter","part-question-num-"+(i+1))
+					PointsBar.eq(i).attr("lay-filter","part-points-num-"+(i+1))
 				}
 				
 			}
@@ -578,7 +696,6 @@
 					contentType: 'application/json;charset=utf-8', //请求的字符编码
 					data: a,
 					success: function(e) {
-						alert(e);
 						var obj = JSON.parse(e); //将字符串转换成json对象
 
 						var new_html = template("question", obj); //将json对象绑定到artTemplate模板上
@@ -641,11 +758,50 @@
 
 			};
 			
+			function getQueryVariable(variable)
+			{
+      			var query = window.location.search.substring(1);
+       			var vars = query.split("&");
+      			for (var i=0;i<vars.length;i++) {
+         			     var pair = vars[i].split("=");
+          			     if(pair[0] == variable){return pair[1];}
+       			}
+       			return(false);
+			}
+			
 			$(document).ready(function() {
+                
+				var a = {'examId': getQueryVariable("examId")};
+                    
+					$.ajax({
+						async: false,
+						url: 'CheckExamUser',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+							if(e.split(" ")[0] == "1") {
+								loadExamInfo();
+								loadExamPartInfo();
+							}
+							if(e.split(" ")[0] == "0") {
+								if(e.split(" ")[1] == "请先登录"){
+									alert("请先登录");
+									window.location.href="to11";
+								}else{
+									alert(e.split(" ")[1]);
+									window.location.href="Exam";
+								    layer.msg(e.split(" ")[1]);
+								}
+							}
+							
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
 				
 				
-				loadExamInfo();
-				loadExamPartInfo();
 				
 				layui.use('form', function() {
 					var form = layui.form;
@@ -711,6 +867,7 @@
 							}
 							td.html(newtxt);
 							resetPartPointsNum();
+							resetAllPartTable();
 						}
 					});
 				});
@@ -1251,7 +1408,7 @@
 							target_part = target_part_list.eq(i);
 						}
 					}
-
+					
 					var layer_checkbox = $(".layer-checkbox");
 					for(var i = 0 ; i < layer_checkbox.length ; i ++){
 						if(layer_checkbox.eq(i).attr("checked") == "checked"){
@@ -1322,22 +1479,60 @@
 					for(var i = 0 ; i < partIntro.length ; i++){
 						partIntroArray[i] = partIntro.eq(i).val();
 					}
-										
-                    $.ajax({
-					async: false,
-					url: 'getUser',
-					type: 'get',
-					contentType: 'application/json;charset=utf-8', //请求的字符编码
-					data: $.parseJSON(Exam),
-					success: function(e) {
-						 userid = e;
-					     alert(e);
-					},
-					error: function() {
-						alert('请先登陆');
-						return;
+					
+					var part = $(".question-container");
+					var questionIdArray = new Array();
+					var questionPointsArray = new Array();
+					for(var i = 0 ; i < part.length ; i++){
+						questionIdArray[i]="";
+						questionPointsArray[i]="";
+						for(var j = 0 ; j < part.eq(i).children().length ; j++){
+							questionIdArray[i] = questionIdArray[i] + part.eq(i).children().eq(j).attr("data-questionid") + " ";
+							questionPointsArray[i] = questionPointsArray[i] + part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() + " ";						
+						    if(part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() == "0"){
+						    	layer.msg('您有题目分数未设置，请重新检查！');
+						        return;
+						    }
+						}
+						if(questionPointsArray[i] == ""){
+							layer.msg('您有部分未添加题目，请重新检查！');
+						        return;
+						}
 					}
-				});
+					
+                    $.ajax({
+						async: false,
+						url: 'getUser',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: $.parseJSON(Exam),
+						success: function(e) {
+							 userid = e;
+						},
+						error: function() {
+							alert('1请先登陆');
+							return;
+						}
+			     	});
+			     	
+			     	$.ajax({
+						async: false,
+						url: 'deleteAllExamInfo',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: $.parseJSON(Exam),
+						success: function(e) {
+							 if(e.split(' ')[1] == "0"){
+							 	layer.msg('发生未知错误');
+						        return;
+							 }
+						},
+						error: function() {
+							alert('2请先登陆');
+							return;
+						}
+			     	});
+			     	
 				var Exam={'examtitle':examTitle,'examintroduction':examIntro,'duration':examTime,'questionnum':questionNum,'pointssum':questionPoints,'examstate':0,'maxTimes':1,'userid':userid,'maxtimes':1}
 	            console.log(JSON.stringify(Exam));
 	            
@@ -1351,7 +1546,6 @@
 					success: function(e){
 						
 						Examid = e.split(' ')[1];
-						alert("Examid"+Examid);
 					},
 					error: function() {
 						alert('请先登陆');
@@ -1359,19 +1553,7 @@
 					}
 				});
 				
-				var part = $(".question-container");
-				var questionIdArray = new Array();
-				var questionPointsArray = new Array();
-				for(var i = 0 ; i < part.length ; i++){
-					questionIdArray[i]="";
-					questionPointsArray[i]="";
-					for(var j = 1 ; j < part.eq(i).children().length ; j++){
-
-						questionIdArray[i] = questionIdArray[i] + part.eq(i).children().eq(j).attr("data-questionid") + " ";
-						questionPointsArray[i] = questionPointsArray[i] + part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() + " ";						
-					}
-
-				}
+				
 				
 				//加入part
 				var partId = new Array();
@@ -1384,8 +1566,6 @@
 							contentType: 'application/json;charset=utf-8', //请求的字符编码
 							data: JSON.stringify(partInfo),
 							success: function(e) {
-						
-								alert("partid"+e.split(' ')[1])
 								partId.push(e.split(' ')[1]);
 							},
 							error: function() {
@@ -1405,8 +1585,7 @@
 							contentType: 'application/json;charset=utf-8', //请求的字符编码
 							data: partQuestionInfo,
 							success: function(e) {
-						
-								alert(e);
+
 							},
 							error: function() {
 								alert('请先登陆');
@@ -1415,25 +1594,25 @@
 						});
 						
 			    }
-				
-
-					
-//					
+				alert("修改成功！");
+				window.location.href="Exam";
+		
 				});
 
 				$("body").on("click", ".delete-part-btn", function() {
 					
 					$(this).parent().parent().parent().parent().parent().remove();
-					var partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					$(".exam-btn-container").children().eq(parseInt(partSerial)).remove();
 					
 					resetPartSerial();
 					resetPartQuestionNum();
 					resetPartPointsNum();
+					resetPartNameInfo();
 				});
 
 				$("body").on("click", ".part-question-delete-btn", function() {
-					
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					var target_part = $(this).parent().parent().parent().parent().parent();
 					var target_question_list = $(this).parent().parent().next().children(".one-question");
 					for(var i = 0 ; i < target_question_list.length ; i++){
@@ -1448,11 +1627,15 @@
 						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
 					}
 					
+					resetPartQuestionNum();
+					resetPartPointsNum();
+					resetPartTable();
+				
 					
 				});
 				
 				$("body").on("click", ".part-question-up-btn", function() {
-					
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					var target_part = $(this).parent().parent().parent().parent().parent();
 					var target_question_list = $(this).parent().parent().next().children(".one-question");
 					for(var i = 0 ; i < target_question_list.length ; i++){
@@ -1469,13 +1652,14 @@
 						
 						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
 					}
+					resetPartTable();
 					
 					var form = layui.form;
 					form.render();
 				});
 				
 				$("body").on("click", ".part-question-down-btn", function() {
-					
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					var target_part = $(this).parent().parent().parent().parent().parent();
 					var target_question_list = $(this).parent().parent().next().children(".one-question");
 					for(var i = 0 ; i < target_question_list.length ; i++){
@@ -1492,6 +1676,7 @@
 						
 						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
 					}
+					resetPartTable();
 					
 					var form = layui.form;
 					form.render();
@@ -1505,6 +1690,9 @@
                 	resetPartNameInfo();
                 });
                 
+                $("body").on("onclick", ".exam-header", function(){
+                	window.location.href="Exam";
+                });
 			});
 		</script>
 
@@ -1528,7 +1716,7 @@
 
 			{{each PartList as part}}
 
-						<div class="part" data-partid = "{{part.partid}}" data-partserial="1" style="padding-bottom:20px;border: 1px solid #F5F5F5;background-color: #FFF;">
+						<div class="part" data-partid = "{{part.partid}}" data-partserial="1" style="margin-top:25px;padding-bottom:20px;border: 1px solid #F5F5F5;background-color: #FFF;">
 
 							<div class="part-name" style="margin-top: 25px;">
 
@@ -1632,7 +1820,11 @@
 											<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-delete-btn" style="margin-top: 10px;margin-bottom: 10px;">
 													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											</button>
-											<button type="button" class="layui-btn layui-btn-normal layui-btn-sm add-exam-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 475px;">
+											
+											<button type="button" class="layui-btn layui-btn-sm layui-bg-red delete-part-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 350px;">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除部分&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</button>
+											<button type="button" class="layui-btn layui-btn-normal layui-btn-sm add-exam-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 30px;">
 													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+添加试题&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											</button>
 										</div>
@@ -1705,6 +1897,8 @@
 
 						<a class="zhankai" href="javascript:;">&nbsp;展开&nbsp;</a>
 					</div>
+					
+					
 
 				</div>
 
@@ -1758,6 +1952,124 @@
 			{{/each}}
 
 		</script>
+		
+		<script type="text/html" id="PartQuestion">
+
+			{{each PartQuestionList as value}}
+
+			<div class="one-question" data-questionid = "{{value.questionid}}" data-questiontype = "{{value.questiontype}}" style="margin-left: 10px;margin-top: 15px;">
+				<div class="one-question-introduction">
+					<div class="layui-form" style="display: inline;margin-right: 0px;margin-top: 0px;">
+						<input type="checkbox" class="part-checkbox" lay-skin="primary">
+					</div>
+
+					<div class="one-question-serial" style="display: inline;">
+						<span style="font-size: 20px;color: #5FB878;">1、&nbsp;&nbsp;</span>
+					</div>
+
+					<div class="one-question-type" style="display: inline;margin-right: 5px;">
+						{{if value.questiontype == "0"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;单选题&nbsp;</span> {{/if}} {{if value.questiontype == "1"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;多选题&nbsp;</span> {{/if}} {{if value.questiontype == "2"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;判断题&nbsp;</span> {{/if}} {{if value.questiontype == "3"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;填空题&nbsp;</span> {{/if}} {{if value.questiontype == "4"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;问答题&nbsp;</span> {{/if}}
+
+					</div>
+
+					<div class="one-question-skill" style="display: inline;margin-right: 5px;">
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;知识点：{{value.questionskill}}&nbsp;</span>
+					</div>
+
+					<div class="one-question-degree" style="display: inline;margin-right: 5px;">
+						{{if value.questiontype == "0"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：易&nbsp;</span> 
+						{{/if}}
+						
+						{{if value.questiontype == "1"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：中&nbsp;</span>
+						{{/if}}
+						
+						{{if value.questiontype == "2"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
+						{{/if}}
+						
+						{{if value.questiontype == "3"}}
+						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
+						{{/if}}
+					</div>
+
+					<div class="one-question-zhankai" style="display: inline;margin-left: 10px;margin-right: 5px;">
+
+						<a class="zhankai" href="javascript:;">&nbsp;展开&nbsp;</a>
+					</div>
+					
+					<div class="one-question-points" style="margin-top: 10px;float:right;">
+
+										<div class="exam-question-title" style="display: inline;">
+											<span style="color: #333333;">分值：</span>
+										</div>
+
+										<div class="exam-question-num" style="display: inline;">
+											<span class="set-points" style="color: #007DDB;font-size: 20px;">{{value.spare2}}</span>
+											<span style="color: #666666;">&nbsp;分</span>
+										</div>
+									</div>
+
+				</div>
+
+				<div class="one-question-title" style="margin-top: 30px;margin-left: 20px;">
+					<span style="color: #333333;font-size: 17px;"> {{value.title}}
+				</div>
+
+
+				<div class="one-question-detial" style="margin-top: 30px;margin-left: 20px;">
+													
+					<div class="choice" style="border-left: 4px solid #5FB878;">
+														
+						<div class="layui-form options-container" style="margin-left: 3px;">
+
+							<input type="radio" name="sex" title="{{value.options}}">
+														
+						</div>
+
+					</div>
+													
+					<div class="right-answer" style="border-left: 4px solid #FF5722;margin-top: 15px;">
+														
+						<div class ="right-answer-title" style="margin-left: 5px;">
+							<span style="color: #333333;font-size: 16px;"> 正确答案 </span>
+						</div>
+					<br>
+						<div class="right-answer-info" style="margin-left: 5px;">
+							<span> {{value.answer}} </span>
+						</div>
+
+				</div>
+
+				<div class="answer-jiexi" style="border-left: 4px solid #FFB800;margin-top: 15px;">
+
+					<div class="right-answer-title" style="margin-left: 5px;">
+						<span style="color: #333333;font-size: 16px;"> 试题解析 </span>
+					</div>
+					<br>
+					<div class="right-answer-info" style="margin-left: 5px;">
+						<span> {{ value.analysis }}</span>
+					</div>
+
+				</div>
+
+			</div>
+
+			<hr>
+
+</div>
+
+			{{/each}}
+
+		</script>
+	
+	
 	</head>
 
 	<body class="layui-layout-body" style="background-color: #F5F5F5;overflow-y:auto; overflow-x:auto;height:1500px;">
@@ -1768,8 +2080,8 @@
 				</div>
 				<!-- 头部区域（可配合layui已有的水平导航） -->
 				<div data-bankid="1" class="layui-nav layui-layout-left">
-					<li class="layui-nav-item">
-						<a class="header-font-color" href="">考试</a>
+					<li class="layui-nav-item exam-header">
+						<a class="header-font-color" href="Exam">考试</a>
 					</li>
 					<li class="layui-nav-item">
 						<a class="header-font-color" href="">题库</a>
@@ -1880,7 +2192,7 @@
 								</div>
 
 								<div class="create-exam-btn" style="width: 240px;margin-left: 18px;margin-top: 20px;margin-bottom: 15px;">
-									<button class="layui-btn layui-btn-fluid layui-btn-warm layui-btn-sm">创建试卷</button>
+									<button class="layui-btn layui-btn-fluid layui-btn-warm layui-btn-sm">更改试卷</button>
 								</div>
 
 							</div>

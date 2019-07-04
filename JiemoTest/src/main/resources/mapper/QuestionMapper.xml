@@ -71,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    question.questionId, title, options, answer, questionType, analysis, difficultDegree, editTime
+    question.questionId,questionSkill, title, options, answer, questionType, analysis, difficultDegree, editTime
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.neuedu.JiemoTest.entity.QuestionExample" >
     select
@@ -104,10 +104,10 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.neuedu.JiemoTest.entity.Question" >
-    insert into question (questionId, title, options, 
+    insert into question (questionId, title, questionSkill , options, 
       answer, questionType, analysis, 
       difficultDegree, editTime)
-    values (#{questionid,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{options,jdbcType=VARCHAR}, 
+    values (#{questionid,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR},#{questionskill,jdbcType=VARCHAR}, #{options,jdbcType=VARCHAR}, 
       #{answer,jdbcType=VARCHAR}, #{questiontype,jdbcType=INTEGER}, #{analysis,jdbcType=VARCHAR}, 
       #{difficultdegree,jdbcType=INTEGER}, #{edittime,jdbcType=INTEGER})
   </insert>
@@ -119,6 +119,9 @@
       </if>
       <if test="title != null" >
         title,
+      </if>
+      <if test="questionskill != null" >
+        questionSkill,
       </if>
       <if test="options != null" >
         options,
@@ -181,6 +184,9 @@
       <if test="record.title != null" >
         title = #{record.title,jdbcType=VARCHAR},
       </if>
+      <if test="record.questionskill != null" >
+        questionSkill = #{record.questionskill,jdbcType=VARCHAR},
+      </if>
       <if test="record.options != null" >
         options = #{record.options,jdbcType=VARCHAR},
       </if>
@@ -208,6 +214,7 @@
     update question
     set questionId = #{record.questionid,jdbcType=INTEGER},
       title = #{record.title,jdbcType=VARCHAR},
+      questionSkill = #{record.questionskill,jdbcType=VARCHAR},
       options = #{record.options,jdbcType=VARCHAR},
       answer = #{record.answer,jdbcType=VARCHAR},
       questionType = #{record.questiontype,jdbcType=INTEGER},
@@ -223,6 +230,9 @@
     <set >
       <if test="title != null" >
         title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="questionskill != null" >
+        questionSkill = #{questionskill,jdbcType=VARCHAR},
       </if>
       <if test="options != null" >
         options = #{options,jdbcType=VARCHAR},
@@ -248,6 +258,7 @@
   <update id="updateByPrimaryKey" parameterType="com.neuedu.JiemoTest.entity.Question" >
     update question
     set title = #{title,jdbcType=VARCHAR},
+      questionSkill = #{questionskill,jdbcType=VARCHAR},
       options = #{options,jdbcType=VARCHAR},
       answer = #{answer,jdbcType=VARCHAR},
       questionType = #{questiontype,jdbcType=INTEGER},
@@ -261,6 +272,14 @@
     <include refid="Base_Column_List" />
     from question,answer_info
     where question.questionId=answer_info.questionId and answer_info.paperId = #{paperid,jdbcType=INTEGER}
+  </select>
+  
+   <!-- ========================选择最新插入数据的id========================== -->
+  <resultMap id="id_int" type="java.lang.Integer" >
+    <id column="max(questionId)" property="questionid" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectLastInsert" resultType="java.lang.Integer">
+    select max(questionId) from question
   </select>
   
 </mapper>

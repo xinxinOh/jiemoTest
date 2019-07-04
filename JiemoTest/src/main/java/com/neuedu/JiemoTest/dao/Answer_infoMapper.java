@@ -36,4 +36,8 @@ public interface Answer_infoMapper {
     
     List<QuestionAnswerVO> getQuestionAndAnswerByPaperId(int paperid);
     
+    List<QuestionAnswerVO> getQuestionAndAnswerByPartId(int partid,int paperid);
+    
+    int studentSumScore(int paperid);
+    
 }

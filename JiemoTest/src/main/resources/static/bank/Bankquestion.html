@@ -76,6 +76,7 @@
 						tot = tot-1;
 						if(start >= tot){
 							start = start-count1;
+							start = start < 0 ? 0:start;
 						}
 						location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+start+"&count="+count1;
 					}
@@ -91,8 +92,8 @@
 				form.render('radio');
 				//各种基于事件的操作，下面会有进一步介绍
 			});
-			var ddegree= -1;
-			var qskill = -1;
+			var ddegree= '';
+			var qskill = '';
 			function editQuestion(questionid,title,questionskill,questiontype,options,answer,analysis,difficultdegree,questionskill){
 				
 				qskill=questionskill;
@@ -131,14 +132,17 @@
 					  		    +'    <option value="2">困难</option>'
 					  		    +'</select>'
 					  		    +'</div>'
+					  		    
 					  		    +'<div class="layui-input-inline">'
 					  		    +'  <select id="skill">'
 					  		    +'    <option value="">题目技能</option>'
-					  		    +'    <option value="0">分析能力</option>'
-					  		    +'    <option value="1">思辨能力</option>'
-					  		    +'    <option value="2">计算能力</option>'
-					  		    +'    <option value="3">综合能力</option>'
-					  		    +'    <option value="4">语言表达能力</option>'
+					  		    +'    <option value="IT技术">IT技术</option>'
+					  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+					  		    +'    <option value="招聘真题">招聘真题</option>'
+					  		    +'    <option value="资格证书">资格证书</option>'
+					  		    +'    <option value="学历教育">学历教育</option>'
+					  		    +'    <option value="培训学习">培训学习</option>'
+					  		    +'    <option value="综合测试">综合测试</option>'
 					  		    +'  </select>'
 					  		    +'</div>'
 					  		    +'</div>'
@@ -229,14 +233,14 @@
 							answer = ans==''?answer:ans;
 							difficultdegree = ed_dif == ''?difficultdegree:ed_dif;
 							questionskill = ed_skill == ''?questionskill:ed_skill;
-							alert(opt);
+							//alert(opt);
 							//var jsdata = '{"id":'+questionid+',"title":'+title+',"answer":'+ans+',"analysis":'+analysis+',"bankId":'+[[${bankId}]]+',"option":'+opt+',"type":0,"skill":'+questionskill+',"degree":'+difficultdegree+'}';
 							//alert(jsdata);
 							var Jsdata = '{"id":'+questionid+',"title":"'+title+'","answer":"'+ans+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"'+opt+'","type":0,"skill":"'+questionskill+'","degree":'+difficultdegree+'}';
 							//alert(Jsdata);
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -255,7 +259,7 @@
 					});
 					break;
 				case 1:
-					alert("多选题");
+					//alert("多选题");
 					var optStr = strToOption(options)
 					var ansStr = strToAns(answer);
 					layer.open({
@@ -284,14 +288,17 @@
 					  		    +'    <option value="2">困难</option>'
 					  		    +'</select>'
 					  		    +'</div>'
+					  		  	
 					  		    +'<div class="layui-input-inline">'
 					  		    +'  <select id="skill">'
 					  		    +'    <option value="">题目技能</option>'
-					  		    +'    <option value="0">分析能力</option>'
-					  		    +'    <option value="1">思辨能力</option>'
-					  		    +'    <option value="2">计算能力</option>'
-					  		    +'    <option value="3">综合能力</option>'
-					  		    +'    <option value="4">语言表达能力</option>'
+					  		    +'    <option value="IT技术">IT技术</option>'
+					  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+					  		    +'    <option value="招聘真题">招聘真题</option>'
+					  		    +'    <option value="资格证书">资格证书</option>'
+					  		    +'    <option value="学历教育">学历教育</option>'
+					  		    +'    <option value="培训学习">培训学习</option>'
+					  		    +'    <option value="综合测试">综合测试</option>'
 					  		    +'  </select>'
 					  		    +'</div>'
 					  		    +'</div>'
@@ -399,12 +406,12 @@
 							questionskill = ed_skill == ''?questionskill:ed_skill;
 							
 							
-							alert("/editQuestion?id="+questionid+"&&title="+title+"&&answer="+ans+"&&analysis="+analysis+"&&bankId="+[[${bankId}]]+"&&option= &&type=1&&skill="+questionskill+"&&degree="+difficultdegree);
+							//alert("/editQuestion?id="+questionid+"&&title="+title+"&&answer="+ans+"&&analysis="+analysis+"&&bankId="+[[${bankId}]]+"&&option= &&type=1&&skill="+questionskill+"&&degree="+difficultdegree);
 							var Jsdata = '{"id":'+questionid+',"title":"'+title+'","answer":"'+ans+'","analysis":"'+analysis+'","bankId":'+[[${bankId}]]+',"option":"'+opt+'","type":1,"skill":"'+questionskill+'","degree":'+difficultdegree+'}';
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -449,14 +456,17 @@
 					  		    +'    <option value="2">困难</option>'
 					  		    +'</select>'
 					  		    +'</div>'
+					  		    
 					  		    +'<div class="layui-input-inline">'
 					  		    +'  <select id="skill">'
 					  		    +'    <option value="">题目技能</option>'
-					  		    +'    <option value="0">分析能力</option>'
-					  		    +'    <option value="1">思辨能力</option>'
-					  		    +'    <option value="2">计算能力</option>'
-					  		    +'    <option value="3">综合能力</option>'
-					  		    +'    <option value="4">语言表达能力</option>'
+					  		    +'    <option value="IT技术">IT技术</option>'
+					  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+					  		    +'    <option value="招聘真题">招聘真题</option>'
+					  		    +'    <option value="资格证书">资格证书</option>'
+					  		    +'    <option value="学历教育">学历教育</option>'
+					  		    +'    <option value="培训学习">培训学习</option>'
+					  		    +'    <option value="综合测试">综合测试</option>'
 					  		    +'  </select>'
 					  		    +'</div>'
 					  		    +'</div>'
@@ -514,7 +524,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -561,14 +571,17 @@
 					  		    +'    <option value="2">困难</option>'
 					  		    +'</select>'
 					  		    +'</div>'
+					  		    
 					  		    +'<div class="layui-input-inline">'
 					  		    +'  <select id="skill">'
 					  		    +'    <option value="">题目技能</option>'
-					  		    +'    <option value="0">分析能力</option>'
-					  		    +'    <option value="1">思辨能力</option>'
-					  		    +'    <option value="2">计算能力</option>'
-					  		    +'    <option value="3">综合能力</option>'
-					  		    +'    <option value="4">语言表达能力</option>'
+					  		    +'    <option value="IT技术">IT技术</option>'
+					  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+					  		    +'    <option value="招聘真题">招聘真题</option>'
+					  		    +'    <option value="资格证书">资格证书</option>'
+					  		    +'    <option value="学历教育">学历教育</option>'
+					  		    +'    <option value="培训学习">培训学习</option>'
+					  		    +'    <option value="综合测试">综合测试</option>'
 					  		    +'  </select>'
 					  		    +'</div>'
 					  		    +'</div>'
@@ -643,7 +656,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -689,14 +702,17 @@
 					  		    +'    <option value="2">困难</option>'
 					  		    +'</select>'
 					  		    +'</div>'
+					  		    
 					  		    +'<div class="layui-input-inline">'
 					  		    +'  <select id="skill">'
 					  		    +'    <option value="">题目技能</option>'
-					  		    +'    <option value="0">分析能力</option>'
-					  		    +'    <option value="1">思辨能力</option>'
-					  		    +'    <option value="2">计算能力</option>'
-					  		    +'    <option value="3">综合能力</option>'
-					  		    +'    <option value="4">语言表达能力</option>'
+					  		    +'    <option value="IT技术">IT技术</option>'
+					  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+					  		    +'    <option value="招聘真题">招聘真题</option>'
+					  		    +'    <option value="资格证书">资格证书</option>'
+					  		    +'    <option value="学历教育">学历教育</option>'
+					  		    +'    <option value="培训学习">培训学习</option>'
+					  		    +'    <option value="综合测试">综合测试</option>'
 					  		    +'  </select>'
 					  		    +'</div>'
 					  		    +'</div>'
@@ -754,7 +770,7 @@
 							
 							$.ajax({
 								type:"POST"
-								,dataType:'json'
+								,dataType:'text'
 								,contentType: "application/json;charset=UTF-8"
 								,data:Jsdata
 								,url:"/editQuestion"
@@ -773,7 +789,7 @@
 					});
 					break;
 				default:
-					alert("其它");
+					//alert("其它");
 					break;
 				}
 
@@ -830,14 +846,16 @@
 				  		    +'</select>'
 				  		    +'</div>'
 				  		    
-				  		    +'<div class="layui-input-inline">'
+				  		  	+'<div class="layui-input-inline">'
 				  		    +'  <select id="skill">'
 				  		    +'    <option value="">题目技能</option>'
-				  		    +'    <option value="0">分析能力</option>'
-				  		    +'    <option value="1">思辨能力</option>'
-				  		    +'    <option value="2">计算能力</option>'
-				  		    +'    <option value="3">综合能力</option>'
-				  		    +'    <option value="4">语言表达能力</option>'
+				  		    +'    <option value="IT技术">IT技术</option>'
+				  		    +'    <option value="IT&EQ">IQ&EQ</option>'
+				  		    +'    <option value="招聘真题">招聘真题</option>'
+				  		    +'    <option value="资格证书">资格证书</option>'
+				  		    +'    <option value="学历教育">学历教育</option>'
+				  		    +'    <option value="培训学习">培训学习</option>'
+				  		    +'    <option value="综合测试">综合测试</option>'
 				  		    +'  </select>'
 				  		    +'</div>'
 				  		    +'</div>'
@@ -965,7 +983,7 @@
 				        var answer = '';
 				        if (type=='0'||type=='4') {
 				        	//单选和问答，从单选框中获取答案
-				        	ansert = $("#edit-bank-answer").val();
+				        	answer = $("#edit-bank-answer").val();
 				        }else if (type == '1'||type=='3') {
 							//多选和填空，从多选中组合答案
 				        	var sig_answers = $("#ed-answer-box").find(".ans-text");
@@ -1000,20 +1018,19 @@
 				        
 				        $.ajax({
 							type:"POST"
-							,dataType:'json'
+							,dataType:'text'
 							,contentType: "application/json;charset=UTF-8"
 							,data:Jsdata
 							,url:"/createQuestion"
-							,success:function(message){/* 
-								var start = 0;
-								var count1 = 5;
-								var tot = [[${totle}]]; */
+							,success:function(message){
 								var st = start;
 								var tot_add = tot+1;
-								if(tot_add%count1>0){
-									st = (tot_dd/count1)*count1-1;
+								if(tot_add%count1!=0){
+									st = parseInt(tot_add/count1)*count1;
+									//alert(">0++++++++"+st);
 								}else {
-									st = (tot_dd/count1-1)*count1-1;
+									st = (parseInt(tot_add/count1)-1)*count1;
+									//alert("=0++++++++"+st);
 								}
 								location.href ="/showQuestions?id="+[[${bankId}]]+"&start="+st+"&count="+count1;
 								layer.closeAll();
@@ -1323,7 +1340,7 @@
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
-								<a class="NavBar-a" href="" ><i class="layui-icon layui-icon-release" style="font-size: 26px; color: darkseagreen;"></i>我的分享</a>
+								<a class="NavBar-a" href="/showOrder?type=0" ><i class="layui-icon layui-icon-release" style="font-size: 26px; color: darkseagreen;"></i>分享</a>
 							</li>
 							<hr style="height:1px;">
 							<li class="NavBar-item">
@@ -1355,7 +1372,7 @@
 						</div>
 						
 						<div class="one-question-serial" style="display: inline;">
-							<span style="font-size: 20px;color: #5FB878;" th:text="${questionStat.index+begin}+'、'">&nbsp;&nbsp;</span>
+							<span style="font-size: 20px;color: #5FB878;" th:text="${questionStat.index+start_+1}+'、'">&nbsp;&nbsp;</span>
 						</div>
                                                                               
                         <!--题型 填空选择-->
@@ -1368,13 +1385,10 @@
 							<span th:case="'*'" class="layui-badge" style="background-color:#5FB878;"> &nbsp;其他&nbsp;</span>						
 						</div>
 
-						<div class="one-question-skill" style="display: inline;margin-right: 5px;" th:switch="${question.questionskill}">
+						<div class="one-question-skill" style="display: inline;margin-right: 5px;">
 						<!--问题技能-->
-							<span th:case="0" class="layui-badge" style="background-color:#5FB878;"> &nbsp;分析能力&nbsp;</span>
-							<span th:case="1" class="layui-badge" style="background-color:#5FB878;"> &nbsp;思辨能力&nbsp;</span>
-							<span th:case="2" class="layui-badge" style="background-color:#5FB878;"> &nbsp;计算能力&nbsp;</span>
-							<span th:case="3" class="layui-badge" style="background-color:#5FB878;"> &nbsp;综合能力&nbsp;</span>
-							<span th:case="4" class="layui-badge" style="background-color:#5FB878;"> &nbsp;语言表达能力&nbsp;</span>
+							<span th:text="${question.questionskill}" class="layui-badge" style="background-color:#5FB878;"></span>
+							
 						</div>
 
 						<div class="one-question-degree" style="display: inline;margin-right: 5px;" th:switch="${question.difficultdegree}">

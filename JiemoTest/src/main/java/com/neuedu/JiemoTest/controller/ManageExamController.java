@@ -3,7 +3,9 @@ package com.neuedu.JiemoTest.controller;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,20 @@ public class ManageExamController {
 	@Autowired
 	ManageExamService manageExamService;
 	
+	@RequestMapping("/FileExam")
+	public String toExam(){
+		
+		return "FileExam";
+		
+	}
+	
+	@RequestMapping("/RecycleBin")
+	public String toRecycleBin(){
+		
+		return "RecycleBin";
+		
+	}
+	
 	@RequestMapping("/PublishExam")
 	public @ResponseBody String PublishExam(@RequestParam("examid") int examid,
 											  @RequestParam("startTime") int startTime,
@@ -40,13 +56,59 @@ public class ManageExamController {
 		
 	}
 	
+	@RequestMapping("/ChangePublishExam")
+	public @ResponseBody String ChangePublishExam(@RequestParam("examid") int examid,
+											  @RequestParam("startTime") int startTime,
+											  @RequestParam("endTime") int endTime,
+											  HttpServletRequest request){
+
+		String ret = manageExamService.ChangePublishExam(examid, startTime, endTime);
+
+		return ret; //返回字符串
+		
+		
+	}
+	
 	@RequestMapping("/toEditExam")
-	public String EditExam(HttpServletRequest request){
+	public String EditExam(HttpServletResponse response,HttpServletRequest request){
+		
 		int examid = Integer.parseInt(request.getParameter("examId"));
 		HttpSession session = request.getSession();
 		session.setAttribute("EditExamId", examid);
 
 		return "EditExam"; //返回字符串
+		
+		
+	}
+	
+	@RequestMapping("/CheckExamUser")
+	public @ResponseBody String CheckExamUser(@RequestParam("examId") int examId,HttpServletResponse response,HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		String userinfo = (String) session.getAttribute("UserInfo"); 
+		JSONObject userJson = JSONObject.parseObject(userinfo);
+		UserInfo userInfo=JSON.toJavaObject(userJson, UserInfo.class);
+		
+		if(userInfo == null) {
+			return "0 请先登录";
+		}
+		
+		Cookie[] cookies = request.getCookies();	
+	    for(Cookie cookie : cookies){
+	        if(cookie.getName().equals("Operation")){
+	            return "0 请再等15秒后操作";
+	        }
+	    }
+	    
+	    
+	    Cookie cookie = new Cookie("Operation","1");
+		cookie.setMaxAge(15);
+		response.addCookie(cookie);
+		
+		int userId = userInfo.getUserid();
+		String ret = manageExamService.CheckExamUser(userId, examId);
+
+		return ret; //返回字符串
 		
 		
 	}
@@ -104,7 +166,7 @@ public class ManageExamController {
 		
 		HashMap map = new HashMap();
 		
-		map.put("QuestionList", questions);
+		map.put("PartQuestionList", questions);
 		
 		String str = JSON.toJSONString(map); // 利用fastjson转换字符串
 		
@@ -112,5 +174,102 @@ public class ManageExamController {
 
 	}
 	
+	@RequestMapping("/deleteAllExamInfo")
+	public @ResponseBody String deleteAllExamInfo(HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		Integer EditExamId =  (Integer) session.getAttribute("EditExamId"); 
+		
+		String ret = manageExamService.deleteExamInfo(EditExamId);
+		
+		return ret;
+		
+	}	
+	
+	@RequestMapping("/PlaceExamOnFile")
+	public @ResponseBody String PlaceExamOnFile(@RequestParam("examId") Integer examId,HttpServletRequest request){
+		
+		String ret= manageExamService.PlaceExamOnFile(examId);
+		
+		return ret; //返回字符串
 
+	}
+	
+	@RequestMapping("/DeleteExam")
+	public @ResponseBody String DeleteExam(@RequestParam("examId") Integer examId,HttpServletRequest request){
+		
+		String ret= manageExamService.DeleteExam(examId);
+		
+		return ret; //返回字符串
+		
+	}
+	
+	@RequestMapping("/RenewExam")
+	public @ResponseBody String RenewExam(@RequestParam("examId") Integer examId,HttpServletRequest request){
+		
+		String ret= manageExamService.RenewExam(examId);
+		
+		return ret; //返回字符串
+		
+	}
+
+	@RequestMapping("/Alldelete")
+	public @ResponseBody String RenewExamFromBin(@RequestParam("examId") Integer examId,HttpServletRequest request){
+		
+		String ret = manageExamService.deleteExamInfo(examId);
+		
+		return ret; //返回字符串
+		
+	}
+	
+	@RequestMapping("/getFileExamList")
+	public @ResponseBody String getFileExamList(HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		String userinfo = (String) session.getAttribute("UserInfo"); 
+		JSONObject userJson = JSONObject.parseObject(userinfo);
+		UserInfo userInfo=JSON.toJavaObject(userJson, UserInfo.class);
+		
+		if(userInfo == null) {
+			return "0 请先登录";
+		}
+		
+		List<Exam> ExamList= manageExamService.SearchFileExam(userInfo.getUserid());
+		
+		HashMap map = new HashMap();
+		
+		map.put("FileExamList", ExamList);
+		
+		String str = JSON.toJSONString(map); // 利用fastjson转换字符串
+		System.out.println(str);
+		return str; //返回字符串
+		
+		
+	}
+	
+	@RequestMapping("/getDeleteExamList")
+	public @ResponseBody String getDeleteExamList(HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		String userinfo = (String) session.getAttribute("UserInfo"); 
+		JSONObject userJson = JSONObject.parseObject(userinfo);
+		UserInfo userInfo=JSON.toJavaObject(userJson, UserInfo.class);
+		
+		if(userInfo == null) {
+			return "0 请先登录";
+		}
+		
+		List<Exam> ExamList= manageExamService.SearchDeleteExam(userInfo.getUserid());
+		
+		HashMap map = new HashMap();
+		
+		map.put("DeleteExamList", ExamList);
+		
+		String str = JSON.toJSONString(map); // 利用fastjson转换字符串
+		System.out.println(str);
+		return str; //返回字符串
+		
+		
+	}
+	
 }

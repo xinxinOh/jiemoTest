@@ -22,44 +22,57 @@
 			var chnUnitChar = ["","十","百","千"];
 			var element = layui.element;
 				element.init();
-				
+			
 			//重置导航中的部分名称
 			function resetPartNameInfo(){
-				var partBtnContainer = $(".exam-basic-info");
+				
 				var partList = $(".part-name-input");
+				var btnNum = $(".exam-btn-container").children().length;
+				for(var i = 0 ; i < partList.length - btnNum + 1 ; i++){
+					var part_btn = '<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">'+
+					'<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878">第1部分</button>'+
+					'</div>';
+					$(".exam-btn-container").append(part_btn);
+				}
+				var partBtnContainer = $(".exam-basic-info");
 				for(var i = 0 ; i < partList.length ; i++){
 					partBtnContainer.eq(i+1).children("button").text(partList.eq(i).val());
 				}
+				
+				
 			}
 			
 			function checkChoosedQuestion(){
 				
 				var target_part_list = $(".part");
 				var target_part = "";
-				for(var i = 0 ; i < target_part_list.length ; i++){
-					if(target_part_list.eq(i).attr("data-partserial") == partserial){
-							target_part = target_part_list.eq(i);
-					}
-				}
-				
-				var part_question = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
+				var allQuestionId = new Array();
+				var allQuestionContainer = $(".question-container");
 				var nowId = new Array();
+				for(var i = 0 ; i < target_part_list.length ; i++){
+					
+				target_part = target_part_list.eq(i);
+
+				var part_question = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
 				var IfRemove=0;
-                for(var i = 0 ; i < part_question.length ; i++){
-					if($.inArray(part_question.eq(i).attr("data-questionid"),nowId) >=0 ){
-							part_question.eq(i).remove();
+	
+                for(var j = 0 ; j < part_question.length ; j++){
+					if($.inArray(part_question.eq(j).attr("data-questionid"),nowId) >=0 ){
+							part_question.eq(j).remove();
 							IfRemove = IfRemove+1;
 					}else{
-						nowId.push(part_question.eq(i).attr("data-questionid"));
+						nowId.push(part_question.eq(j).attr("data-questionid"));
 					}
 				}
+                
                 if(IfRemove > 0){
                 	layer.msg('已自动过滤重复题目'+IfRemove+'道');
                 }
                 var part_question_list = target_part.children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
-				for(var i = 0 ; i < part_question_list.length ; i++){
-						
-					part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
+				for(var j = 0 ; j < part_question_list.length ; j++){
+					part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((j+1)+"、  ");
+				}
+				
 				}
 				
 			}
@@ -627,6 +640,7 @@
 							}
 							td.html(newtxt);
 							resetPartPointsNum();
+							resetPartTable();
 						}
 					});
 				});
@@ -1114,13 +1128,13 @@
 					'<div class="question-manage-info" style="background-color: #F5F5F5;">'+
 					'<div class="question-manage-btn" style="margin-left: 10px;margin-top: 10px;">'+
 					'<span style="color: #333333;font-size: 14px;">对选中试题的操作：</span>'+
-					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-up-btn" style="margin-top: 10px;margin-bottom: 10px;">'+
 					'&nbsp;&nbsp;&nbsp;&nbsp;↑上移&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'</button>'+
-					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-down-btn" style="margin-top: 10px;margin-bottom: 10px;">'+
 					'&nbsp;&nbsp;&nbsp;&nbsp;↓下移&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'</button>'+
-					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-delete-btn" style="margin-top: 10px;margin-bottom: 10px;">'+
 					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'</button>'+
 					'<button type="button" class="layui-btn layui-btn-sm layui-bg-red delete-part-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 350px;">'+
@@ -1238,6 +1252,28 @@
 					for(var i = 0 ; i < partIntro.length ; i++){
 						partIntroArray[i] = partIntro.eq(i).val();
 					}
+					
+					var part = $(".question-container");
+					var questionIdArray = new Array();
+					var questionPointsArray = new Array();
+					for(var i = 0 ; i < part.length ; i++){
+						questionIdArray[i]="";
+						questionPointsArray[i]="";
+						for(var j = 1 ; j < part.eq(i).children().length ; j++){
+							questionIdArray[i] = questionIdArray[i] + part.eq(i).children().eq(j).attr("data-questionid") + " ";
+							questionPointsArray[i] = questionPointsArray[i] + part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() + " ";						
+						    if(part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() == "0"){
+						    	layer.msg('您有题目分数未设置，请重新检查！');
+						        return;
+						    }
+						}
+						
+						if(questionPointsArray[i] == ""){
+							layer.msg('您有部分未添加题目，请重新检查！');
+						        return;
+						}
+						
+					}
 										
                     $.ajax({
 					async: false,
@@ -1254,7 +1290,7 @@
 						return;
 					}
 				});
-				var Exam={'examtitle':examTitle,'examintroduction':examIntro,'duration':examTime,'questionnum':questionNum,'pointssum':questionPoints,'examstate':0,'maxTimes':1,'userid':userid}
+				var Exam={'examtitle':examTitle,'examintroduction':examIntro,'duration':examTime,'questionnum':questionNum,'pointssum':questionPoints,'examstate':0,'maxtimes':0,'userid':userid,'spare1':0}
 	            console.log(JSON.stringify(Exam));
 	            
 	            var Examid = -1;
@@ -1274,20 +1310,6 @@
 						return;
 					}
 				});
-				
-				var part = $(".question-container");
-				var questionIdArray = new Array();
-				var questionPointsArray = new Array();
-				for(var i = 0 ; i < part.length ; i++){
-					questionIdArray[i]="";
-					questionPointsArray[i]="";
-					for(var j = 1 ; j < part.eq(i).children().length ; j++){
-
-						questionIdArray[i] = questionIdArray[i] + part.eq(i).children().eq(j).attr("data-questionid") + " ";
-						questionPointsArray[i] = questionPointsArray[i] + part.eq(i).children().eq(j).children(".one-question-introduction").children(".one-question-points").children(".exam-question-num").children(".set-points").text() + " ";						
-					}
-
-				}
 				
 				//加入part
 				var partId = new Array();
@@ -1340,16 +1362,17 @@
 				$("body").on("click", ".delete-part-btn", function() {
 					
 					$(this).parent().parent().parent().parent().parent().remove();
-					var partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					$(".exam-btn-container").children().eq(parseInt(partSerial)).remove();
 					
 					resetPartSerial();
 					resetPartQuestionNum();
 					resetPartPointsNum();
+					resetPartNameInfo();
 				});
 
 				$("body").on("click", ".part-question-delete-btn", function() {
-					
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					var target_part = $(this).parent().parent().parent().parent().parent();
 					var target_question_list = $(this).parent().parent().next().children(".one-question");
 					for(var i = 0 ; i < target_question_list.length ; i++){
@@ -1363,12 +1386,14 @@
 					for(var i = 0 ; i < part_question_list.length ; i++){
 						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
 					}
-					
-					
+					resetPartSerial();
+					resetPartQuestionNum();
+					resetPartPointsNum();
+					resetPartTable();
 				});
 				
 				$("body").on("click", ".part-question-up-btn", function() {
-					
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					var target_part = $(this).parent().parent().parent().parent().parent();
 					var target_question_list = $(this).parent().parent().next().children(".one-question");
 					for(var i = 0 ; i < target_question_list.length ; i++){
@@ -1385,13 +1410,13 @@
 						
 						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
 					}
-					
+					resetPartTable();
 					var form = layui.form;
 					form.render();
 				});
 				
 				$("body").on("click", ".part-question-down-btn", function() {
-					
+					partSerial = $(this).parent().parent().parent().parent().parent().attr("data-partserial");
 					var target_part = $(this).parent().parent().parent().parent().parent();
 					var target_question_list = $(this).parent().parent().next().children(".one-question");
 					for(var i = 0 ; i < target_question_list.length ; i++){
@@ -1408,6 +1433,7 @@
 						
 						part_question_list.eq(i).children(".one-question-introduction").children(".one-question-serial").children("span").text((i+1)+"、  ");
 					}
+					resetPartTable();
 					
 					var form = layui.form;
 					form.render();
@@ -1469,21 +1495,18 @@
 					</div>
 
 					<div class="one-question-degree" style="display: inline;margin-right: 5px;">
-						{{if value.questiontype == "0"}}
+						{{if value.difficultdegree == "0"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：易&nbsp;</span> 
 						{{/if}}
 						
-						{{if value.questiontype == "1"}}
+						{{if value.difficultdegree == "1"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：中&nbsp;</span>
 						{{/if}}
 						
-						{{if value.questiontype == "2"}}
+						{{if value.difficultdegree == "2"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
 						{{/if}}
-						
-						{{if value.questiontype == "3"}}
-						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
-						{{/if}}
+
 					</div>
 
 					<div class="one-question-zhankai" style="display: inline;margin-left: 10px;margin-right: 5px;">
@@ -1554,7 +1577,7 @@
 				<!-- 头部区域（可配合layui已有的水平导航） -->
 				<div data-bankid="1" class="layui-nav layui-layout-left">
 					<li class="layui-nav-item">
-						<a class="header-font-color" href="">考试</a>
+						<a class="header-font-color" href="Exam">考试</a>
 					</li>
 					<li class="layui-nav-item">
 						<a class="header-font-color" href="">题库</a>
@@ -1803,7 +1826,10 @@
 											<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-delete-btn" style="margin-top: 10px;margin-bottom: 10px;">
 													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											</button>
-											<button type="button" class="layui-btn layui-btn-normal layui-btn-sm add-exam-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 475px;">
+											<button type="button" class="layui-btn layui-btn-sm layui-bg-red delete-part-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 350px;">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除部分&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</button>
+											<button type="button" class="layui-btn layui-btn-normal layui-btn-sm add-exam-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 30px;">
 													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+添加试题&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 											</button>
 										</div>
