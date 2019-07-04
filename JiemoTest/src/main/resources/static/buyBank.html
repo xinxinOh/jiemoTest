@@ -20,14 +20,8 @@
 
 			$(".layui-body").scroll(function() {
 				var scroll = parseInt($(".layui-body").scrollTop());
-				//屏幕的高度
 				var client = parseInt($(".abc").height() + 55);
 				var h = parseInt($(document).height());
-
-				console.log(scroll);
-				console.log(client);
-				console.log(h);
-
 				console.log("------------------");
 				if(h + scroll >= client) { // 到达底部时,加载新内容
 					continueLoad();

@@ -80,7 +80,6 @@ public class AnsweredPapersServiceImpl implements AnsweredPapersService{
 		Criteria criteria = example.createCriteria();
 		criteria.andExamidEqualTo(examID).andIfteacherdeleteEqualTo(0);
 		List<PaperTest> paperTests=paperTestMapper.selectByExample(example);
-		// TODO Auto-generated method stub
 		return paperTests;
 	}
 
@@ -137,7 +136,6 @@ public class AnsweredPapersServiceImpl implements AnsweredPapersService{
 		record.setPaperid(paperid);
         record.setQuestionid(questionid);	
         record.setCorrectstate(1);
-		// TODO Auto-generated method stub
 		int a=answer_infoMapper.updateByPrimaryKeySelective(record);
 		int sumscore=answer_infoMapper.studentSumScore(paperid);
 		
@@ -221,7 +219,7 @@ public class AnsweredPapersServiceImpl implements AnsweredPapersService{
 		// TODO Auto-generated method stub
 		PaperTest record=new PaperTest();
 		record.setPaperid(paperid);
-		record.setIfteacherdelete(1);;//0未答卷  1正在答卷   2待批改   3已批改
+		record.setIfteacherdelete(1);
 		int i=paperTestMapper.updateByPrimaryKeySelective(record);
 		
 		return i;

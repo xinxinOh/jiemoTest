@@ -86,22 +86,18 @@ public class BankServiceImpl implements BankService{
 		criteria.andUseridEqualTo(userid);
 		criteria.andBankidEqualTo(bankid);
 		int ret=bankMapper.countByExample(example);
-		System.out.println("ret:"+ret);
 		
 		BankExample example2=new BankExample();//第一种情况 题库是买过的sourceid和输入值符合
 		com.neuedu.JiemoTest.entity.BankExample.Criteria criteria2=example2.createCriteria();
 		criteria2.andUseridEqualTo(userid);
 		criteria2.andSourcebankidEqualTo(bankid);
-		int ret2=bankMapper.countByExample(example2);
-		System.out.println("ret2:"+ret2);
-		
+		int ret2=bankMapper.countByExample(example2);	
 		//两种情况只要有一种为1 说明拥有此题库 返回较大的即可
-		if(ret>ret2) {
+		if(ret>ret2) 
 			return ret;
-		}
-		else {
+		else 
 			return ret2;
-		}
+		
 	
 	}
 

@@ -29,7 +29,7 @@
 		        var values=[];    //纵坐标数组（实际用来盛放Y坐标值）
 		        $.ajax({
 		            type : "post",
-		            async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+		            async : true,            //异步请求
 		            url : "EchartsShow",    //请求发送到dataActiont处
 		            data : {"examid":examid},
 		            dataType : "json",        //返回数据形式为json
@@ -263,11 +263,9 @@
 								table.render({
 									elem: '#demo',
 									height: 450,
-									url: 'showAnswered' //数据接口
-										,
+									url: 'showAnswered' ,//数据接口		
 									title: '试卷表',
-									page: true //开启分页
-										,
+									page: true, //开启分页		
 									where: {'examid':examid} ,
 									
 									toolbar:'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
@@ -369,8 +367,6 @@
 											} else {
 												layer.msg(data[0].paperid);
 												for(var i=0;i<data.length;i++){	    		
-													//data[i].del(); //删除对应行（tr）的DOM结构
-													//$("p").parent(".selected")
 													deletePaper(data[i].paperid);
 													var allpaperidTd = $("[data-field=paperid]");
 													for(var j = 0 ; j < allpaperidTd.length ; j++){
@@ -378,8 +374,7 @@
 															allpaperidTd.eq(j).children("div").parent().parent().remove();
 														}
 													}
-												}
-											    
+												}    
 											}
 											break;
 									};

@@ -34,7 +34,6 @@ public class LoadGoodsImpl implements LoadGoodsService{
 	@Override
 	public List<Goods> loadGoods(int type,int start,int end,String type2) {//type1 0 题库 1 考试；type 2 字符串型 0初始加载 其他为标签
 		List<Goods> goods=new ArrayList<Goods>();
-		// TODO Auto-generated method stub
 		GoodsExample example=new GoodsExample();
 		example.setOrderByClause("spare_1 DESC limit "+start+","+end);
 		Criteria criteria=example.createCriteria();
@@ -43,7 +42,6 @@ public class LoadGoodsImpl implements LoadGoodsService{
 		}
 		else {
 			criteria.andGoodstagEqualTo(type2);
-			System.out.println("afkaf--------------");
 		}
 		goods=goodsMapper.selectByExample(example);
 		return goods;
@@ -56,10 +54,8 @@ public class LoadGoodsImpl implements LoadGoodsService{
 		GoodsExample example=new GoodsExample();
 		example.setOrderByClause("spare_1 DESC limit "+start+","+end);
 		Criteria criteria=example.createCriteria();
-		criteria.andGoodstypeEqualTo(type);//题库还是考试
-		
+		criteria.andGoodstypeEqualTo(type);		
 		if(!keyword.isEmpty()){
-		    //通配符%需要手动加上
 			criteria.andSpare3Like("%"+keyword+"%");
 		}
 		goods=goodsMapper.selectByExample(example);

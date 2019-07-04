@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.neuedu.JiemoTest.entity.Bank;
 import com.neuedu.JiemoTest.entity.Goods;
 import com.neuedu.JiemoTest.entity.PaperTest;
@@ -139,9 +140,10 @@ public class wShopController {
 		//4 已登录 积分充足 本人无该题库  返回购买成功 可去本人题库查看 并将商品购买数加1，生成订单记录，卖家积分增加，本人积分减少
 		
 		//UserInfo user = (UserInfo) request.getSession().getAttribute("user");
-		UserInfo user=new UserInfo();
-		user.setUserid(1);
-		user.setBonuspoints(111);
+		HttpSession session = request.getSession();
+		String userinfo = (String) session.getAttribute("UserInfo"); 
+		JSONObject userJson = JSONObject.parseObject(userinfo);
+		UserInfo user=JSON.toJavaObject(userJson, UserInfo.class);
 		
 		float price=Float.parseFloat(goodsprice);
 		int intprice=(int)price;

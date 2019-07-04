@@ -157,9 +157,7 @@ function initGoods(type) {  //search=0时 代表未在搜索，type值为标签 
 function continueLoad(){
 	var start = parseInt($('.bank-info').children().length);
   	var end=start+3;
-   
   	var Surl="loadBank?start="+start+"&end="+end+"&type="+cate+"&search="+search;
- 
   	$.ajax({
   		type: "GET",
   		url: Surl,

@@ -17,7 +17,7 @@
 
 	</head>
 
-	<body class="layui-layout-body" style="background-color: #F5F5F5;overflow-y:auto; overflow-x:auto;height:1500px;">
+	<body class="layui-layout-body" style="background-color: #F5F5F5;overflow-y:auto; overflow-x:auto;height:auto;">
 	
 	<div style="display:none;">
 				<span  class="paperid" style="font-size: 20px;color: #5FB878;" th:id="${paperid}" th:text="${paperid}"></span>
@@ -250,9 +250,7 @@
 										<legend>
 											<i class="layui-icon layui-icon-form xinxi" style="font-size:20px;color:#5FB878;font-weight: bold;" th:text="${part.partname}"></i>
 										</legend>
-
-										<div class="question-container" id="question-container">
-											
+										<div class="question-container" id="question-container">							
 											<div class="one-question" style="margin-left: 10px;margin-top: 15px;"  th:each="questionAnswerVO:${part__${part.partid}__}"  >
 												<div class="one-question-introduction">
 				
@@ -317,10 +315,10 @@
 														<div class="layui-form-item" style="margin-bottom:0px;" th:each="option:${#strings.arraySplit(questionAnswerVO.options, '#^#')}">
   															    <div th:switch = "${ #strings.contains(questionAnswerVO.answercontent, #strings.substring(option,0,1)  ) }" >
                                                                       <div th:case="true">
-                                                                      <i class="layui-icon layui-icon-radio" style="font-size: 15px; color:#4E5465;"  th:text="'&nbsp;&nbsp;'+${option}" th:id="${option}"></i>
+                                                                      <i class="layui-icon layui-icon-radio" style="font-size: 15px; color:#4E5465;"  th:text="'&nbsp;&nbsp;'+${option}" ></i>
                                                                       </div>
 														         	 <div th:case="false">
-                                                                      <i class="layui-icon layui-icon-circle" style="font-size: 15px; color:#4E5465;"  th:text="${'&nbsp;&nbsp;'+option}" th:id="${option}"></i>
+                                                                      <i class="layui-icon layui-icon-circle" style="font-size: 15px; color:#4E5465;"  th:text="'&nbsp;&nbsp;'+${option}" ></i>
                                                                       </div>
 																</div>	
 			                                            	<br>
