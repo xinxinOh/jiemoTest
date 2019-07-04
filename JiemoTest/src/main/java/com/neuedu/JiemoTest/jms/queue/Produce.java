@@ -36,7 +36,6 @@ public class Produce {
 	 */
 	
 	public  void sendBankQuestion(String keys){
-		//将对象u先转成json字符串,再插入到队列中
 		//利用该方法,向队列中插入一个消息 , 
 		//参数1: 目标队列
 		System.out.println(keys);
