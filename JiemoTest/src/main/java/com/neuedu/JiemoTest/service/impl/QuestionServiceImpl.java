@@ -114,7 +114,7 @@ public class QuestionServiceImpl implements QuestionService {
 			questionInBank.insert(record);
 		}
 	}
-
+	
 	@Override
 	public void create(int bankid, Question question) {
 		// TODO Auto-generated method stub

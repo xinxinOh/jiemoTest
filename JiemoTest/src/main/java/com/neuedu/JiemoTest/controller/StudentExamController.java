@@ -71,7 +71,8 @@ public class StudentExamController {
 		int PaperId = Integer.parseInt(request.getParameter("PaperId"));
 		HttpSession session = request.getSession();
 		session.setAttribute("PaperId", PaperId);
-
+		
+		
 		return "AnswerPaper"; //返回字符串
 		
 		
@@ -117,6 +118,51 @@ public class StudentExamController {
 		
 	}
 	
-	
+	@RequestMapping("/AddStartAnswerInfo")
+	public @ResponseBody String AddStartAnswerInfo(@RequestParam("questionId") Integer questionId,
+											  @RequestParam("questionSerial") Integer questionSerial,
+											  HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		Integer PaperId =  (Integer) session.getAttribute("PaperId"); 
+		
+		String ret = answerPaperService.AddStartAnswerInfo(PaperId, questionId, questionSerial);
 
+		return ret; //返回字符串
+		
+		
+	}
+	
+	@RequestMapping("/ChangeAnswerInfo")
+	public @ResponseBody String ChangeAnswerInfo(@RequestParam("questionId") Integer questionId,
+											  @RequestParam("questionSerial") Integer questionSerial,
+											  @RequestParam("questionAnswer") String questionAnswer,
+											  HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		Integer PaperId =  (Integer) session.getAttribute("PaperId"); 
+		
+		String ret = answerPaperService.ChangeAnswerInfo(PaperId, questionId, questionSerial,questionAnswer);
+
+		return ret; //返回字符串
+		
+		
+	}
+
+	@RequestMapping("/paperFinish")
+	public @ResponseBody String paperFinish(@RequestParam("startTime") Integer startTime,
+											  @RequestParam("endTime") Integer endTime,
+											  @RequestParam("windowTime") Integer windowTime,
+											  HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		Integer PaperId =  (Integer) session.getAttribute("PaperId"); 
+		
+		String ret = answerPaperService.paperFinish(PaperId, startTime, endTime,windowTime);
+
+		return ret; //返回字符串
+		
+		
+	}
+	
 }

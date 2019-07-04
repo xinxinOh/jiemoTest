@@ -77,16 +77,18 @@ public class CreateExamServiceImpl implements CreateExamService {
 
 		int nowtime = (int) (System.currentTimeMillis()/1000);
 		exam.setEdittime(nowtime);
-		
 		exam.setSourceexamid(-1);
-		
+		exam.setSpare1(0);
 		int ret = examMapper.insert(exam);
 		int examId = exam.getExamid();
+		
+		
 		if(ret==1) {
 			return "1"+" "+examId;
 		}else {
 			return "0 添加失败";
 		}
+		
 	}
 	
 	@Override

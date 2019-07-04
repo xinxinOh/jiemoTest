@@ -18,6 +18,10 @@
 			layui.use('element', function() {
 				var element = layui.element;
 			});
+			
+			var paperStartTime = Date.parse(new Date()) / 1000;
+			var windowsTime = 0;
+			var maxWindowsTime = -1;
 			var partserial = 1;
 			var chnNumChar = ["零","一","二","三","四","五","六","七","八","九"];
 			var chnUnitSection = ["","万","亿","万亿","亿亿"];
@@ -62,6 +66,8 @@
 						$(".exam-title-input").val(obj.examtitle);
 						$(".exam-intro-input").val(obj.examintroduction);
 						$(".exam-time").text(obj.duration);
+						maxWindowsTime= obj.maxtimes;
+						alert("考试中最大切换窗口"+maxWindowsTime+"次，超过该次数后会强制交卷。");
 						loadExamPartInfo();
 					},
 					error: function() {
@@ -86,9 +92,10 @@
 						resetPartNameInfo();
 						loadPartQuestionInfo();
 						addBlockToQuestion();//添加填空。
-						refreshStartSerial();
 						
-						AddQuestionIfAnswer();
+						AddQuestionIfAnswer();//添加做没做的提示
+						
+						AddStartAnswerInfo();//向后台添加初始的answer_info.
 
 //						resetPartQuestionNum();
 //						resetPartPointsNum();
@@ -101,6 +108,33 @@
 				
 			}
 			
+			function AddStartAnswerInfo(){
+				
+				var questionList = $(".one-question");
+				
+				for(var i = 0 ; i < questionList.length ; i++){
+					var a = {
+						'questionId': parseInt(questionList.eq(i).attr("data-questionid")),
+						'questionSerial': parseInt(questionList.eq(i).attr("data-questionserial")),
+						};
+
+					$.ajax({
+						async: false,
+						url: 'AddStartAnswerInfo',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+						
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+				}
+				
+			}
+			
 			function addBlockToQuestion(){
 				
 				var fillQuestion = $("[data-questiontype=3]");
@@ -108,36 +142,54 @@
 				for(var i = 0 ; i < fillQuestion.length ; i++){
 					
 					var fillNum = fillQuestion.eq(i).attr("data-answer").split("#^#").length;
-					
+					var questionSerail = fillQuestion.eq(i).attr("data-questionserial");
 					for(var j = 0 ; j < fillNum ; j++){
 						var content = '<div class="layui-input-block" style="margin-left:25px;margin-bottom:15px;">'+
-								'<input style="width:80%" type="text" name="title" required lay-verify="required" placeholder="请按顺序填写答案" autocomplete="off" class="layui-input fill-question-input">'+
+								'<input style="width:80%" type="text" name="'+questionSerail+'" required lay-verify="required" placeholder="请按顺序填写答案" autocomplete="off" class="layui-input fill-question-input">'+
 							'</div>';
 						fillQuestion.eq(i).children(".one-question-detial").children(".choice").children(".options-container").append(content);
 					}
-					
+				    fillQuestion.eq(i).removeAttr("data-answer");	
 				}
-				fillQuestion.eq(i).removeAttr("data-answer");
+				
+				fillQuestion = $("[data-questiontype=4]");
+				
+				for(var i = 0 ; i < fillQuestion.length ; i++){
+					
+					var fillNum = fillQuestion.eq(i).attr("data-answer").split("#^#").length;
+					var questionSerail = fillQuestion.eq(i).attr("data-questionserial");
+					for(var j = 0 ; j < fillNum ; j++){
+						var content = '<div class="layui-input-block" style="margin-left:25px;margin-bottom:15px;">'+
+								'<textarea style="width:80%;height:150px" type="text" name="'+questionSerail+'" required lay-verify="required" placeholder="请填写答案" autocomplete="off" class="layui-input fill-question-textarea"></textarea>'+
+							'</div>';
+						fillQuestion.eq(i).children(".one-question-detial").children(".choice").css("height","150px");
+						fillQuestion.eq(i).children(".one-question-detial").children(".choice").children(".options-container").append(content);
+					}
+				    fillQuestion.eq(i).removeAttr("data-answer");	
+				}
+				
+				
 			}
 			
 			//初始添加问题是否已回答的统计
 			function AddQuestionIfAnswer(){
-				
+				var nowNum = 1;
 				var statisticList = $(".question-statistic-container");
 				var questionContainerList = $(".question-container");
 				for(var i = 0 ; i < statisticList.length ; i++){
 					
 					var questionNum = questionContainerList.eq(i).children(".one-question").length;
 					for(var j = 0 ; j < questionNum ; j++){
-						var content = '<div class="If-answer" style="margin-top:10px;margin-left:26px;display: inline-block;">'+
-									    '<div class="If-answer-img" style="padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+						var content = '<div class="If-answer" data-ifSerial = "'+nowNum+'" style="margin-top:10px;margin-left:26px;display: inline-block;">'+
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
 									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
 									    '</div>'+
 									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
-									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+(j+1)+'</span>'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+nowNum+'</span>'+
 									    '</div>'+
 									'</div>';
 						statisticList.eq(i).append(content);
+						nowNum++;
 					}
 					
 				}
@@ -147,18 +199,16 @@
 			//初始加载的时候初始化部分的序号和部分中问题的序号
 			function refreshStartSerial(){
 				
+				var nowNum = 1;
 				var target_part_list = $(".part");
 				for(var i = 0 ; i < target_part_list.length ; i++){
 					target_part_list.eq(i).attr("data-partserial",(i+1));
 					var part_question_list = target_part_list.eq(i).children(".part-question-info").children("fieldset").children(".question-container").children(".one-question");
 					for(var j = 0 ; j < part_question_list.length ; j++){
-						part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((j+1)+"、  ");
-				    }
-					
-					for(var j = 0 ; j < part_question_list.length ; j++){
-						part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((j+1)+"、  ");
-				    }
-					
+						part_question_list.eq(j).attr("data-questionSerial",nowNum);
+						part_question_list.eq(j).children(".one-question-introduction").children(".one-question-serial").children("span").text((nowNum)+"、  ");
+						nowNum++;
+				   }
 				}
 				
 			}
@@ -191,6 +241,7 @@
 						}
 					});
 				}
+				refreshStartSerial();
 				resetPartQuestionOptions();
 				
 			}
@@ -202,7 +253,7 @@
 				var btnNum = $(".exam-btn-container").children().length;
 				for(var i = 0 ; i < partList.length - btnNum + 1 ; i++){
 					var part_btn = '<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">'+
-					'<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878">第1部分</button>'+
+					'<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#FF5722">第1部分</button>'+
 					'</div>';
 					$(".exam-btn-container").append(part_btn);
 				}
@@ -216,10 +267,11 @@
 			//将部分中的选项标为已选和不可选
 			function resetPartQuestionOptions(){
 				var question = $(".question-container").children(".one-question");
+				
 				var i= 0 ;
 				var container_optionsContainer = $(".question-container").children(".one-question").children(".one-question-detial").children(".choice").children(".options-container");
 				while(i < question.length) {	
-
+					var serialNum = question.eq(i).attr("data-questionserial");
 					first_question = container_optionsContainer.eq(i).children("input");
 					var question_type = container_optionsContainer.eq(i).parent().parent().parent().attr("data-questiontype");
 
@@ -232,7 +284,7 @@
 						console.log(question_type);
 						for(var j = 0; j < split_info.length; j++) {
 							console.log(split_info[j]);
-							container_optionsContainer.eq(i).append('<input lay-filter="radioChoose" type="radio"  name="'+ i+'"  title="' + split_info[j] + '">' + '<br>');
+							container_optionsContainer.eq(i).append('<input lay-filter="radioChoose" type="radio"  name="'+ serialNum+'"  title="' + split_info[j] + '">' + '<br>');
 						}
 						i++;
 						continue;
@@ -247,7 +299,7 @@
 						console.log(question_type);
 						for(var j = 0; j < split_info.length; j++) {
 							console.log(split_info[j]);
-							container_optionsContainer.eq(i).append('<input style="color: #333;" type="checkbox" lay-skin="primary"  name="'+ i+'"  title="' + split_info[j] + '">' + '<br>'+ '<br>');
+							container_optionsContainer.eq(i).append('<input lay-filter="checkboxChoose" style="color: #333;" type="checkbox" lay-skin="primary"  name="'+ serialNum+'"  title="' + split_info[j] + '">' + '<br>'+ '<br>');
 						}
 						i++;
 						continue;
@@ -505,6 +557,146 @@
 			//交卷
 			function submitPaper(){
 				
+				//判断是否都答完题
+				layer.msg('1');
+				var allPart = $(".exam-basic-info");
+				for(var i = 0 ; i < allPart.length ; i++){
+					if(allPart.eq(i).children("button").css("background-color") == "rgb(255, 87, 34)"){
+											
+						layer.confirm('您有题目没有作答，是否选择交卷', {
+					 	 btn: ['确定','取消'] //按钮
+						}, function(){
+						
+					    EditAnswerInfo();
+					  
+						}, function(){
+					 	 alert(1);
+					 	});
+					 	return;
+					}
+				}
+				layer.confirm('确定交卷？', {
+					 	 btn: ['确定','取消'] //按钮
+						}, function(){
+						
+					    EditAnswerInfo();
+					  
+						}, function(){
+					 	 alert(1);
+				});
+			
+			}
+			
+			function EditAnswerInfo(){
+				
+				var questionList = $(".one-question");
+				
+				for(var i = 0 ; i < questionList.length ; i++){
+					var a = {
+						'questionId': parseInt(questionList.eq(i).attr("data-questionid")),
+						'questionSerial': parseInt(questionList.eq(i).attr("data-questionserial")),
+						'questionAnswer':getQuestionAnswer(questionList.eq(i),questionList.eq(i).attr("data-questiontype"))
+						};
+
+					$.ajax({
+						async: false,
+						url: 'ChangeAnswerInfo',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+						
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+				}
+				    var endTime = Date.parse(new Date()) / 1000;
+				    var a = {
+						'startTime':paperStartTime,
+						'endTime': endTime,
+						'windowTime':windowsTime
+						};
+
+					$.ajax({
+						async: false,
+						url: 'paperFinish',
+						type: 'get',
+						contentType: 'application/json;charset=utf-8', //请求的字符编码
+						data: a,
+						success: function(e) {
+						window.location.href="Exam";
+						},
+						error: function() {
+							alert('请先登陆');
+						}
+					});
+				
+			}
+			
+			function getQuestionAnswer(question,questiontype){
+				var questionSerial = question.attr("data-questionserial");
+				
+				
+				if(questiontype == 0 || questiontype == "0"){
+					var radioList = $("input[name='"+questionSerial+"']");
+					for(var i = 0 ; i < radioList.length ; i++){
+						if(radioList.eq(i).attr("checked") == "checked" || radioList.eq(i).attr("checked") == true){
+							console.log(radioList.eq(i).attr("title").charAt(0));
+							return radioList.eq(i).attr("title").charAt(0);
+						}
+					}
+					
+				}
+				
+				if(questiontype == 1 || questiontype == "1"){
+					var radioList = $("input[name='"+questionSerial+"']");
+					var answer = "";
+					for(var i = 0 ; i < radioList.length ; i++){
+						if(radioList.eq(i).attr("checked") == "checked" || radioList.eq(i).attr("checked") == true){
+							answer = answer + radioList.eq(i).attr("title").charAt(0) + "#^#";
+						}
+					}
+					console.log(answer.substring(0,answer.length-3));
+					return answer.substring(0,answer.length-3);
+				}
+				
+				if(questiontype == 2 || questiontype == "2"){
+					var radioList = $("input[name='"+questionSerial+"']");
+					for(var i = 0 ; i < radioList.length ; i++){
+						if(radioList.eq(i).attr("checked") == "checked" || radioList.eq(i).attr("checked") == true){
+							console.log(radioList.eq(i).attr("title").charAt(0));
+							return radioList.eq(i).attr("title").charAt(0);
+						}
+					}
+					
+				}
+				
+				if(questiontype == 3 || questiontype == "3"){
+					var inputList = $("input[name='"+questionSerial+"']");
+					var answer = "";
+					for(var i = 0 ; i < inputList.length ; i++){
+
+							answer = answer + inputList.eq(i).val() + "#^#";
+
+					}
+					console.log(answer.substring(0,answer.length-3));
+					return answer.substring(0,answer.length-3);
+				}
+				
+				if(questiontype == 4 || questiontype == "4"){
+					var textareaList = $("textarea[name='"+questionSerial+"']");
+					var answer = "";
+					for(var i = 0 ; i < textareaList.length ; i++){
+
+							answer = answer + textareaList.eq(i).val() + "#^#";
+
+					}
+					console.log(answer.substring(0,answer.length-3));
+					return answer.substring(0,answer.length-3);
+				}
+				
 			}
 			
 			//刷新部分中问题的序号
@@ -571,7 +763,6 @@
 				var all_page = $(this).parent().children(".all-page").children("span").text().replace(/[^0-9]/ig,"");
 				
 				if(now_page >= all_page){
-					alert('123');
 					return;
 				}
 				
@@ -847,6 +1038,20 @@
 
 			};
 			
+			function excWindowsChange(){
+				
+				windowsTime = windowsTime +1 ;
+				
+				if(windowsTime/2>=maxWindowsTime){
+					
+					EditAnswerInfo();
+					alert("超过最大窗口切换次数，已自动交卷！");
+				}
+				
+				layer.msg("您已切换窗口，剩余"+(maxWindowsTime-windowsTime/2)+"次");
+				
+			}
+			
 			$(document).ready(function() {
 				
 				
@@ -860,10 +1065,268 @@
 					//各种基于事件的操作，下面会有进一步介绍
 				});
 				
+				document.addEventListener("visibilitychange", function(){
+                    excWindowsChange();
+                });
 				form.on('radio(radioChoose)', function(data){
 				    console.log(data.elem); //得到radio原始DOM对象
- 				    console.log(data.value); //被点击的radio的value值
-				});  
+				    var choose=$(data.elem);
+				    
+				    var questionSerial = parseInt(choose.parent().parent().parent().parent().attr("data-questionserial"));
+
+				    var content=
+									    '<div class="If-answer-img" style="padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				    IfAnswer.empty();
+				    IfAnswer.append(content);
+				    var part = choose.parent().parent().parent().parent().parent().parent().parent().parent();			
+				    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    var partSerial = part.attr("data-partserial");
+				    for(var i = 0 ; i < partStatistic.length ; i++){
+				    	console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    		$(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    		return;
+				    	}
+				    }
+				    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");
+				    
+				    
+				}); 
+				
+				$("body").on("input propertychange", ".fill-question-textarea", function() {
+                	
+                	var inputInfo = $(this).val();
+                	var question = $(this).parent().parent().parent().parent().parent();
+                	var questionSerial = question.attr("data-questionserial");
+                	
+                	var allFill = $("textarea[name='"+questionSerial+"']");
+                	for(var i = 0 ; i < allFill.length ; i++){
+                		
+                		if(allFill.eq(i).val() == ""){
+
+				    		var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    	    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				            
+				   		    IfAnswer.empty();
+				    	    IfAnswer.append(content);
+				    	    
+				    	    var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    		return;
+                	    }else{
+				    
+				    	    
+                     	}
+                		
+                	}
+                	
+                	var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   	IfAnswer.empty();
+				    IfAnswer.append(content);
+                	
+                	        var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    		return;
+				    
+				    
+                	
+                });
+				
+				$("body").on("input propertychange", ".fill-question-input", function() {
+                	
+                	var inputInfo = $(this).val();
+                	var question = $(this).parent().parent().parent().parent().parent();
+                	var questionSerial = question.attr("data-questionserial");
+                	
+                	var allFill = $("input[name='"+questionSerial+"']");
+                	for(var i = 0 ; i < allFill.length ; i++){
+                		
+                		if(allFill.eq(i).val() == ""){
+
+				    		var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    	    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				            
+				   		    IfAnswer.empty();
+				    	    IfAnswer.append(content);
+				    	    
+				    	    var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    	    
+				    		return;
+                	    }else{
+				    
+				    	    
+                     	}
+                		
+                	}
+                	
+                	var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   	IfAnswer.empty();
+				    IfAnswer.append(content);
+                	var part = question.parent().parent().parent().parent();			
+				    	    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    	    var partSerial = part.attr("data-partserial");
+				    	    for(var i = 0 ; i < partStatistic.length ; i++){
+				        	    console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 	    if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    			    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    			    return;
+				   		 	    }
+				   	        }
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");	
+				    		return;
+                	
+                });
+				
+				//点击跳转到指定题目
+				
+				$("body").on("click", ".If-answer-img", function(){
+					
+					var questionSerial = $(this).parent().attr("data-ifserial");
+					
+                	$('html,body').animate({scrollTop:parseInt($("div[data-questionserial='"+questionSerial+"']").offset().top)},300);	
+                	
+					
+				});
+				
+				form.on('checkbox(checkboxChoose)', function(data){
+				    console.log(data.elem); //得到radio原始DOM对象
+				    var choose=$(data.elem);
+				    var checkboxName = choose.attr("name");
+				    var allChoose = $("input[name='"+checkboxName+"']");
+				    
+				    for(var i = 0 ; i < allChoose.length ; i ++){
+				    	
+						if(allChoose.eq(i).attr("checked") == "checked"){
+							
+							var questionSerial = parseInt(choose.parent().parent().parent().parent().attr("data-questionserial"));
+				    
+				    		var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #5FB878;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-ok" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    		var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   		 	IfAnswer.empty();
+				    		IfAnswer.append(content);
+				    		
+						    var part = choose.parent().parent().parent().parent().parent().parent().parent().parent();			
+				    		var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    		
+				            var partSerial = part.attr("data-partserial");
+				    		for(var i = 0 ; i < partStatistic.length ; i++){
+				    		console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    			if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    				$(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    				break;
+				   		 		}
+				    		}
+				            $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");
+				    		return ;
+							
+						}
+						
+					}
+				    
+				    var questionSerial = parseInt(choose.parent().parent().parent().parent().attr("data-questionserial"));
+				    
+				    var content=
+									    '<div class="If-answer-img" style="cursor:pointer;padding:4px;background-color: #FF5722;border-radius: 50%;      -moz-border-radius: 50%;      -webkit-border-radius: 50%;">'+
+									        '<i class="layui-icon layui-icon-close" style="font-size: 32px; color: #FFF;"></i> '+
+									    '</div>'+
+									    '<div class="If-answer-word" style="margin-top: 5px;" align="center">'+
+									        '<span class="If-answer-serial-span" style="font-size: 20px;color: #444;">'+questionSerial+'</span>'+
+									    '</div>';
+				    
+				    var IfAnswer = $("[data-ifSerial='"+questionSerial+"']");
+				    
+				   	IfAnswer.empty();
+				    IfAnswer.append(content);
+				    
+					var part = choose.parent().parent().parent().parent().parent().parent().parent().parent();			
+				    var partStatistic = part.children(".part-question-statistic").children("fieldset").children(".question-statistic-container").children(".If-answer");
+				    var partSerial = part.attr("data-partserial");
+				    for(var i = 0 ; i < partStatistic.length ; i++){
+				        console.log(partStatistic.eq(i).children(".If-answer-img").css("background-color"))
+				    	 if(partStatistic.eq(i).children(".If-answer-img").css("background-color") != "rgb(95, 184, 120)"){
+				    		$(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#FF5722");
+				    		return;
+				   		 }
+				    }
+				    $(".exam-basic-info").eq(parseInt(partSerial)).children("button").css("background-color","#5FB878");				    
+				    
+				});
 
 				$(window).scroll(function(){
 				    
@@ -967,7 +1430,6 @@
 				var all_page = $(".all-page").children("span").text().replace(/[^0-9]/ig,"");
 
 				if(now_page > all_page){
-					alert('123');
 					return;
 				}
 				
@@ -1147,7 +1609,6 @@
 				var all_page = $(this).parent().children(".all-page").children("span").text().replace(/[^0-9]/ig,"");
 
 				if(now_page <= 1){
-					alert('123');
 					return;
 				}
 				
@@ -1755,10 +2216,17 @@
 			      $(this).html(event.strftime('当前剩余时间 '+'%H:%M:%S'));
 			      
 			      if (event.type == 'finish'){
-			      	  submitPaper();
+			      	  EditAnswerInfo();
+			      	  alert("考试时间已过，已自动交卷。");
 			      }
 			      
 			    });
+			    
+			    //提交试卷
+			    $("body").on("click", ".submit-paper", function(){
+			    	submitPaper();
+			    });
+			    
 			});
 		</script>
 
@@ -1959,11 +2427,8 @@
 
 			{{each PartQuestionList as value}}
 
-			<div class="one-question" data-answer="{{value.answer}}" data-questionid = "{{value.questionid}}" data-questiontype = "{{value.questiontype}}" style="margin-left: 10px;margin-top: 15px;">
+			<div class="one-question" data-questionSerial="-1" data-answer="{{value.answer}}" data-questionid = "{{value.questionid}}" data-questiontype = "{{value.questiontype}}" style="margin-left: 10px;margin-top: 15px;">
 				<div class="one-question-introduction">
-					<div class="layui-form" style="display: inline;margin-right: 0px;margin-top: 0px;">
-						<input type="checkbox" class="part-checkbox" lay-skin="primary">
-					</div>
 
 					<div class="one-question-serial" style="display: inline;">
 						<span style="font-size: 20px;color: #5FB878;">1、&nbsp;&nbsp;</span>
@@ -1984,21 +2449,18 @@
 					</div>
 
 					<div class="one-question-degree" style="display: inline;margin-right: 5px;">
-						{{if value.questiontype == "0"}}
+						{{if value.difficultdegree == "0"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：易&nbsp;</span> 
 						{{/if}}
 						
-						{{if value.questiontype == "1"}}
+						{{if value.difficultdegree == "1"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：中&nbsp;</span>
 						{{/if}}
 						
-						{{if value.questiontype == "2"}}
+						{{if value.difficultdegree == "2"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
 						{{/if}}
-						
-						{{if value.questiontype == "3"}}
-						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
-						{{/if}}
+
 					</div>
 					
 					<div class="one-question-points" style="margin-top: 10px;float:right;">
@@ -2113,7 +2575,7 @@
 									</div>
 									
 									<div class="exam-basic-info" style="width: 240px;margin-left: 18px;margin-top: 5px;">
-										<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#5FB878"> 第一部分</button>
+										<button class="layui-btn layui-btn-fluid layui-btn-sm" style="background-color:#FF5722"> 第一部分</button>
 									</div>
 								</div>
 							
