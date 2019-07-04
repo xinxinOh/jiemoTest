@@ -24,6 +24,7 @@ import com.neuedu.JiemoTest.entity.QuestionInBankExample;
 import com.neuedu.JiemoTest.entity.QuestionInBankKey;
 import com.neuedu.JiemoTest.entity.UserInfo;
 import com.neuedu.JiemoTest.service.BankService;
+import com.neuedu.JiemoTest.service.QuestionBankService;
 
 @Service
 public class BankServiceImpl implements BankService{
@@ -40,6 +41,8 @@ public class BankServiceImpl implements BankService{
 	UserInfoMapper userInfoMapper;
 	@Autowired
 	Order1Mapper order1Mapper;
+	@Autowired
+	QuestionBankService questionBankService;
 	
 	@Override
 	public List<Question> getQuestionByBankID(int bankid) {
@@ -106,14 +109,7 @@ public class BankServiceImpl implements BankService{
 	public void buyGoods(int userid,int  goodsid, int  goodsprice,int  bankid) {
 		// TODO Auto-generated method stub
 		//本人题库增加一个题库 并将商品购买数加1，生成订单记录，卖家积分增加，本人积分减少
-		Bank bank=bankMapper.selectByPrimaryKey(bankid);
-		Bank record =new Bank();
-		record.setUserid(userid);
-		record.setSourcebankid(bankid);
-		record.setBankname(bank.getBankname());
-		record.setBankintroduction(bank.getBankintroduction());
-		record.setCreatedate(bank.getCreatedate());
-		bankMapper.insertSelective(record);
+		questionBankService.copyBank(bankid, userid);
 		
 		Goods record2=new Goods();
 		record2.setGoodsid(goodsid);
