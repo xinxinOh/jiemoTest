@@ -27,10 +27,10 @@
 					var startTime = examList.eq(i).attr("data-InTime");
 					var endTime = examList.eq(i).attr("data-InTimea");
 					var nowTime = Date.parse(new Date()) / 1000;
-					if(endTime != "" || endTime =="-1" || endTime==-1) {
-						examList.eq(i).attr("data-InTime", "1");
-					} else {
+					if(endTime == "" || endTime =="-1" || endTime==-1) {
 						examList.eq(i).attr("data-InTime", "0");
+					} else {
+						examList.eq(i).attr("data-InTime", "1");
 					}
 				}
 
@@ -115,6 +115,7 @@
 
 						if(e == "请先登录") {
 							layer.msg("请先登录");
+							window.location.href="to11";
 							return;
 						}
 
@@ -378,7 +379,8 @@
 			};
 
 			$(document).ready(function() {
-
+				
+				
 				layui.use('form', function() {
 					var form = layui.form;
 					form.render();
@@ -530,6 +532,8 @@
 						layer.msg("开始时间必须大于结束时间！")
 						return;
 					}
+					
+					
 					var a = {
 						'examid': parseInt(nowManageExam),
 						'startTime': parseInt(startTimestamp) / 1000,
@@ -605,9 +609,7 @@
 					layer.confirm('确定更改考试时间？', {
 					  btn: ['确定','取消'] //按钮
 					}, function(){
-						
-					  var a = {'examId': parseInt(nowManageExam)};
-					  
+
 					$.ajax({
 						async: false,
 						url: 'ChangePublishExam',
@@ -638,7 +640,16 @@
                 });
 				//编辑考试
 				$("body").on("click", ".edit-exam-btn", function() {
+					
+					var allcookies = document.cookie;
+                    var cookie_pos = allcookies.indexOf("Operation");
+                    if(cookie_pos != -1){
+                    	layer.msg("请等15秒后再进行编辑操作！")
+                    	return;
+                    }
+                    
 					nowManageExam = $(this).parent().parent().parent().parent().parent().parent().parent().attr("data-examid");
+					
 					var CanAdd = $("[data-examid='" + nowManageExam + "'").attr("data-intime");
 					if(CanAdd == "1") {
 						layer.msg("考试已经发布，无法编辑内容");
@@ -673,7 +684,7 @@
 								nowExam.remove();
 							}
 							if(e.split(" ")[0] == "0") {
-								layer.msg(e.split(" ")[0]);
+								layer.msg(e.split(" ")[1]);
 							}
 							
 						},
@@ -962,7 +973,7 @@
 
 						<li class="NavBar-item">
 
-							<a class="NavBar-a" href=""><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
+							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-list" style="font-size: 26px; color: darkseagreen;"></i> 我的考试</a>
 						</li>
 						<hr style="height:1px;">
 						<li class="NavBar-item create-exam">
@@ -970,11 +981,11 @@
 						</li>
 						<hr style="height:1px;">
 						<li class="NavBar-item file-exam">
-							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
+							<a class="NavBar-a" href="FileExam"><i class="layui-icon layui-icon-form" style="font-size: 26px; color: darkseagreen;"></i>归档考试</a>
 						</li>
 						<hr style="height:1px;">
-						<li class="NavBar-item delete-exam">
-							<a class="NavBar-a" href="javascript:;"><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
+						<li class="NavBar-item">
+							<a class="NavBar-a" href="RecycleBin"><i class="layui-icon layui-icon-delete" style="font-size: 26px; color: darkseagreen;"></i>回收站</a>
 						</li>
 					</ul>
 				</div>

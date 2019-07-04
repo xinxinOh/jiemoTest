@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neuedu.JiemoTest.dao.Answer_infoMapper;
@@ -33,13 +36,14 @@ import com.neuedu.JiemoTest.entity.Part;
 import com.neuedu.JiemoTest.entity.PartDetail;
 import com.neuedu.JiemoTest.entity.Question;
 import com.neuedu.JiemoTest.entity.QuestionAnswerVO;
+import com.neuedu.JiemoTest.entity.UserInfo;
 import com.neuedu.JiemoTest.service.AnsweredPapersService;
 import com.neuedu.JiemoTest.service.LoadGoodsService;
 
 
 
 @Controller
-public class testAnsweredController{
+public class PaperController{
 
 	@Autowired
 	AnsweredPapersService answeredPapersService;
@@ -50,78 +54,11 @@ public class testAnsweredController{
 	 * @RequestMapping 相当于servlet的映射名
 	 * 当访问http://localhost:8081/hello1时 进入该方法 不需要项目名
 	 */
-	
-	
-	
-	@RequestMapping("/hello1")
-	public ModelAndView test1() {
-		//ModelAndView spring提供的装载数据和视图的对象
-		ModelAndView modelAndView=new ModelAndView("111");
-		modelAndView.setViewName("NewFile");//只写前缀就行
-		modelAndView.addObject("name1", "hahaha");//向request范围内添加属性
-		
-		return modelAndView;
-	}
-	
-	//一个控制器可以写多个 普通跳转 指向路径下的某个页面
-	@RequestMapping("/hello2")
-	public String test2() {
-		return "NewFile";//返回到某个页面
-	}
-	
-	/*
-	 * //不加参数 默认是首页
-	 * 
-	 * @RequestMapping public String test3() { return "index"; }
-	 */
-	
-	//一个a标签的跳转 传参 如何在java文件中获取
-	@RequestMapping("/hello4")
-	public String test4(String name,Integer age) {
-		System.out.println("name是"+name+" age是"+age);
-		return "index";
-	}
-	
-	//访问thymeleaf模板网页 传递一个参数
-	@RequestMapping("/hello5")
-	public ModelAndView test5() {
-		ModelAndView modelAndView=new ModelAndView("testdata");
-		modelAndView.addObject("name1", "wobuxin");//向request范围内添加属性
-		//System.out.println("name是"+name+" age是"+age);
-		return modelAndView;
-	}
-	
-	//model传递数组列表
-	/*
-	 * //与mybatis结合
-	 * 
-	 * @RequestMapping("/hello7") public String test7(Model m) { List<User_info>
-	 * list =userInfoService.queryAll(); m.addAttribute("list",list); return
-	 * "helloTest"; }
-	 * 
-	 * //与mybatis结合
-	 * 
-	 * @RequestMapping("/addUser") public void test8(User_info u,HttpServletResponse
-	 * resp) throws IOException { System.out.println("================");
-	 * 
-	 * System.out.println(u.getNickname()); System.out.println("================");
-	 * int i=userInfoService.insert(u); if(i>0) {
-	 * resp.getWriter().println("success"); } else {
-	 * resp.getWriter().println("failure"); }
-	 * 
-	 * }
-	 */
-	 	
-		@RequestMapping("/toJson")
-		public String test9() {
-			return "json1";
-		}
-		
 		
 		@RequestMapping("/toShowAnsweredList")
 		public ModelAndView toShowAnsweredList(HttpServletRequest request){	
-			//String paperID=request.getParameter("examID");
-			String examID="1";
+			String examID=request.getParameter("examID");
+			//String examID="1";
 			ModelAndView modelAndView=new ModelAndView();
 			modelAndView.setViewName("ShowAnsweredList");//只写前缀就行
 			modelAndView.addObject("examid",examID);//向request范围内添加属性
@@ -129,9 +66,18 @@ public class testAnsweredController{
 		}
 		
 		@RequestMapping("/toStudentUnAnsweredPapers")
-		public ModelAndView toStudentUnAnsweredPapers(HttpServletRequest request){	
+		public ModelAndView toStudentUnAnsweredPapers(HttpServletRequest request){
+			HttpSession session = request.getSession();
+			String userinfo = (String) session.getAttribute("UserInfo"); 
+			JSONObject userJson = JSONObject.parseObject(userinfo);
+			UserInfo user=JSON.toJavaObject(userJson, UserInfo.class);
+			
+		/*
+		 * if(userInfo == null) { return "0 请先登录"; }
+		 */
+
 			//String userID=request.getParameter("userID");
-			String userID="1";
+			int userID=user.getUserid();
 			ModelAndView modelAndView=new ModelAndView();
 			modelAndView.setViewName("StudentUnAnsweredPapers");//只写前缀就行
 			modelAndView.addObject("userid",userID);//向request范围内添加属性
@@ -140,8 +86,13 @@ public class testAnsweredController{
 		
 		@RequestMapping("/toStudentAnsweredPapers")
 		public ModelAndView toStudentAnsweredPapers(HttpServletRequest request){	
+			HttpSession session = request.getSession();
+			String userinfo = (String) session.getAttribute("UserInfo"); 
+			JSONObject userJson = JSONObject.parseObject(userinfo);
+			UserInfo user=JSON.toJavaObject(userJson, UserInfo.class);
 			//String userID=request.getParameter("userID");
-			String userID="1";
+			//String userID="1";
+			int userID=user.getUserid();
 			ModelAndView modelAndView=new ModelAndView();
 			modelAndView.setViewName("StudentAnsweredPapers");//只写前缀就行
 			modelAndView.addObject("userid",userID);//向request范围内添加属性

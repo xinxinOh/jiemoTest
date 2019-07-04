@@ -64,6 +64,7 @@
 						nowId.push(part_question.eq(j).attr("data-questionid"));
 					}
 				}
+                
                 if(IfRemove > 0){
                 	layer.msg('已自动过滤重复题目'+IfRemove+'道');
                 }
@@ -639,6 +640,7 @@
 							}
 							td.html(newtxt);
 							resetPartPointsNum();
+							resetPartTable();
 						}
 					});
 				});
@@ -1126,13 +1128,13 @@
 					'<div class="question-manage-info" style="background-color: #F5F5F5;">'+
 					'<div class="question-manage-btn" style="margin-left: 10px;margin-top: 10px;">'+
 					'<span style="color: #333333;font-size: 14px;">对选中试题的操作：</span>'+
-					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-up-btn" style="margin-top: 10px;margin-bottom: 10px;">'+
 					'&nbsp;&nbsp;&nbsp;&nbsp;↑上移&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'</button>'+
-					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-down-btn" style="margin-top: 10px;margin-bottom: 10px;">'+
 					'&nbsp;&nbsp;&nbsp;&nbsp;↓下移&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'</button>'+
-					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="margin-top: 10px;margin-bottom: 10px;">'+
+					'<button type="button" class="layui-btn layui-btn-primary layui-btn-sm part-question-delete-btn" style="margin-top: 10px;margin-bottom: 10px;">'+
 					'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+
 					'</button>'+
 					'<button type="button" class="layui-btn layui-btn-sm layui-bg-red delete-part-btn" style="margin-top: 10px;margin-bottom: 10px;margin-left: 350px;">'+
@@ -1387,7 +1389,7 @@
 					resetPartSerial();
 					resetPartQuestionNum();
 					resetPartPointsNum();
-					
+					resetPartTable();
 				});
 				
 				$("body").on("click", ".part-question-up-btn", function() {
@@ -1493,21 +1495,18 @@
 					</div>
 
 					<div class="one-question-degree" style="display: inline;margin-right: 5px;">
-						{{if value.questiontype == "0"}}
+						{{if value.difficultdegree == "0"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：易&nbsp;</span> 
 						{{/if}}
 						
-						{{if value.questiontype == "1"}}
+						{{if value.difficultdegree == "1"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：中&nbsp;</span>
 						{{/if}}
 						
-						{{if value.questiontype == "2"}}
+						{{if value.difficultdegree == "2"}}
 						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
 						{{/if}}
-						
-						{{if value.questiontype == "3"}}
-						<span class="layui-badge" style="background-color:#5FB878;">&nbsp;难度：难&nbsp;</span>
-						{{/if}}
+
 					</div>
 
 					<div class="one-question-zhankai" style="display: inline;margin-left: 10px;margin-right: 5px;">
@@ -1578,7 +1577,7 @@
 				<!-- 头部区域（可配合layui已有的水平导航） -->
 				<div data-bankid="1" class="layui-nav layui-layout-left">
 					<li class="layui-nav-item">
-						<a class="header-font-color" href="">考试</a>
+						<a class="header-font-color" href="Exam">考试</a>
 					</li>
 					<li class="layui-nav-item">
 						<a class="header-font-color" href="">题库</a>

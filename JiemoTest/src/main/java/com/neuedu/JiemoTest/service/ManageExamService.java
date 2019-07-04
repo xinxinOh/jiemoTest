@@ -19,4 +19,5 @@ public interface ManageExamService {
 	List<Exam> SearchFileExam(int userId);
 	String RenewExam(int examId);
 	List<Exam> SearchDeleteExam(int userId);
+	String CheckExamUser(int userId, int examId);
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.jms.Session;
 import javax.servlet.http.HttpServletRequest;
 
-import org.mockito.internal.matchers.InstanceOf.VarArgAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpRequest;

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<meta charset="utf-8" />
+		<title>登录</title>
+		<link rel="stylesheet" href="layui/css/layui.css" th:href="@{static/layui/css/layui.css}" media="all" />
+		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
+		<script src="layui/layui.all.js" th:src="@{static/layui/layui.all.js}"></script>
+		<script type="text/javascript" src="js/jquery-1.8.3.min.js" th:src="@{static/js/jquery-1.8.3.min.js}"></script>
+		<script type="text/javascript" src="js/jquery-1.8.3.js" th:src="@{static/js/jquery-1.8.3.js}"></script>
+		<link rel="stylesheet" href="css/login.css" th:href="@{static/css/login.css}" media="all" />
+
+	</head>
+
+	<body>
+		<!--     小人登录                -->
+		<div class="music-lgin">
+			<div class="music-lgin-all">
+				<!--左手-->
+				<div class="music-lgin-left ovhd">
+					<div class="music-hand">
+						<div class="music-lgin-hara"></div>
+						<div class="music-lgin-hars"></div>
+					</div>
+				</div>
+
+				<!--脑袋-->
+				<div class="music-lgin-dh">
+					<div class="music-lgin-alls">
+						<div class="music-lgin-eyeleft">
+							<div class="music-left-eyeball yeball-l"></div>
+						</div>
+						<div class="music-lgin-eyeright">
+							<div class="music-right-eyeball yeball-r"></div>
+						</div>
+						<div class="music-lgin-cl"></div>
+					</div>
+					<!--鼻子-->
+					<div class="music-nose"></div>
+					<!--嘴-->
+					<div class="music-mouth music-mouth-ds"></div>
+					<!--肩-->
+					<div class="music-shoulder-l">
+						<div class="music-shoulder"></div>
+					</div>
+					<div class="music-shoulder-r">
+						<div class="music-shoulder"></div>
+					</div>
+					<!--消息框-->
+					<div class="music-news">芥末测评欢迎您！</div>
+				</div>
+
+				<!--右手-->
+				<div class="music-lgin-right ovhd">
+					<div class="music-hand">
+						<div class="music-lgin-hara"></div>
+						<div class="music-lgin-hars"></div>
+					</div>
+				</div>
+
+			</div>
+			<!--1-->
+			<div class="music-lgin-text">
+				<div class="p1">用户登录</div>
+			</div>
+			<!--2-->
+			<div class="music-lgin-text">
+				<input class="inputname inputs" type="text" name="username" id="username" placeholder="登录名为邮箱/手机号"  required="required" />
+			</div>
+			<!--3-->
+			<div class="music-lgin-text">
+				<input type="password" class="mima inputs" id="password" name="password" placeholder="密码"  required="required" />
+			</div>
+			<!--4-->
+			<div class="music-lgin-text">
+				<input class="music-qd inputs1" type="submit" id="denglu" value="登录" />
+			</div>
+
+			<!--5-->
+			<div class="arguement">
+				<br />
+				<div>
+					<a href="" class="p3">忘记密码？</a>
+				</div>
+
+				还没有账号？
+				<a href="toregister" class="p3">点击注册</a>
+				<div class="line"></div>
+				<div class="p2">第三方账号快速登录</div>
+
+				<a href="https://wx.qq.com/" class="layui-icon layui-icon-login-wechat" style="font-size: 35px; color: #00FF00;"> </a>
+				<a href="https://id.qq.com/login/ptlogin.html" class="layui-icon layui-icon-login-qq" style="font-size: 35px; color: #1E9FFF;"></a>
+				<a href="https://weibo.com/" class="layui-icon layui-icon-login-weibo" style="font-size: 35px; color: #FF9800;"></a>
+			</div>
+
+		</div>
+
+		<script type="text/javascript">
+			//眼睛 密码部分
+			$(".mima").focus(function() {
+				$(".music-lgin-left").addClass("left-dh").removeClass("rmleft-dh");
+				$(".music-lgin-right").addClass("right-dh").removeClass("right-rmdh");
+				$(".music-hand").addClass("no");
+			}).blur(function() {
+				$(".music-lgin-left").removeClass("left-dh").addClass("rmleft-dh");
+				$(".music-lgin-right").removeClass("right-dh").addClass("right-rmdh");
+				$(".music-hand").removeClass("no");
+
+			});
+
+			
+
+			
+			$('#denglu').click(function() {
+
+				
+				if(($('#username').val() == '') || ($('#password').val() == '')){
+					alert('请输入登录名和密码');
+				}else{
+				
+				var p1 = $('#username').val().trim();
+				var p2 = $('#password').val().trim();
+				var u = {
+					'username': p1,
+					'password': p2
+				}; //包装成一个对象
+				//ajax传值
+				$.ajax({
+					async: false,
+					url: 'login',
+					type: 'post',
+					contentType: 'application/json;charset=utf-8',
+					data: JSON.stringify(u), //转换成json格式的字符串，传到后台
+					dataType: "text", //返回类型
+					success: function(result) {
+						if(result=='Exam'){
+							window.location.href = 'toExam1111';
+							}else{
+								alert(result);
+							}
+					},
+					error: function() {
+						alert('提交失败');
+					}
+				});
+				}
+
+			});
+
+			$(document).keydown(function(event) {
+				if(event.keyCode == "13") {
+					alert("确认要提交么？");
+
+				}
+			});
+		</script>
+		
+		
+
+		
+	</body>
+
+</html>

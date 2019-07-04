@@ -22,7 +22,7 @@ public class UploadController {
 
 	// @RequestMapping 
 	// @GetMapping  @PostMapping 这两个注解需要请求的方式必须是get /post  ,urlmapping一致, 才能进入该方法
-	@GetMapping("/toupload")
+	@RequestMapping("/toupload")
     public String upload() {
         return "upload";
     }
@@ -33,7 +33,7 @@ public class UploadController {
      * @param request
      * @return
      */
-	@PostMapping("/upload")
+	@RequestMapping("/upload")
     @ResponseBody
     public String upload(@RequestParam("file") MultipartFile file,HttpServletRequest request) {
         if (file.isEmpty()) {
@@ -41,8 +41,9 @@ public class UploadController {
         }
         //fileName可以用自己的生成方案，我这里只简单用的原始文件名称
         String fileName = file.getOriginalFilename();
-        String filePath = request.getServletContext().getRealPath("/upload");
-	    //如果没有该文件夹,创建文件夹,有,就跳过
+       // String filePath = request.getServletContext().getRealPath("/upload");
+        String  filePath = "E:/java/maven/upload";//绝对路径
+        //如果没有该文件夹,创建文件夹,有,就跳过
         File fileFolder = new File(filePath);
 		if (!fileFolder.exists()) {
 			fileFolder.mkdirs();
