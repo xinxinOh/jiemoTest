@@ -49,33 +49,30 @@ public class EditUserController {
 		return "userEdit";
 	}	
 	@RequestMapping("/userEdit")
-	@ResponseBody
-	public String updateEditUser(@RequestBody UserInfo u,HttpServletRequest request,HttpServletResponse response) throws Exception {
-		System.out.println("TOstring"+u.toString());
-		
-		//设置编码格式
+	public @ResponseBody String updateEditUser(@RequestBody UserInfo u,
+			HttpServletRequest request,HttpServletResponse response) throws Exception {
+
+		//设置返回编码格式
 		response.setCharacterEncoding("utf-8");
-		String password1 = u.getPassword();
-		String p1 = editUserServiceImpl.getMD5String(password1);
+		String p1 = editUserServiceImpl.getMD5String(u.getPassword());
 		u.setPassword(p1);	
-		System.out.println("未加密的密码：---"+password1);
-		System.out.println("加密的密码：---"+p1);
-		int i = editUserServiceImpl.updateEditUser(u);//获得后台的userinfo数据	
+	
+//		UserInfo u1 = new UserInfo();
+//		u1.setUserid(u.getUserid());
 		//Integer userid2 = user2.getUserid();//后台的userID
-		if(i>0) {
+
+		int i = editUserServiceImpl.updateEditUser(u);//获得后台的userinfo数据	
+		
+		if(i == 1) {
 			return "信息修改成功";
-			
 		}else {
 			return "信息修改失败";
 		}
 		
 //		//request.getSession().setAttribute("user", user);//对前台中的数据进行保存、缓存设置		
 //		UserInfo p = (UserInfo) request.getSession().getAttribute("userid");//得到前台缓存好的的数据	，相当于前台中的	${session.user.userid}
-		
-
-		
 	}
 	
-	
+
 	
 }

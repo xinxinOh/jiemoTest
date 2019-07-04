@@ -48,7 +48,7 @@ public class LoginController {
          LoginService loginService;
 	     
 	     
-	     UserInfo u = new UserInfo();
+	     //UserInfo u = new UserInfo();
 	     
 	     @Autowired
 	     LoginServiceImpl loginServiceImpl;
@@ -61,25 +61,39 @@ public class LoginController {
 	     //@PostMapping(value = "/login")
          //@RequestMapping(value = "/login", method = RequestMethod.POST)
 	     @RequestMapping("/login")
-	      public @ResponseBody String login(@RequestBody UserInfo u,HttpServletRequest request) throws Exception{	    	 
+	      public @ResponseBody  String login(@RequestBody UserInfo u,HttpServletRequest request) throws Exception{	    	 
 	    	 String pwd = u.getPassword();
 	    	 System.out.println("未加密的登录用户名"+u.getUsername());	    	
 	    	 System.out.println("未加密的登录密码"+pwd);	    	
-	    	 String i = loginServiceImpl.getMD5String(pwd);
+	    	 String i = loginServiceImpl.getMD5String(pwd);//md5加密
 	    	 System.out.println("加密的登录密码"+i);	    	
-	    	 u.setPassword(i);//吧前台传进来的数据设置进来
+	    	 u.setPassword(i);//设置前台传来的数据
 	    	 UserInfo  user = loginServiceImpl.checkLogin(u);
-	    	 //System.out.println("数据库的登录密码"+user.getPassword());	    	
 	    	 if(user != null) {	    		 	    		 
 	    		 request.getSession().setAttribute("user",user);
-	    		 return "登录成功";
+	    		 return "Exam";
 	    		 
 	    	 }else{
 	    		 return "登录名或密码填写错误! 请重新输入!";
 	    	 }
-	    	 
-
-      
+	     }
+	     
+	     @RequestMapping("/toExam111")
+	      public String Exam() {
+			return "Exam";	    	 
+	     }
+	     
+	     @RequestMapping("/tologinout")
+	      public String loginout1() {
+	    	
+			return "loginout";	    	 
+	     }
+	     @RequestMapping("/loginout")
+	      public String loginout(HttpServletRequest request) {
+	    	request.getSession().removeAttribute("user");//清除内容，退出登录
+			return "login";	    	 
+	     
+	     
 	     }
 
 }

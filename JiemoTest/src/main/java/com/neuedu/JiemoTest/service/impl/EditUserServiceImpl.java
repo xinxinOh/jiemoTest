@@ -43,19 +43,18 @@ public class EditUserServiceImpl implements EditUserService {
     }
 	
 	@Override
-	public UserInfo showEditUser(UserInfo u) {
-		UserInfo userid = userInfoMapper.selectByPrimaryKey(u.getUserid());
-		return userid;
-	}
-
-
-	@Override
 	public int updateEditUser(UserInfo u) {
+		//会对字段进行判断再更新                                                                             (如果为Null就忽略更新)，如果只更新某一字段，用这个方法。
+		int i = userInfoMapper.updateByPrimaryKeySelective(u);
+		
+		if (i > 0) {
+			return 1;//更新成功
+		} else {
+		return 0;
+		}
 		//只更新某一个字段
-		int i = userInfoMapper.updateByPrimaryKeySelective(u);//会对字段进行判断再更新(如果为Null就忽略更新)，如果你只想更新某一字段，可以用这个方法。
-		return i;
-		
-		
+		//updateByPrimaryKeySelective，前者只是更新新的model中不为空的字段，updateByPrimaryKey，后者则会将为空的字段在数据库中置为NULL
+
 	}
 
 

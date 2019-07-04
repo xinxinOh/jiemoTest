@@ -255,12 +255,10 @@
 
 			$("#zhuce").click(function() {
 
-				if(($('#username').val() == '') || ($('#username').val() == '') || ($('#password').val() == '')) {
+				if(($('#nickname').val() == '') || ($('#username').val() == '') || ($('#password').val() == '')) {
 					alert('用户名、登录名、密码均不能为空');
 				} else {
 
-					
-					
 					var p1 = $('#nickname').val();
 					var p2 = $('#username').val();
 					var p3 = $('#password').val();
@@ -279,8 +277,12 @@
 						contentType: 'application/json;charset=utf-8',
 						data: JSON.stringify(u), //转换成json格式的字符串，传到后台
 						dataType: "text", //返回类型
-						success: function(e) {
-							alert(e);
+						success: function(result) {
+							if(result=='Exam'){
+								window.location.href = 'toExam1111';
+								}else{
+									alert(result);
+								}
 						},
 						error: function() {
 							alert('提交失败');

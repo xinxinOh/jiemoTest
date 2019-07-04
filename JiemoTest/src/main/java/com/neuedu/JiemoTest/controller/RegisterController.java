@@ -68,14 +68,17 @@ public class RegisterController {
 	   		request.getSession().setAttribute("user",user);
 	   		int r1 = registerService.addRegister(u);
 			if(r1 == 1) {
-				return "注册成功";
+				return "Exam";
 			}else {
 				return "注册失败";
 			}
    		 
    	 }
 		
-		
-		
 		}
+	@RequestMapping("/toExam1111")
+    public String Exam() {
+		return "Exam";	    	 
+   }
+	
 }

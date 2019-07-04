@@ -75,10 +75,10 @@ public class RegisterServiceImpl implements RegisterService {
 		System.out.println(list.size());//输出list的size试试
 		if (list.size() > 0) {//表示数据库中有重复的信息
 			list.get(0);
-			return 0;//返回false
+			return 0;//返回false，说明登录名重复
 		} else {
 		//判断list.size（）是1 ， 取list.get(0) ,返回1个Userifno
-		return 1;//返回正确
+		return 1;//返回正确，登录名不重复
 		}
 		
 		
@@ -107,9 +107,9 @@ public class RegisterServiceImpl implements RegisterService {
 		
 		int i = userInfoMapper.insert(u);
 		if (i>0) {
-			return 1;
+			return 1;//添加成功
 		} else {
-			return 0;
+			return 0;//添加失败
 		}
 		
 		

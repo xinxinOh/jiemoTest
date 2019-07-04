@@ -13,13 +13,13 @@
 
 		<script src="layui/layui.js" th:src="@{static/layui/layui.js}"></script>
 		<style type="text/css">
-		#pic {
-			width: 50px;
-			height: 50px;
-			border-radius: 50%;
-			cursor: pointer;
-		}
-	</style>
+			#pic {
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				cursor: pointer;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -56,7 +56,7 @@
 					<ul class="layui-nav layui-layout-right">
 						<li class="layui-nav-item">
 							<a href="javascript:;" class="header-font-color">
-								<img src="/upload" id="g" class="layui-nav-img">  贤心
+								<img src="http://t.cn/RCzsdCq" id="g" class="layui-nav-img"> 贤心
 							</a>
 							<dl class="layui-nav-child">
 								<dd>
@@ -68,7 +68,7 @@
 							</dl>
 						</li>
 						<li class="layui-nav-item header-font-color">
-							<a class="header-font-color" href="">退出登录</a>
+							<a class="header-font-color" href="loginout">退出登录</a>
 						</li>
 					</ul>
 				</div>
@@ -102,20 +102,22 @@
 						<br />
 						<div class="fw_conent" style="color:black;">
 							<!--内容开始------------------------------>
-							
+
 							<table width="100%" border="0" cellspacing="0" cellpadding="0" class="zwfb_shop_table">
-								<form method="post" action="upload" enctype="multipart/form-data">
+								<form method="post" action="upload" id="form1" enctype="multipart/form-data">
+									<!-- enctype="multipart/form-data" -->
 									<div class="gmxz_tip">
 
 										<label class="layui-form-label">头像</label>
-										<img id="pic" src="" >
+										<img id="pic" src="http://t.cn/RCzsdCq">
 										<!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
-										<input type="file" id="test1" name="file" value="上传头像" style="display: none;" ></input>
+										<input type="file" id="test1" name="file" value="上传头像" style="display: none;"></input>
+										<input type="submit" name="file" value="上传头像" style="background-color: darkseagreen;"></input>
+
 								</form>
 								<br />
 								<br />
-
-								<form method="post" action="userEdit">
+								<form method="post" action="userEdit" id="form">
 									<div class="layui-form-item">
 										<div class="layui-inline">
 											<label class="layui-form-label">用户ID</label>
@@ -129,7 +131,7 @@
 											<div class="layui-inline">
 												<label class="layui-form-label">昵称</label>
 												<div class="layui-input-inline">
-													<input type="text" id="nickname" placeholder="用户名昵称" name="nickname" lay-verify="required|nickname" autocomplete="off" class="layui-input" />
+													<input type="text" id="nickname" placeholder="用户名昵称" th:value="${session.user.nickname}" name="nickname" lay-verify="required|nickname" autocomplete="off" class="layui-input" />
 												</div>
 											</div>
 										</div>
@@ -158,7 +160,6 @@
 											</div>
 										</div>
 										<br />
-										
 
 										<div class="layui-form-item layui-form-text">
 											<label class="layui-form-label">个人简介</label>
@@ -169,7 +170,7 @@
 
 										<div class="layui-form-item">
 											<div class="layui-input-block">
-												<button class="layui-btn" type="button" id="tijiao" lay-filter="demo1">提交</button>
+												<button class="layui-btn" type="submit" id="tijiao" lay-filter="demo1">提交</button>
 												<button type="reset" id="chongzhi" class="layui-btn layui-btn-primary">重置</button>
 											</div>
 										</div>
@@ -187,18 +188,18 @@
 
 				<div class="layui-footer" style="margin-left: 20px;border-left: 1px solid darkseagreen;background-color: #FFF;">
 					<!-- 底部固定区域 -->
-					© layui.com - 底部固定区域
+
 				</div>
 			</div>
 			<!--头像问题处理-->
 			<script type="text/javascript">
-				$(function () {
-					$("#pic").click(function () {
+				$(function() {
+					$("#pic").click(function() {
 						$("#test1").click(); //隐藏了input:file样式后，点击头像就可以本地上传
-						
-						$("#test1").on("change", function () {
+
+						$("#test1").on("change", function() {
 							var objUrl = getObjectURL(this.files[0]); //获取图片的路径，该路径不是图片在本地的路径
-							if (objUrl) {
+							if(objUrl) {
 								$("#pic").attr("src", objUrl); //将图片路径存入src中，显示出图片
 								$("#g").attr("src", objUrl);
 							}
@@ -208,17 +209,15 @@
 				//建立一個可存取到該file的url
 				function getObjectURL(file) {
 					var url = "/upload";
-					if (window.createObjectURL != undefined) { //basic
+					if(window.createObjectURL != undefined) { //basic
 						url = window.createObjectURL(file);
-					} else if (window.URL != undefined) { //mozilla(firefox) 
+					} else if(window.URL != undefined) { //mozilla(firefox) 
 						url = window.URL.createObjectURL(file);
-					} else if (window.webkitURL != undefined) { //webkit or chrome
+					} else if(window.webkitURL != undefined) { //webkit or chrome
 						url = window.webkitURL.createObjectURL(file);
 					}
 					return url;
 				}
-
-
 			</script>
 			<script type="text/javascript">
 				//JavaScript代码区域
@@ -227,7 +226,9 @@
 
 				});
 				$(document).ready(function() {
-
+					if(($('#nickname').val() == '') || ($('#email').val() == '') || ($('#phonenumber').val() == '') || ($('#introduction').val() == '') || ($('#password').val() == '')) {
+						alert('若编辑个人信息，请填写所有可输入框中信息');
+					}
 					//					$.ajax({
 					//						dataType: 'json',
 					//						url: 'userEdit',
@@ -257,38 +258,46 @@
 			</script>
 
 			<script type="text/javascript">
-				$(function() {
-					$("#tijiao").click(function() {
-						var p1 = $('#nickname').val();
-						var p2 = $('#email').val();
-						var p3 = $('#phonenumber').val();
-						var p4 = $('#introduction').val();
-						var p5 = $('#userid').val();
-						var p6 = $('#password').val();
-						
-						var u = {
-							'nickname': p1,
-							'email': p2,
-							'phonenumber': p3,
-							'userid':p5,
-							'introduction': p4,
-							'password':p6
-						}; //包装成一个对象
-						$.ajax({
-							url: 'userEdit',
-							type: 'post',
-							contentType: 'application/json;charset=utf-8',
-							data: JSON.stringify(u), //转换成json格式的字符串，传到后台
-							dataType: "text", //返回类型
-							success: function(e) {
-								alert(e);
-							},
-							error: function() {
-								alert('编辑信息提交失败');
-							}
-						});
+			$(function() {
 
+				$("#tijiao").click(function() {
+				if(($('#nickname').val() == '') || ($('#password').val() == '') || ($('#email').val() == '') || ($('#phonenumber').val() == '') || ($('#introduction').val() == '')){
+					alert('请输入完整的信息');
+				}else{
+					var p1 = $('#nickname').val();
+					var p2 = $('#email').val();
+					var p3 = $('#phonenumber').val();
+					var p4 = $('#introduction').val();
+					var p5 = $('#userid').val();
+					var p6 = $('#password').val();
+
+					var u = {
+						'nickname': p1,
+						'email': p2,
+						'phonenumber': p3,
+						'userid': p5,
+						'introduction': p4,
+						'password': p6
+					}; //包装成一个对象
+
+					$.ajax({
+						async: false,
+						url: 'userEdit',
+						type: 'post',
+						contentType: 'application/json;charset=utf-8', //必定会发送给服务器（即使没有数据要发送）
+						data: JSON.stringify(u), //转换成json格式的字符串，传到后台
+						//processData: false,// 告诉jQuery不要去处理发送的数据
+						dataType: "text", //返回类型
+						success: function(e) {
+							alert(e);
+						},
+						error: function() {
+							alert('编辑信息提交失败');
+						}
 					});
+				}
+
+				});
 
 				});
 

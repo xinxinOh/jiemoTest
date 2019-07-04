@@ -116,8 +116,8 @@
 
 				
 				if(($('#username').val() == '') || ($('#password').val() == '')){
-					alert('请输入用户名和密码');
-				}
+					alert('请输入登录名和密码');
+				}else{
 				
 				var p1 = $('#username').val().trim();
 				var p2 = $('#password').val().trim();
@@ -133,13 +133,18 @@
 					contentType: 'application/json;charset=utf-8',
 					data: JSON.stringify(u), //转换成json格式的字符串，传到后台
 					dataType: "text", //返回类型
-					success: function(e) {
-						alert(e);
+					success: function(result) {
+						if(result=='Exam'){
+							window.location.href = 'toExam1111';
+							}else{
+								alert(result);
+							}
 					},
 					error: function() {
 						alert('提交失败');
 					}
 				});
+				}
 
 			});
 
@@ -152,19 +157,7 @@
 		</script>
 		
 		
-		<script type="text/javascript">
-		
-//		$(function() {
-//			
-//				
-//					
-//					
-//
-//				
-//		
-//		});
-		
-		</script>
+
 		
 	</body>
 
