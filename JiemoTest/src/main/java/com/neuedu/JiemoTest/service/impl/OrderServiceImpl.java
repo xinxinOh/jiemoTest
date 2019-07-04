@@ -1,5 +1,6 @@
 package com.neuedu.JiemoTest.service.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,23 +49,40 @@ public class OrderServiceImpl implements OrderService{
 		criteria.andOrdertypeEqualTo(type);
 		
 		List<Order1> order1s = orderMapper.selectByExample(example);
-		
+		List<Order1> orderRemove = new ArrayList<Order1>();
 		//为分享则goodid存的查找分享的用户的id,设置相应值
 		if (type==0) {
 			for (Order1 order1 : order1s) {
 				//分享者
 				order1.setSpare3(userMapper.selectByPrimaryKey(order1.getSpare1()).getNickname());
 				//题库名
-				order1.setSpare4(bankMapper.selectByPrimaryKey(order1.getGoodsid()).getBankname());
+				try {
+					order1.setSpare4(bankMapper.selectByPrimaryKey(order1.getGoodsid()).getBankname());
+				}catch (Exception e) {
+					// TODO: handle exception
+					orderMapper.deleteByPrimaryKey(order1.getOrderid());
+					//删除已被删除题库的分享
+					orderRemove.add(order1);
+				}
 			}
 		}else {
 			//设置商品名
 			for (Order1 order1 : order1s) {
 				//商品名
-				order1.setSpare3(goodsMapper.selectByPrimaryKey(order1.getGoodsid()).getSpare3());
+				try {
+					order1.setSpare3(goodsMapper.selectByPrimaryKey(order1.getGoodsid()).getSpare3());
+				}catch (Exception e) {
+					// TODO: handle exceptio
+					orderMapper.deleteByPrimaryKey(order1.getOrderid());
+					//删除已被删除题库的分享
+					orderRemove.add(order1);
+				}
 			}
 		}
 		
+		for(Order1 order1 : orderRemove) {
+			order1s.remove(order1);
+		}
 		return order1s;
 	}
 
